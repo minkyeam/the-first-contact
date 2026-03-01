@@ -371,6 +371,41 @@
         padding-left: 8px;
         padding-bottom: calc(max(120px, env(safe-area-inset-bottom) + 96px) + var(--keyboard-offset));
       }
+
+      #gameScreen {
+        display: grid;
+        gap: 10px;
+      }
+
+      #commandBar {
+        order: -1;
+        position: sticky;
+        top: max(4px, env(safe-area-inset-top));
+        z-index: 20;
+        background: rgba(5, 16, 7, 0.95);
+        border: 1px solid var(--line);
+        padding: 8px;
+      }
+
+      #gameScreen .level {
+        order: 1;
+      }
+
+      #gameScreen .hint {
+        order: 2;
+      }
+
+      #gameScreen .palette {
+        order: 3;
+      }
+
+      #gameScreen .status {
+        order: 4;
+      }
+
+      #gameScreen .done {
+        order: 5;
+      }
     }
   </style>
 </head>
@@ -418,7 +453,7 @@ COMMAND: PRESS START TO BEGIN</pre>
           <div id="paletteGrid" class="palette-grid"></div>
         </section>
 
-        <section class="input-area">
+        <section id="commandBar" class="input-area">
           <label class="prompt-input" for="commandInput">
             <span class="prompt-mark">$</span>
             <input id="commandInput" type="text" autocomplete="off" spellcheck="false" aria-label="명령어 입력" />
@@ -739,6 +774,7 @@ COMMAND: PRESS START TO BEGIN</pre>
       levelTitle: document.getElementById('levelTitle'),
       sceneArt: document.getElementById('sceneArt'),
       sceneDesc: document.getElementById('sceneDesc'),
+      commandBar: document.getElementById('commandBar'),
       compatNote: document.getElementById('compatNote'),
       externalOpenHelp: document.getElementById('externalOpenHelp'),
       externalOpenLink: document.getElementById('externalOpenLink'),
@@ -932,6 +968,9 @@ COMMAND: PRESS START TO BEGIN</pre>
     function ensureInputVisible() {
       const active = document.activeElement;
       if (active !== ui.commandInput) return;
+      if (window.innerWidth <= 768 && ui.commandBar) {
+        ui.commandBar.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }
       const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
       const rect = ui.commandInput.getBoundingClientRect();
       const overlap = rect.bottom - viewportHeight + 18;
