@@ -747,6 +747,15 @@ COMMAND: PRESS START TO BEGIN</pre>
         .replace(/\s+/g, ' ');
     }
 
+    function findStageByCommand(commandText, startIndex) {
+      for (let index = startIndex; index < levels.length; index += 1) {
+        if (normalizeCommand(levels[index].command) === commandText) {
+          return index;
+        }
+      }
+      return -1;
+    }
+
     function pickKoreanVoice() {
       const voices = speechSynthesis.getVoices();
       koreanVoice = voices.find(v => /ko-KR/i.test(v.lang) && /google|enhanced|premium/i.test(v.name))
@@ -822,6 +831,13 @@ COMMAND: PRESS START TO BEGIN</pre>
       if (answer === expected) {
         completeLevel();
       } else {
+        const jumpIndex = findStageByCommand(answer, currentLevel + 1);
+        if (jumpIndex !== -1) {
+          currentLevel = jumpIndex;
+          setStatus('OK> STAGE JUMP. COMMAND ACCEPTED.', 'ok');
+          completeLevel();
+          return;
+        }
         setStatus('ERR> INVALID COMMAND. TRY AGAIN OR PRESS REPEAT.', 'err');
         speak(`괜찮아, 다시 해보자. 정답은 ${level.command.toUpperCase()}. ${commandToSpellingKo(level.command)}.`, { rate: 0.88 });
       }
