@@ -32,7 +32,7 @@
 
     body {
       margin: 0;
-      font-family: "RetroDOS", "Lucida Console", "Courier New", monospace;
+      font-family: "RetroDOS", "D2Coding", "NanumGothicCoding", "GulimChe", "Lucida Console", "Courier New", monospace;
       color: var(--text);
       background:
         repeating-linear-gradient(
@@ -151,10 +151,11 @@
     pre {
       margin: 0;
       font-size: clamp(14px, 2.1vw, 18px);
-      line-height: 1.35;
+      line-height: 1.3;
       color: #e8fdf2;
-      white-space: pre-wrap;
-      word-break: break-word;
+      white-space: pre;
+      overflow-x: auto;
+      letter-spacing: 0;
     }
 
     .desc {
@@ -414,7 +415,7 @@ COMMAND: PRESS START TO BEGIN</pre>
       );
     }
 
-    const levels = [
+    const baseLevels = [
       {
         title: 'Lv.1 마법의 방',
         command: 'on',
@@ -589,6 +590,48 @@ COMMAND: PRESS START TO BEGIN</pre>
       }
     ];
 
+    function expandStages(levels) {
+      const normalizeTitle = title => title.replace(/^Lv\.\d+\s*/, '').trim();
+      const stages = [];
+      for (const level of levels) {
+        stages.push({
+          stageName: normalizeTitle(level.title),
+          command: level.command,
+          artBefore: level.artBefore,
+          artAfter: level.artAfter,
+          descBefore: level.descBefore,
+          descAfter: level.descAfter,
+          contextTTS: level.contextTTS,
+          rewardTTS: level.rewardTTS,
+          themeColor: null,
+          showPalette: level.command === 'paint'
+        });
+
+        for (const [detailKey, detailValue] of Object.entries(level.details || {})) {
+          const baseTitle = normalizeTitle(level.title);
+          stages.push({
+            stageName: `${baseTitle} / ${detailKey.toUpperCase()}`,
+            command: `${level.command}-${detailKey}`,
+            artBefore: level.artAfter,
+            artAfter: detailValue.artAfter || level.artAfter,
+            descBefore: `${level.descAfter} 이제 ${detailKey.toUpperCase()} 스테이지예요.`,
+            descAfter: detailValue.descAfter || level.descAfter,
+            contextTTS: `${detailKey.toUpperCase()} 스테이지예요. ${level.command.toUpperCase()} 대시 ${detailKey.toUpperCase()}를 입력해요.`,
+            rewardTTS: detailValue.rewardTTS || level.rewardTTS,
+            themeColor: detailValue.themeColor || null,
+            showPalette: level.command === 'paint'
+          });
+        }
+      }
+
+      return stages.map((stage, index) => ({
+        ...stage,
+        title: `Lv.${index + 1} ${stage.stageName}`
+      }));
+    }
+
+    const levels = expandStages(baseLevels);
+
     const ui = {
       startScreen: document.getElementById('startScreen'),
       gameScreen: document.getElementById('gameScreen'),
@@ -645,22 +688,30 @@ COMMAND: PRESS START TO BEGIN</pre>
 
     function commandToSpellingKo(command) {
       return command
-        .toUpperCase()
         .split('')
-        .map(letter => letterKo[letter] || letter)
+        .map(ch => {
+          if (ch === '-') return '대시';
+          const upper = ch.toUpperCase();
+          return letterKo[upper] || upper;
+        })
         .join(', ');
+    }
+
+    function normalizeArt(art) {
+      const lines = art.replace(/\r/g, '').split('\n');
+      if (lines[0] === '') lines.shift();
+      while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
+      const minIndent = lines
+        .filter(line => line.trim().length > 0)
+        .reduce((min, line) => Math.min(min, line.match(/^ */)[0].length), Infinity);
+      const indent = Number.isFinite(minIndent) ? minIndent : 0;
+      return lines.map(line => line.slice(indent).replace(/\s+$/g, '')).join('\n');
     }
 
     function buildIntroTTS(level) {
       const commandUpper = level.command.toUpperCase();
       const spellingKo = commandToSpellingKo(level.command);
-      const details = Object.keys(level.details || {});
-      const detailGuide = details.length ? `세부 명령도 할 수 있어.` : '';
-      const countGuide = details.length ? `가능한 세부 명령은 모두 ${details.length}가지.` : '';
-      const sampleGuide = details.length
-        ? `예시는 ${commandUpper}-${details[0].toUpperCase()}${details[1] ? `, ${commandUpper}-${details[1].toUpperCase()}` : ''}.`
-        : '';
-      return `${level.contextTTS} 정답 명령어는 ${commandUpper}. 천천히 눌러보자. ${spellingKo}. ${detailGuide} ${countGuide} ${sampleGuide}`;
+      return `${level.contextTTS} 정답 명령어는 ${commandUpper}. 철자는 ${spellingKo}.`;
     }
 
     function resetTheme() {
@@ -675,7 +726,7 @@ COMMAND: PRESS START TO BEGIN</pre>
     }
 
     function renderPalette(level) {
-      if (level.command !== 'paint') {
+      if (!level.showPalette) {
         ui.palettePanel.classList.add('hidden');
         ui.paletteGrid.innerHTML = '';
         return;
@@ -685,44 +736,6 @@ COMMAND: PRESS START TO BEGIN</pre>
       ui.paletteGrid.innerHTML = ansi16Palette
         .map(color => `<div class="palette-chip"><span class="swatch" style="background:${color.hex}"></span><span class="chip-cmd">[${color.idx}] paint-${color.key}</span></div>`)
         .join('');
-    }
-
-    function buildShortDetailVoice(level) {
-      const details = Object.keys(level.details || {});
-      if (!details.length) return '';
-      const top = details.slice(0, 4).map(detail => `-${detail}`).join(', ');
-      const rest = details.length > 4 ? ` 외 ${details.length - 4}가지` : '';
-      return `${top}${rest}`;
-    }
-
-    function buildDetailHint(level) {
-      const details = Object.keys(level.details || {});
-      if (!details.length) return '';
-      if (details.length > 8) {
-        return ` | DETAIL: ${details.slice(0, 8).map(detail => `-${detail}`).join(' ')} ...(+${details.length - 8})`;
-      }
-      return ` | DETAIL: ${details.map(detail => `-${detail}`).join(' ')}`;
-    }
-
-    function parseAnswer(level, answer) {
-      if (answer === level.command) {
-        return { ok: true, variant: null };
-      }
-
-      if (!answer.startsWith(`${level.command}-`)) {
-        return { ok: false, reason: 'base' };
-      }
-
-      const detailKey = answer.slice(level.command.length + 1).trim();
-      if (!detailKey) {
-        return { ok: false, reason: 'detail' };
-      }
-
-      const variant = level.details?.[detailKey];
-      if (!variant) {
-        return { ok: false, reason: 'detail' };
-      }
-      return { ok: true, variant };
     }
 
     function pickKoreanVoice() {
@@ -755,28 +768,25 @@ COMMAND: PRESS START TO BEGIN</pre>
       resetTheme();
       renderPalette(level);
       ui.levelTitle.textContent = level.title;
-      ui.sceneArt.textContent = level.artBefore;
+      ui.sceneArt.textContent = normalizeArt(level.artBefore);
       ui.sceneDesc.textContent = level.descBefore;
       ui.commandText.textContent = level.command.toUpperCase();
-      ui.spellingText.textContent = `철자 힌트: ${level.spelling} (${commandToSpellingKo(level.command)})${buildDetailHint(level)}`;
+      ui.spellingText.textContent = `철자 힌트: ${level.command.toUpperCase()} (${commandToSpellingKo(level.command)})`;
       ui.commandInput.value = '';
       ui.commandInput.focus();
       setStatus('SYS> VOICE GUIDE READY. TYPE THE COMMAND.');
       speak(buildIntroTTS(level), { rate: 0.88 });
     }
 
-    function completeLevel(variant = null) {
+    function completeLevel() {
       const level = levels[currentLevel];
-      const artAfter = variant?.artAfter || level.artAfter;
-      const descAfter = variant?.descAfter || level.descAfter;
-      const rewardTTS = variant?.rewardTTS || level.rewardTTS;
-      const themeColor = variant?.themeColor || null;
+      const themeColor = level.themeColor || null;
 
-      ui.sceneArt.textContent = artAfter;
-      ui.sceneDesc.textContent = descAfter;
+      ui.sceneArt.textContent = normalizeArt(level.artAfter);
+      ui.sceneDesc.textContent = level.descAfter;
       applyTheme(themeColor);
       setStatus('OK> MISSION CLEARED. LOADING NEXT LEVEL...', 'ok');
-      speak(rewardTTS, { rate: 0.9 });
+      speak(level.rewardTTS, { rate: 0.9 });
 
       setTimeout(() => {
         currentLevel += 1;
@@ -798,18 +808,12 @@ COMMAND: PRESS START TO BEGIN</pre>
       if (currentLevel >= levels.length) return;
       const level = levels[currentLevel];
       const answer = ui.commandInput.value.trim().toLowerCase();
-      const parsed = parseAnswer(level, answer);
 
-      if (parsed.ok) {
-        completeLevel(parsed.variant);
+      if (answer === level.command) {
+        completeLevel();
       } else {
-        const detailHint = buildShortDetailVoice(level);
         setStatus('ERR> INVALID COMMAND. TRY AGAIN OR PRESS REPEAT.', 'err');
-        if (parsed.reason === 'detail') {
-          speak(`거의 맞았어. ${level.command.toUpperCase()} 뒤에 세부 명령어를 붙여보자. 예를 들면 ${detailHint}.`, { rate: 0.88 });
-        } else {
-          speak(`괜찮아, 다시 해보자. 정답은 ${level.command.toUpperCase()}. ${commandToSpellingKo(level.command)}.`, { rate: 0.88 });
-        }
+        speak(`괜찮아, 다시 해보자. 정답은 ${level.command.toUpperCase()}. ${commandToSpellingKo(level.command)}.`, { rate: 0.88 });
       }
     }
 
