@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Little Hacker's Quest - Voice Edition</title>
+  <style>
+    @font-face {
+      font-family: "RetroDOS";
+      src:
+        local("Perfect DOS VGA 437 Win"),
+        local("Px437 IBM VGA8"),
+        local("Fixedsys Excelsior 3.01");
+    }
+
+    :root {
+      --bg: #050505;
+      --bg-alt: #0f1110;
+      --panel: #0a0d0a;
+      --accent: #00ff7f;
+      --accent-2: #ffd43b;
+      --text: #d2ffd2;
+      --muted: #84b484;
+      --danger: #ff6b6b;
+      --success: #6dff9b;
+      --line: #224422;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "RetroDOS", "Lucida Console", "Courier New", monospace;
+      color: var(--text);
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(0, 255, 127, 0.03) 0,
+          rgba(0, 255, 127, 0.03) 1px,
+          transparent 1px,
+          transparent 3px
+        ),
+        radial-gradient(circle at 12% 10%, #183018 0%, transparent 28%),
+        radial-gradient(circle at 88% 90%, #2f1e0d 0%, transparent 26%),
+        linear-gradient(180deg, var(--bg-alt) 0%, var(--bg) 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app {
+      width: min(920px, 100%);
+      border: 2px solid var(--accent);
+      border-radius: 0;
+      background: rgba(5, 8, 5, 0.95);
+      box-shadow: 0 0 0 2px #011a01 inset, 0 18px 42px rgba(0, 0, 0, 0.55);
+      overflow: hidden;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: #070c07;
+      border-bottom: 1px solid var(--line);
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      margin: 0;
+      color: var(--accent);
+      font-size: clamp(14px, 2.6vw, 20px);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .controls {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      border: 1px solid var(--line);
+      padding: 6px 8px;
+      background: #061006;
+    }
+
+    .main {
+      padding: 14px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .start-screen {
+      display: grid;
+      gap: 12px;
+      justify-items: start;
+      text-align: left;
+      padding: 8px 4px;
+    }
+
+    .boot {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+      border: 1px solid var(--line);
+      background: #071007;
+      padding: 10px;
+    }
+
+    .start-btn {
+      border: 1px solid var(--accent);
+      border-radius: 0;
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: clamp(16px, 2.8vw, 20px);
+      color: var(--accent);
+      background: #052205;
+      cursor: pointer;
+      box-shadow: none;
+      text-transform: uppercase;
+    }
+
+    .start-btn:hover {
+      background: #0b330b;
+    }
+
+    .level {
+      border: 1px solid var(--line);
+      border-radius: 0;
+      padding: 12px;
+      background: rgba(8, 16, 8, 0.85);
+      min-height: 240px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .level-title {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 16px;
+      letter-spacing: 0.04em;
+    }
+
+    pre {
+      margin: 0;
+      font-size: clamp(14px, 2.1vw, 18px);
+      line-height: 1.35;
+      color: #e8fdf2;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .desc {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .hint {
+      border: 1px solid #574400;
+      background: rgba(80, 64, 8, 0.16);
+      border-radius: 0;
+      padding: 10px;
+      font-size: 14px;
+      color: #ffeeb0;
+    }
+
+    .command {
+      color: var(--accent-2);
+      font-size: clamp(24px, 5vw, 34px);
+      margin: 4px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .palette {
+      border: 1px solid #27462f;
+      background: rgba(9, 18, 9, 0.8);
+      padding: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .palette-title {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 6px;
+    }
+
+    .palette-chip {
+      border: 1px solid #254025;
+      background: #071007;
+      padding: 5px 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+    }
+
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border: 1px solid #0c0c0c;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .chip-cmd {
+      color: #cfe8cf;
+      font-size: 11px;
+      letter-spacing: 0.02em;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .prompt-input {
+      flex: 1 1 260px;
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: #061106;
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      gap: 8px;
+    }
+
+    .prompt-mark {
+      color: var(--accent);
+      font-size: 18px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: var(--text);
+      padding: 0;
+      font-family: inherit;
+      font-size: 18px;
+      outline: none;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 0;
+      padding: 9px 12px;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      background: #071207;
+      color: var(--text);
+      text-transform: uppercase;
+    }
+
+    button:hover {
+      background: #0f1d0f;
+      color: var(--accent);
+    }
+
+    .status {
+      min-height: 24px;
+      font-size: 14px;
+      color: var(--muted);
+      border-top: 1px dashed var(--line);
+      padding-top: 8px;
+    }
+
+    .status.ok {
+      color: var(--success);
+    }
+
+    .status.err {
+      color: var(--danger);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .done {
+      text-align: center;
+      font-size: clamp(18px, 2.8vw, 24px);
+      color: var(--success);
+      padding: 16px 12px;
+      border: 1px solid #2b6b43;
+      border-radius: 0;
+      background: rgba(15, 40, 20, 0.35);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" aria-live="polite">
+    <header class="header">
+      <h1 class="title">$ LHQ Voice Terminal v1.6 (16-BIT)</h1>
+      <div class="controls">
+        <label>
+          <input id="letterSoundToggle" type="checkbox" checked />
+          KEY SOUND ON
+        </label>
+      </div>
+    </header>
+
+    <section class="main">
+      <section id="startScreen" class="start-screen">
+        <pre class="boot">BOOT: LITTLE HACKER'S QUEST (VOICE)
+STATUS: READY
+AUDIO: KO-KR TTS CONNECTED
+COMMAND: PRESS START TO BEGIN</pre>
+        <button id="startBtn" class="start-btn" type="button">[ START MISSION ]</button>
+      </section>
+
+      <section id="gameScreen" class="hidden">
+        <article class="level" id="levelCard">
+          <h2 class="level-title" id="levelTitle"></h2>
+          <pre id="sceneArt"></pre>
+          <p class="desc" id="sceneDesc"></p>
+        </article>
+
+        <section class="hint">
+          <strong>&gt; NEXT COMMAND</strong>
+          <p class="command" id="commandText"></p>
+          <p id="spellingText"></p>
+        </section>
+
+        <section id="palettePanel" class="palette hidden">
+          <p class="palette-title">16-COLOR PALETTE / PAINT SUBCOMMANDS</p>
+          <div id="paletteGrid" class="palette-grid"></div>
+        </section>
+
+        <section class="input-area">
+          <label class="prompt-input" for="commandInput">
+            <span class="prompt-mark">$</span>
+            <input id="commandInput" type="text" autocomplete="off" spellcheck="false" aria-label="명령어 입력" />
+          </label>
+          <button id="submitBtn" type="button">[ ENTER ] RUN</button>
+          <button id="repeatBtn" type="button">[ F1 ] REPEAT VOICE</button>
+        </section>
+
+        <p id="status" class="status"></p>
+        <section id="doneBox" class="done hidden"></section>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const ansi16Palette = [
+      { idx: 0, key: 'black', ko: '검정', hex: '#000000' },
+      { idx: 1, key: 'maroon', ko: '적갈', hex: '#800000' },
+      { idx: 2, key: 'green', ko: '초록', hex: '#008000' },
+      { idx: 3, key: 'olive', ko: '올리브', hex: '#808000' },
+      { idx: 4, key: 'navy', ko: '남색', hex: '#000080' },
+      { idx: 5, key: 'purple', ko: '보라', hex: '#800080' },
+      { idx: 6, key: 'teal', ko: '청록', hex: '#008080' },
+      { idx: 7, key: 'silver', ko: '은색', hex: '#c0c0c0' },
+      { idx: 8, key: 'gray', ko: '회색', hex: '#808080' },
+      { idx: 9, key: 'red', ko: '빨강', hex: '#ff0000' },
+      { idx: 10, key: 'lime', ko: '라임', hex: '#00ff00' },
+      { idx: 11, key: 'yellow', ko: '노랑', hex: '#ffff00' },
+      { idx: 12, key: 'blue', ko: '파랑', hex: '#0000ff' },
+      { idx: 13, key: 'fuchsia', ko: '자홍', hex: '#ff00ff' },
+      { idx: 14, key: 'aqua', ko: '아쿠아', hex: '#00ffff' },
+      { idx: 15, key: 'white', ko: '하양', hex: '#ffffff' }
+    ];
+
+    function createPaintDetails() {
+      return Object.fromEntries(
+        ansi16Palette.map(color => [
+          color.key,
+          {
+            descAfter: `캔버스를 ${color.ko}색으로 칠했어요! (${color.hex})`,
+            artAfter: String.raw`
+  .------------------------.
+  |      16-BIT CANVAS     |
+  |      COLOR: ${color.key.toUpperCase().padEnd(8, ' ')} |
+  |      ████████████      |
+  '------------------------'
+`,
+            rewardTTS: `좋아! ${color.ko}색으로 칠하기 성공!`,
+            themeColor: color.hex
+          }
+        ])
+      );
+    }
+
+    const levels = [
+      {
+        title: 'Lv.1 마법의 방',
+        command: 'on',
+        spelling: 'O, N',
+        artBefore: String.raw`
+  .--------------------.
+  |      (어두운 방)     |
+  |        ....         |
+  |       ......        |
+  '--------------------'
+`,
+        artAfter: String.raw`
+  .--------------------.
+  |      (밝은 방)       |
+  |      \  ☀  /        |
+  |       \ | /         |
+  '--------------------'
+`,
+        descBefore: '방이 아주 어두워 보여요.',
+        descAfter: '우와! 방이 환하게 밝아졌어요.',
+        contextTTS: '방이 너무 어두워요. 불을 켜 주면 좋겠어요.',
+        rewardTTS: '우와, 성공이야! 방이 정말 환해졌네. 아주 잘했어!',
+        details: {
+          rainbow: {
+            descAfter: '불이 켜지며 무지개 조명이 반짝여요!',
+            artAfter: String.raw`
+  .--------------------.
+  |   (무지개 모드 ON)   |
+  |   * R A I N B O W * |
+  |      \  ✨  /        |
+  '--------------------'
+`,
+            rewardTTS: '와! 무지개 조명이 켜졌어. 반짝반짝 정말 예쁘다!'
+          },
+          stars: {
+            descAfter: '천장에 별빛이 가득 떠올랐어요.',
+            artAfter: String.raw`
+  .--------------------.
+  |     *  *  *  *     |
+  |   *  STAR LIGHT *  |
+  |     *  *  *  *     |
+  '--------------------'
+`,
+            rewardTTS: '멋져! 별빛 모드가 켜졌어. 밤하늘 같아!'
+          }
+        }
+      },
+      {
+        title: 'Lv.2 배고픈 강아지',
+        command: 'feed',
+        spelling: 'F, E, E, D',
+        artBefore: String.raw`
+ / \__
+(    @\___
+ /         O
+/   (_____/
+/_____/   U
+`,
+        artAfter: String.raw`
+ / \__
+(    ^\___   <3
+ /         O  <3
+/   (_____/
+/_____/   U
+`,
+        descBefore: '강아지 초코가 배가 고파 보여요.',
+        descAfter: '초코가 맛있게 먹고 하트를 보여줘요!',
+        contextTTS: '강아지 초코가 배가 고픈가 봐요. 밥을 주면 기뻐할 거예요.',
+        rewardTTS: '정답! 초코가 정말 맛있게 먹고 있어. 멍멍!',
+        details: {
+          icecream: {
+            descAfter: '초코가 아이스크림을 핥으며 신나게 꼬리를 흔들어요!',
+            artAfter: String.raw`
+ / \__
+(    ^\___   <3
+ /   🍦     O
+/   (_____/
+/_____/   U
+`,
+            rewardTTS: '오, FEED-ICECREAM 성공! 초코가 아이스크림을 정말 좋아하네!'
+          },
+          snack: {
+            descAfter: '바삭한 간식을 먹고 초코가 기분이 좋아졌어요.',
+            artAfter: String.raw`
+ / \__
+(    ^\___   <3
+ /  [SNACK] O
+/   (_____/
+/_____/   U
+`,
+            rewardTTS: '좋아! 초코가 간식을 아삭아삭 맛있게 먹고 있어!'
+          },
+          bone: {
+            descAfter: '커다란 뼈다귀를 받고 초코가 신나게 뛰어요.',
+            artAfter: String.raw`
+ / \__
+(    ^\___   <3
+ /   (==)   O
+/   (_____/
+/_____/   U
+`,
+            rewardTTS: '멋진 선택! 초코가 뼈다귀를 받고 신났어!'
+          }
+        }
+      },
+      {
+        title: 'Lv.3 잠든 로봇',
+        command: 'wake',
+        spelling: 'W, A, K, E',
+        artBefore: String.raw`
+   [ -_- ]
+  /|  z |\
+   |____|
+   /    \\
+`,
+        artAfter: String.raw`
+   [ ^_^ ]
+  /| HELLO|\
+   |____|
+   /    \\
+`,
+        descBefore: '로봇이 잠들어 있어요.',
+        descAfter: '로봇이 깨어나서 인사해요!',
+        contextTTS: '로봇이 잠들어 있어요. 살짝 깨워 볼까요?',
+        rewardTTS: '멋져! 로봇이 눈을 뜨고 인사했어. 이제 같이 놀 수 있어!',
+        details: {
+          dance: {
+            descAfter: '로봇이 깨어나자마자 댄스 모드로 흔들흔들 춤춰요!',
+            artAfter: String.raw`
+   [ ^o^ ]  ♫
+  /| DANCE|\
+   |____|
+   /    \\
+`,
+            rewardTTS: '와! WAKE-DANCE 성공. 로봇이 신나게 춤추고 있어!'
+          },
+          song: {
+            descAfter: '로봇이 깨어나고 귀여운 노래를 부르기 시작해요.',
+            artAfter: String.raw`
+   [ ^_^ ]  ♪
+  /| SING!|\
+   |____|
+   /    \\
+`,
+            rewardTTS: '좋아! WAKE-SONG 성공. 로봇의 노래가 들려!'
+          }
+        }
+      },
+      {
+        title: 'Lv.4 16비트 페인트',
+        command: 'paint',
+        spelling: 'P, A, I, N, T',
+        artBefore: String.raw`
+  .------------------------.
+  |      16-BIT CANVAS     |
+  |      COLOR: EMPTY      |
+  |      ............      |
+  '------------------------'
+`,
+        artAfter: String.raw`
+  .------------------------.
+  |      16-BIT CANVAS     |
+  |      COLOR: WHITE      |
+  |      ████████████      |
+  '------------------------'
+`,
+        descBefore: '색칠할 준비 완료! paint-색상 으로 16가지 색을 고를 수 있어요.',
+        descAfter: '캔버스를 멋지게 칠했어요!',
+        contextTTS: '이제 16비트 페인트 시간! paint 뒤에 하이픈과 색 이름을 넣어 보자.',
+        rewardTTS: '좋아! 멋진 색칠이 완성됐어!',
+        details: createPaintDetails()
+      }
+    ];
+
+    const ui = {
+      startScreen: document.getElementById('startScreen'),
+      gameScreen: document.getElementById('gameScreen'),
+      startBtn: document.getElementById('startBtn'),
+      levelCard: document.getElementById('levelCard'),
+      levelTitle: document.getElementById('levelTitle'),
+      sceneArt: document.getElementById('sceneArt'),
+      sceneDesc: document.getElementById('sceneDesc'),
+      commandText: document.getElementById('commandText'),
+      spellingText: document.getElementById('spellingText'),
+      palettePanel: document.getElementById('palettePanel'),
+      paletteGrid: document.getElementById('paletteGrid'),
+      commandInput: document.getElementById('commandInput'),
+      submitBtn: document.getElementById('submitBtn'),
+      repeatBtn: document.getElementById('repeatBtn'),
+      status: document.getElementById('status'),
+      doneBox: document.getElementById('doneBox'),
+      letterSoundToggle: document.getElementById('letterSoundToggle')
+    };
+
+    let currentLevel = 0;
+    let gameStarted = false;
+    let koreanVoice = null;
+    let lastLetterSpokenAt = 0;
+
+    const letterKo = {
+      A: '에이',
+      B: '비',
+      C: '씨',
+      D: '디',
+      E: '이',
+      F: '에프',
+      G: '지',
+      H: '에이치',
+      I: '아이',
+      J: '제이',
+      K: '케이',
+      L: '엘',
+      M: '엠',
+      N: '엔',
+      O: '오',
+      P: '피',
+      Q: '큐',
+      R: '알',
+      S: '에스',
+      T: '티',
+      U: '유',
+      V: '브이',
+      W: '더블유',
+      X: '엑스',
+      Y: '와이',
+      Z: '지'
+    };
+
+    function commandToSpellingKo(command) {
+      return command
+        .toUpperCase()
+        .split('')
+        .map(letter => letterKo[letter] || letter)
+        .join(', ');
+    }
+
+    function buildIntroTTS(level) {
+      const commandUpper = level.command.toUpperCase();
+      const spellingKo = commandToSpellingKo(level.command);
+      const details = Object.keys(level.details || {});
+      const detailGuide = details.length ? `세부 명령도 할 수 있어.` : '';
+      const countGuide = details.length ? `가능한 세부 명령은 모두 ${details.length}가지.` : '';
+      const sampleGuide = details.length
+        ? `예시는 ${commandUpper}-${details[0].toUpperCase()}${details[1] ? `, ${commandUpper}-${details[1].toUpperCase()}` : ''}.`
+        : '';
+      return `${level.contextTTS} 정답 명령어는 ${commandUpper}. 천천히 눌러보자. ${spellingKo}. ${detailGuide} ${countGuide} ${sampleGuide}`;
+    }
+
+    function resetTheme() {
+      ui.levelCard.style.borderColor = 'var(--line)';
+      ui.commandText.style.color = 'var(--accent-2)';
+    }
+
+    function applyTheme(color) {
+      if (!color) return;
+      ui.levelCard.style.borderColor = color;
+      ui.commandText.style.color = color;
+    }
+
+    function renderPalette(level) {
+      if (level.command !== 'paint') {
+        ui.palettePanel.classList.add('hidden');
+        ui.paletteGrid.innerHTML = '';
+        return;
+      }
+
+      ui.palettePanel.classList.remove('hidden');
+      ui.paletteGrid.innerHTML = ansi16Palette
+        .map(color => `<div class="palette-chip"><span class="swatch" style="background:${color.hex}"></span><span class="chip-cmd">[${color.idx}] paint-${color.key}</span></div>`)
+        .join('');
+    }
+
+    function buildShortDetailVoice(level) {
+      const details = Object.keys(level.details || {});
+      if (!details.length) return '';
+      const top = details.slice(0, 4).map(detail => `-${detail}`).join(', ');
+      const rest = details.length > 4 ? ` 외 ${details.length - 4}가지` : '';
+      return `${top}${rest}`;
+    }
+
+    function buildDetailHint(level) {
+      const details = Object.keys(level.details || {});
+      if (!details.length) return '';
+      if (details.length > 8) {
+        return ` | DETAIL: ${details.slice(0, 8).map(detail => `-${detail}`).join(' ')} ...(+${details.length - 8})`;
+      }
+      return ` | DETAIL: ${details.map(detail => `-${detail}`).join(' ')}`;
+    }
+
+    function parseAnswer(level, answer) {
+      if (answer === level.command) {
+        return { ok: true, variant: null };
+      }
+
+      if (!answer.startsWith(`${level.command}-`)) {
+        return { ok: false, reason: 'base' };
+      }
+
+      const detailKey = answer.slice(level.command.length + 1).trim();
+      if (!detailKey) {
+        return { ok: false, reason: 'detail' };
+      }
+
+      const variant = level.details?.[detailKey];
+      if (!variant) {
+        return { ok: false, reason: 'detail' };
+      }
+      return { ok: true, variant };
+    }
+
+    function pickKoreanVoice() {
+      const voices = speechSynthesis.getVoices();
+      koreanVoice = voices.find(v => /ko-KR/i.test(v.lang) && /google|enhanced|premium/i.test(v.name))
+        || voices.find(v => /ko-KR/i.test(v.lang))
+        || voices.find(v => /korean|한국/i.test(v.name))
+        || null;
+    }
+
+    function speak(text, options = {}) {
+      if (!gameStarted || !('speechSynthesis' in window)) return;
+      const interrupt = options.interrupt ?? true;
+      if (interrupt) speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'ko-KR';
+      utter.rate = options.rate ?? 0.9;
+      utter.pitch = options.pitch ?? 1.0;
+      if (koreanVoice) utter.voice = koreanVoice;
+      speechSynthesis.speak(utter);
+    }
+
+    function setStatus(text, type = '') {
+      ui.status.textContent = text;
+      ui.status.className = `status ${type}`.trim();
+    }
+
+    function renderLevel() {
+      const level = levels[currentLevel];
+      resetTheme();
+      renderPalette(level);
+      ui.levelTitle.textContent = level.title;
+      ui.sceneArt.textContent = level.artBefore;
+      ui.sceneDesc.textContent = level.descBefore;
+      ui.commandText.textContent = level.command.toUpperCase();
+      ui.spellingText.textContent = `철자 힌트: ${level.spelling} (${commandToSpellingKo(level.command)})${buildDetailHint(level)}`;
+      ui.commandInput.value = '';
+      ui.commandInput.focus();
+      setStatus('SYS> VOICE GUIDE READY. TYPE THE COMMAND.');
+      speak(buildIntroTTS(level), { rate: 0.88 });
+    }
+
+    function completeLevel(variant = null) {
+      const level = levels[currentLevel];
+      const artAfter = variant?.artAfter || level.artAfter;
+      const descAfter = variant?.descAfter || level.descAfter;
+      const rewardTTS = variant?.rewardTTS || level.rewardTTS;
+      const themeColor = variant?.themeColor || null;
+
+      ui.sceneArt.textContent = artAfter;
+      ui.sceneDesc.textContent = descAfter;
+      applyTheme(themeColor);
+      setStatus('OK> MISSION CLEARED. LOADING NEXT LEVEL...', 'ok');
+      speak(rewardTTS, { rate: 0.9 });
+
+      setTimeout(() => {
+        currentLevel += 1;
+        if (currentLevel >= levels.length) {
+          ui.doneBox.textContent = 'ALL MISSIONS COMPLETE :: LITTLE HACKER CERTIFIED';
+          ui.doneBox.classList.remove('hidden');
+          setStatus('OK> SESSION CLOSED. REFRESH TO PLAY AGAIN.', 'ok');
+          speak('모든 미션을 성공했어요! 오늘의 꼬마 해커로 임명!', { rate: 0.9 });
+          ui.submitBtn.disabled = true;
+          ui.repeatBtn.disabled = true;
+          ui.commandInput.disabled = true;
+          return;
+        }
+        renderLevel();
+      }, 1800);
+    }
+
+    function handleSubmit() {
+      if (currentLevel >= levels.length) return;
+      const level = levels[currentLevel];
+      const answer = ui.commandInput.value.trim().toLowerCase();
+      const parsed = parseAnswer(level, answer);
+
+      if (parsed.ok) {
+        completeLevel(parsed.variant);
+      } else {
+        const detailHint = buildShortDetailVoice(level);
+        setStatus('ERR> INVALID COMMAND. TRY AGAIN OR PRESS REPEAT.', 'err');
+        if (parsed.reason === 'detail') {
+          speak(`거의 맞았어. ${level.command.toUpperCase()} 뒤에 세부 명령어를 붙여보자. 예를 들면 ${detailHint}.`, { rate: 0.88 });
+        } else {
+          speak(`괜찮아, 다시 해보자. 정답은 ${level.command.toUpperCase()}. ${commandToSpellingKo(level.command)}.`, { rate: 0.88 });
+        }
+      }
+    }
+
+    function handleLetterSound(event) {
+      if (!ui.letterSoundToggle.checked || !gameStarted) return;
+      if (event.key.length !== 1) return;
+      if (!/[a-z]/i.test(event.key)) return;
+      const now = Date.now();
+      if (now - lastLetterSpokenAt < 80) return;
+      lastLetterSpokenAt = now;
+      const letter = event.key.toUpperCase();
+      speak(letterKo[letter] || letter, { rate: 0.82, pitch: 1.04, interrupt: false });
+    }
+
+    ui.startBtn.addEventListener('click', () => {
+      gameStarted = true;
+      pickKoreanVoice();
+      ui.startScreen.classList.add('hidden');
+      ui.gameScreen.classList.remove('hidden');
+      renderLevel();
+    });
+
+    ui.submitBtn.addEventListener('click', handleSubmit);
+    ui.repeatBtn.addEventListener('click', () => {
+      if (currentLevel < levels.length) {
+        speak(buildIntroTTS(levels[currentLevel]), { rate: 0.88 });
+      }
+    });
+
+    ui.commandInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        handleSubmit();
+      } else {
+        handleLetterSound(event);
+      }
+    });
+
+    if ('speechSynthesis' in window) {
+      speechSynthesis.onvoiceschanged = pickKoreanVoice;
+      pickKoreanVoice();
+    } else {
+      setStatus('ERR> THIS BROWSER DOES NOT SUPPORT TTS.', 'err');
+    }
+  </script>
+</body>
+</html>
