@@ -158,6 +158,23 @@
       letter-spacing: 0;
     }
 
+    .scene-art .fg-black { color: #000000; }
+    .scene-art .fg-maroon { color: #800000; }
+    .scene-art .fg-green { color: #008000; }
+    .scene-art .fg-olive { color: #808000; }
+    .scene-art .fg-navy { color: #000080; }
+    .scene-art .fg-purple { color: #800080; }
+    .scene-art .fg-teal { color: #008080; }
+    .scene-art .fg-silver { color: #c0c0c0; }
+    .scene-art .fg-gray { color: #808080; }
+    .scene-art .fg-red { color: #ff0000; }
+    .scene-art .fg-lime { color: #00ff00; }
+    .scene-art .fg-yellow { color: #ffff00; }
+    .scene-art .fg-blue { color: #0000ff; }
+    .scene-art .fg-fuchsia { color: #ff00ff; }
+    .scene-art .fg-aqua { color: #00ffff; }
+    .scene-art .fg-white { color: #ffffff; }
+
     .desc {
       margin-top: 10px;
       color: var(--muted);
@@ -345,7 +362,7 @@ COMMAND: PRESS START TO BEGIN</pre>
       <section id="gameScreen" class="hidden">
         <article class="level" id="levelCard">
           <h2 class="level-title" id="levelTitle"></h2>
-          <pre id="sceneArt"></pre>
+          <pre id="sceneArt" class="scene-art"></pre>
           <p class="desc" id="sceneDesc"></p>
         </article>
 
@@ -430,7 +447,7 @@ COMMAND: PRESS START TO BEGIN</pre>
         artAfter: String.raw`
   .--------------------.
   |      (밝은 방)       |
-  |      \  ☀  /        |
+  |      \ ON /         |
   |       \ | /         |
   '--------------------'
 `,
@@ -444,8 +461,8 @@ COMMAND: PRESS START TO BEGIN</pre>
             artAfter: String.raw`
   .--------------------.
   |   (무지개 모드 ON)   |
-  |   * R A I N B O W * |
-  |      \  ✨  /        |
+  | [RED]RR[/RED][YELLOW]YY[/YELLOW][LIME]GG[/LIME][AQUA]AA[/AQUA][BLUE]BB[/BLUE][FUCHSIA]PP[/FUCHSIA] |
+  |      \ RGB /        |
   '--------------------'
 `,
             rewardTTS: '와! 무지개 조명이 켜졌어. 반짝반짝 정말 예쁘다!'
@@ -476,8 +493,8 @@ COMMAND: PRESS START TO BEGIN</pre>
 `,
         artAfter: String.raw`
  / \__
-(    ^\___   <3
- /         O  <3
+(    ^\___ [HEART]
+ /         O [HEART]
 /   (_____/
 /_____/   U
 `,
@@ -490,8 +507,8 @@ COMMAND: PRESS START TO BEGIN</pre>
             descAfter: '초코가 아이스크림을 핥으며 신나게 꼬리를 흔들어요!',
             artAfter: String.raw`
  / \__
-(    ^\___   <3
- /   🍦     O
+(    ^\___ [HEART]
+ /   [ICE]  O
 /   (_____/
 /_____/   U
 `,
@@ -501,7 +518,7 @@ COMMAND: PRESS START TO BEGIN</pre>
             descAfter: '바삭한 간식을 먹고 초코가 기분이 좋아졌어요.',
             artAfter: String.raw`
  / \__
-(    ^\___   <3
+(    ^\___ [HEART]
  /  [SNACK] O
 /   (_____/
 /_____/   U
@@ -512,7 +529,7 @@ COMMAND: PRESS START TO BEGIN</pre>
             descAfter: '커다란 뼈다귀를 받고 초코가 신나게 뛰어요.',
             artAfter: String.raw`
  / \__
-(    ^\___   <3
+(    ^\___ [HEART]
  /   (==)   O
 /   (_____/
 /_____/   U
@@ -545,7 +562,7 @@ COMMAND: PRESS START TO BEGIN</pre>
           dance: {
             descAfter: '로봇이 깨어나자마자 댄스 모드로 흔들흔들 춤춰요!',
             artAfter: String.raw`
-   [ ^o^ ]  ♫
+   [ ^o^ ]  *
   /| DANCE|\
    |____|
    /    \\
@@ -555,7 +572,7 @@ COMMAND: PRESS START TO BEGIN</pre>
           song: {
             descAfter: '로봇이 깨어나고 귀여운 노래를 부르기 시작해요.',
             artAfter: String.raw`
-   [ ^_^ ]  ♪
+   [ ^_^ ]  *
   /| SING!|\
    |____|
    /    \\
@@ -591,6 +608,47 @@ COMMAND: PRESS START TO BEGIN</pre>
     ];
 
     function expandStages(levels) {
+      const detailKo = {
+        rainbow: '무지개',
+        stars: '별빛',
+        icecream: '아이스크림',
+        snack: '간식',
+        bone: '뼈다귀',
+        dance: '춤',
+        song: '노래',
+        black: '검정',
+        maroon: '적갈',
+        green: '초록',
+        olive: '올리브',
+        navy: '남색',
+        purple: '보라',
+        teal: '청록',
+        silver: '은색',
+        gray: '회색',
+        red: '빨강',
+        lime: '라임',
+        yellow: '노랑',
+        blue: '파랑',
+        fuchsia: '자홍',
+        aqua: '아쿠아',
+        white: '하양'
+      };
+      const buildDetailPrompt = (command, detailKey) => {
+        const word = detailKo[detailKey] || detailKey;
+        if (command === 'on') return `이제 ${word} 색으로 불을 켜보아요.`;
+        if (command === 'feed') return `이제 ${word}을 초코에게 줘볼까요?`;
+        if (command === 'wake') return `이제 로봇과 ${word}도 해볼까요?`;
+        if (command === 'paint') return `이제 ${word} 색으로 칠해보아요.`;
+        return `이제 ${word}도 해보아요.`;
+      };
+      const buildDetailContextTTS = (command, detailKey) => {
+        const word = detailKo[detailKey] || detailKey;
+        if (command === 'on') return `${word} 색 불빛을 켜볼까요? ${command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`;
+        if (command === 'feed') return `이번에는 ${word}을 줄 차례예요. ${command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`;
+        if (command === 'wake') return `이번에는 로봇과 ${word}을 해봐요. ${command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`;
+        if (command === 'paint') return `${word} 색으로 칠해볼까요? ${command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`;
+        return `${word} 명령을 해봐요. ${command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`;
+      };
       const normalizeTitle = title => title.replace(/^Lv\.\d+\s*/, '').trim();
       const stages = [];
       for (const level of levels) {
@@ -614,9 +672,9 @@ COMMAND: PRESS START TO BEGIN</pre>
             command: `${level.command} -${detailKey}`,
             artBefore: level.artAfter,
             artAfter: detailValue.artAfter || level.artAfter,
-            descBefore: `${level.descAfter} 이제 ${detailKey.toUpperCase()} 스테이지예요.`,
+            descBefore: `${level.descAfter} ${buildDetailPrompt(level.command, detailKey)}`,
             descAfter: detailValue.descAfter || level.descAfter,
-            contextTTS: `${detailKey.toUpperCase()} 스테이지예요. ${level.command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`,
+            contextTTS: buildDetailContextTTS(level.command, detailKey),
             rewardTTS: detailValue.rewardTTS || level.rewardTTS,
             themeColor: detailValue.themeColor || null,
             showPalette: level.command === 'paint'
@@ -709,6 +767,24 @@ COMMAND: PRESS START TO BEGIN</pre>
       return lines.map(line => line.slice(indent).replace(/\s+$/g, '')).join('\n');
     }
 
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderColoredArt(art) {
+      const normalized = normalizeArt(art);
+      const escaped = escapeHtml(normalized);
+      return escaped.replace(
+        /\[(BLACK|MAROON|GREEN|OLIVE|NAVY|PURPLE|TEAL|SILVER|GRAY|RED|LIME|YELLOW|BLUE|FUCHSIA|AQUA|WHITE)\]([\s\S]*?)\[\/\1\]/gi,
+        (_match, color, text) => `<span class="fg-${color.toLowerCase()}">${text}</span>`
+      );
+    }
+
     function buildIntroTTS(level) {
       const commandUpper = level.command.toUpperCase();
       const spellingKo = commandToSpellingKo(level.command);
@@ -777,7 +853,7 @@ COMMAND: PRESS START TO BEGIN</pre>
       resetTheme();
       renderPalette(level);
       ui.levelTitle.textContent = level.title;
-      ui.sceneArt.textContent = normalizeArt(level.artBefore);
+      ui.sceneArt.innerHTML = renderColoredArt(level.artBefore);
       ui.sceneDesc.textContent = level.descBefore;
       ui.commandText.textContent = level.command.toUpperCase();
       ui.spellingText.textContent = `철자 힌트: ${level.command.toUpperCase()} (${commandToSpellingKo(level.command)})`;
@@ -791,7 +867,7 @@ COMMAND: PRESS START TO BEGIN</pre>
       const level = levels[currentLevel];
       const themeColor = level.themeColor || null;
 
-      ui.sceneArt.textContent = normalizeArt(level.artAfter);
+      ui.sceneArt.innerHTML = renderColoredArt(level.artAfter);
       ui.sceneDesc.textContent = level.descAfter;
       applyTheme(themeColor);
       setStatus('OK> MISSION CLEARED. LOADING NEXT LEVEL...', 'ok');
