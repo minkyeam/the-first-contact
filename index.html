@@ -758,8 +758,10 @@ COMMAND: PRESS START TO BEGIN</pre>
     let koreanVoice = null;
     let lastLetterSpokenAt = 0;
     let sceneAnimationTimer = null;
+    let activeAnimationName = '';
     const userAgent = navigator.userAgent || '';
     const isKakaoInApp = /KAKAOTALK/i.test(userAgent);
+    const sessionId = `lhq_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
     function hasTTS() {
       return (
@@ -843,6 +845,10 @@ COMMAND: PRESS START TO BEGIN</pre>
       if (sceneAnimationTimer) {
         clearInterval(sceneAnimationTimer);
         sceneAnimationTimer = null;
+        if (activeAnimationName) {
+          trackEvent('scene_animation_stop', { animation_name: activeAnimationName });
+          activeAnimationName = '';
+        }
       }
     }
 
@@ -876,6 +882,8 @@ COMMAND: PRESS START TO BEGIN</pre>
 
       let frameIndex = 0;
       ui.sceneArt.innerHTML = renderColoredArt(frames[0]);
+      activeAnimationName = 'wake_dance';
+      trackEvent('scene_animation_start', { animation_name: activeAnimationName });
       sceneAnimationTimer = setInterval(() => {
         frameIndex = (frameIndex + 1) % frames.length;
         ui.sceneArt.innerHTML = renderColoredArt(frames[frameIndex]);
@@ -925,11 +933,13 @@ COMMAND: PRESS START TO BEGIN</pre>
       ui.externalOpenLink.href = currentUrl;
       ui.externalOpenHelp.classList.remove('hidden');
       setStatus('INFO> OPENING SYSTEM BROWSER...', 'ok');
+      trackEvent('external_browser_open_attempt', { source: 'kakao_inapp', target_url: currentUrl });
       try {
         const externalScheme = `kakaotalk://web/openExternal?url=${encodeURIComponent(currentUrl)}`;
         window.location.href = externalScheme;
       } catch (_error) {
         ui.externalOpenHelp.classList.remove('hidden');
+        trackEvent('external_browser_open_failed', { source: 'kakao_inapp' });
       }
     }
 
@@ -965,7 +975,10 @@ COMMAND: PRESS START TO BEGIN</pre>
 
     function trackEvent(eventName, params = {}) {
       if (typeof window.gtag !== 'function') return;
-      window.gtag('event', eventName, params);
+      window.gtag('event', eventName, {
+        session_id: sessionId,
+        ...params
+      });
     }
 
     function renderLevel() {
@@ -982,6 +995,12 @@ COMMAND: PRESS START TO BEGIN</pre>
       ui.commandInput.focus();
       setStatus('SYS> VOICE GUIDE READY. TYPE THE COMMAND.');
       speak(buildIntroTTS(level), { rate: 0.88 });
+      trackEvent('level_view', {
+        level_index: currentLevel + 1,
+        level_title: level.title,
+        command: normalizeCommand(level.command),
+        palette_visible: Boolean(level.showPalette)
+      });
     }
 
     function completeLevel() {
@@ -1026,10 +1045,24 @@ COMMAND: PRESS START TO BEGIN</pre>
       const level = levels[currentLevel];
       const answer = normalizeCommand(ui.commandInput.value);
       const expected = normalizeCommand(level.command);
+      trackEvent('command_submit', {
+        level_index: currentLevel + 1,
+        answer,
+        expected
+      });
 
       if (answer === expected) {
+        trackEvent('command_success', {
+          level_index: currentLevel + 1,
+          command: expected
+        });
         completeLevel();
       } else {
+        trackEvent('command_error', {
+          level_index: currentLevel + 1,
+          answer,
+          expected
+        });
         setStatus('ERR> INVALID COMMAND. TRY AGAIN OR PRESS REPEAT.', 'err');
         speak(`괜찮아, 다시 해보자. 정답은 ${level.command.toUpperCase()}. ${commandToSpellingKo(level.command)}.`, { rate: 0.88 });
       }
@@ -1047,6 +1080,7 @@ COMMAND: PRESS START TO BEGIN</pre>
     }
 
     ui.startBtn.addEventListener('click', () => {
+      trackEvent('start_button_click', { inapp_kakao: isKakaoInApp });
       if (isKakaoInApp) {
         requestExternalBrowserOpen();
         return;
@@ -1061,9 +1095,14 @@ COMMAND: PRESS START TO BEGIN</pre>
 
     ui.submitBtn.addEventListener('click', handleSubmit);
     ui.repeatBtn.addEventListener('click', () => {
+      trackEvent('hint_repeat_click', { level_index: currentLevel + 1 });
       if (currentLevel < levels.length) {
         speak(buildIntroTTS(levels[currentLevel]), { rate: 0.88 });
       }
+    });
+
+    ui.letterSoundToggle.addEventListener('change', () => {
+      trackEvent('letter_sound_toggle', { enabled: ui.letterSoundToggle.checked });
     });
 
     ui.commandInput.addEventListener('keydown', (event) => {
@@ -1075,22 +1114,35 @@ COMMAND: PRESS START TO BEGIN</pre>
     });
 
     ui.commandInput.addEventListener('focus', () => {
+      trackEvent('command_input_focus', { level_index: currentLevel + 1 });
       setTimeout(() => {
         ui.commandInput.scrollIntoView({ block: 'center', behavior: 'smooth' });
       }, 160);
     });
 
+    ui.externalOpenLink.addEventListener('click', () => {
+      trackEvent('external_browser_open_manual_click', { source: 'kakao_inapp_help' });
+    });
+
     if (isKakaoInApp) {
       ui.compatNote.textContent = '카카오톡 인앱브라우저입니다. START MISSION을 누르면 기본 브라우저로 열어요.';
       ui.compatNote.classList.remove('hidden');
+      trackEvent('inapp_detected', { app: 'kakaotalk' });
     }
 
     if (hasTTS()) {
       window.speechSynthesis.onvoiceschanged = pickKoreanVoice;
       pickKoreanVoice();
+      trackEvent('tts_available');
     } else {
       setStatus('WARN> TTS NOT AVAILABLE. TEXT MODE ENABLED.', 'err');
+      trackEvent('tts_unavailable');
     }
+
+    trackEvent('app_boot', {
+      inapp_kakao: isKakaoInApp,
+      tts_supported: hasTTS()
+    });
   </script>
 </body>
 </html>
