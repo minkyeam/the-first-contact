@@ -582,9 +582,9 @@ COMMAND: PRESS START TO BEGIN</pre>
   |      ████████████      |
   '------------------------'
 `,
-        descBefore: '색칠할 준비 완료! paint-색상 으로 16가지 색을 고를 수 있어요.',
+        descBefore: '색칠할 준비 완료! paint -색상 형식으로 16가지 색을 고를 수 있어요.',
         descAfter: '캔버스를 멋지게 칠했어요!',
-        contextTTS: '이제 16비트 페인트 시간! paint 뒤에 하이픈과 색 이름을 넣어 보자.',
+        contextTTS: '이제 16비트 페인트 시간! paint 다음에 띄어쓰고 하이픈과 색 이름을 넣어 보자.',
         rewardTTS: '좋아! 멋진 색칠이 완성됐어!',
         details: createPaintDetails()
       }
@@ -611,12 +611,12 @@ COMMAND: PRESS START TO BEGIN</pre>
           const baseTitle = normalizeTitle(level.title);
           stages.push({
             stageName: `${baseTitle} / ${detailKey.toUpperCase()}`,
-            command: `${level.command}-${detailKey}`,
+            command: `${level.command} -${detailKey}`,
             artBefore: level.artAfter,
             artAfter: detailValue.artAfter || level.artAfter,
             descBefore: `${level.descAfter} 이제 ${detailKey.toUpperCase()} 스테이지예요.`,
             descAfter: detailValue.descAfter || level.descAfter,
-            contextTTS: `${detailKey.toUpperCase()} 스테이지예요. ${level.command.toUpperCase()} 대시 ${detailKey.toUpperCase()}를 입력해요.`,
+            contextTTS: `${detailKey.toUpperCase()} 스테이지예요. ${level.command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`,
             rewardTTS: detailValue.rewardTTS || level.rewardTTS,
             themeColor: detailValue.themeColor || null,
             showPalette: level.command === 'paint'
@@ -690,6 +690,7 @@ COMMAND: PRESS START TO BEGIN</pre>
       return command
         .split('')
         .map(ch => {
+          if (ch === ' ') return '띄어쓰기';
           if (ch === '-') return '대시';
           const upper = ch.toUpperCase();
           return letterKo[upper] || upper;
@@ -734,8 +735,16 @@ COMMAND: PRESS START TO BEGIN</pre>
 
       ui.palettePanel.classList.remove('hidden');
       ui.paletteGrid.innerHTML = ansi16Palette
-        .map(color => `<div class="palette-chip"><span class="swatch" style="background:${color.hex}"></span><span class="chip-cmd">[${color.idx}] paint-${color.key}</span></div>`)
+        .map(color => `<div class="palette-chip"><span class="swatch" style="background:${color.hex}"></span><span class="chip-cmd">[${color.idx}] paint -${color.key}</span></div>`)
         .join('');
+    }
+
+    function normalizeCommand(value) {
+      return value
+        .trim()
+        .toLowerCase()
+        .replace(/\s*-\s*/g, ' -')
+        .replace(/\s+/g, ' ');
     }
 
     function pickKoreanVoice() {
@@ -807,9 +816,10 @@ COMMAND: PRESS START TO BEGIN</pre>
     function handleSubmit() {
       if (currentLevel >= levels.length) return;
       const level = levels[currentLevel];
-      const answer = ui.commandInput.value.trim().toLowerCase();
+      const answer = normalizeCommand(ui.commandInput.value);
+      const expected = normalizeCommand(level.command);
 
-      if (answer === level.command) {
+      if (answer === expected) {
         completeLevel();
       } else {
         setStatus('ERR> INVALID COMMAND. TRY AGAIN OR PRESS REPEAT.', 'err');
