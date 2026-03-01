@@ -53,11 +53,13 @@
         radial-gradient(circle at 12% 10%, #183018 0%, transparent 28%),
         radial-gradient(circle at 88% 90%, #2f1e0d 0%, transparent 26%),
         linear-gradient(180deg, var(--bg-alt) 0%, var(--bg) 100%);
-      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 16px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .app {
@@ -67,6 +69,7 @@
       background: rgba(5, 8, 5, 0.95);
       box-shadow: 0 0 0 2px #011a01 inset, 0 18px 42px rgba(0, 0, 0, 0.55);
       overflow: hidden;
+      margin-bottom: max(16px, env(safe-area-inset-bottom));
     }
 
     .header {
@@ -356,6 +359,16 @@
       to {
         opacity: 1;
         transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        align-items: flex-start;
+        padding-top: max(8px, env(safe-area-inset-top));
+        padding-right: 8px;
+        padding-left: 8px;
+        padding-bottom: max(120px, env(safe-area-inset-bottom) + 96px);
       }
     }
   </style>
@@ -1059,6 +1072,12 @@ COMMAND: PRESS START TO BEGIN</pre>
       } else {
         handleLetterSound(event);
       }
+    });
+
+    ui.commandInput.addEventListener('focus', () => {
+      setTimeout(() => {
+        ui.commandInput.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }, 160);
     });
 
     if (isKakaoInApp) {
