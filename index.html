@@ -798,6 +798,7 @@ COMMAND: PRESS START TO BEGIN</pre>
     let lastLetterSpokenAt = 0;
     let sceneAnimationTimer = null;
     let activeAnimationName = '';
+    let isStageTransitioning = false;
     const userAgent = navigator.userAgent || '';
     const isKakaoInApp = /KAKAOTALK/i.test(userAgent);
     const sessionId = `lhq_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -891,37 +892,199 @@ COMMAND: PRESS START TO BEGIN</pre>
       }
     }
 
-    function startDanceAnimation() {
-      const frames = [
-        String.raw`
+    function parseCommand(command) {
+      const normalized = normalizeCommand(command);
+      const parts = normalized.split(' ');
+      return {
+        base: parts[0] || '',
+        option: (parts[1] || '').replace(/^-/, '')
+      };
+    }
+
+    function buildResultFrames(level) {
+      const parsed = parseCommand(level.command);
+      const base = parsed.base;
+      const option = parsed.option;
+
+      if (base === 'on') {
+        if (option === 'rainbow') {
+          return [
+            String.raw`
+  .--------------------.
+  |   (무지개 모드 ON)   |
+  | [RED]RR[/RED][YELLOW]YY[/YELLOW][LIME]GG[/LIME][AQUA]AA[/AQUA][BLUE]BB[/BLUE][FUCHSIA]PP[/FUCHSIA] |
+  |      \ RGB /        |
+  '--------------------'
+`,
+            String.raw`
+  .--------------------.
+  |   (무지개 모드 ON)   |
+  | [YELLOW]YY[/YELLOW][LIME]GG[/LIME][AQUA]AA[/AQUA][BLUE]BB[/BLUE][FUCHSIA]PP[/FUCHSIA][RED]RR[/RED] |
+  |      \ RGB /        |
+  '--------------------'
+`,
+            String.raw`
+  .--------------------.
+  |   (무지개 모드 ON)   |
+  | [LIME]GG[/LIME][AQUA]AA[/AQUA][BLUE]BB[/BLUE][FUCHSIA]PP[/FUCHSIA][RED]RR[/RED][YELLOW]YY[/YELLOW] |
+  |      \ RGB /        |
+  '--------------------'
+`
+          ];
+        }
+
+        return [
+          String.raw`
+  .--------------------.
+  |      (밝은 방)       |
+  |      \ ON /         |
+  |       \ | /         |
+  '--------------------'
+`,
+          String.raw`
+  .--------------------.
+  |      (밝은 방)       |
+  |      \*ON*/         |
+  |       \ | /         |
+  '--------------------'
+`
+        ];
+      }
+
+      if (base === 'feed') {
+        const item = option === 'icecream' ? '/V\\'
+          : option === 'snack' ? '*-*'
+          : option === 'bone' ? '(==)'
+          : 'FOOD';
+        return [
+          String.raw`
+ / \__
+(    ^\___  <3
+ /   ${item}   O
+/   (_____/
+/_____/   U
+`,
+          String.raw`
+ / \__
+(   ^ \__~  <3
+ /   ${item}   O
+/   (_____/
+/_____/   U
+`,
+          String.raw`
+ / \__
+(  ^  \___  <3
+ /   ${item}   O
+/   (_____/
+/_____/   U
+`
+        ];
+      }
+
+      if (base === 'wake') {
+        if (option === 'dance') {
+          return [
+            String.raw`
    [ ^o^ ]  *
   /|DANCE|\
    |____|
    /    \\
 `,
-        String.raw`
+            String.raw`
    [ ^o^ ] \o
   \|DANCE|/
     |__|
    /    \\
 `,
-        String.raw`
+            String.raw`
    [ ^o^ ] o/
   \|DANCE|/
     |__|
    /    \\
 `,
-        String.raw`
+            String.raw`
    [ ^o^ ]  *
   /|DANCE|\
    |____|
   _/    \_
 `
-      ];
+          ];
+        }
 
+        if (option === 'song') {
+          return [
+            String.raw`
+   [ ^_^ ]  *
+  /| SING!|\
+   |____|
+   /    \\
+`,
+            String.raw`
+   [ ^_^ ]  ~
+  /| SING!|\
+   |____|
+   /    \\
+`,
+            String.raw`
+   [ ^_^ ]  *
+  /| SING!|\
+   |____|
+  _/    \_
+`
+          ];
+        }
+
+        return [
+          String.raw`
+   [ ^_^ ]
+  /| HELLO|\
+   |____|
+   /    \\
+`,
+          String.raw`
+   [ ^_^ ]  *
+  /| HELLO|\
+   |____|
+   /    \\
+`
+        ];
+      }
+
+      if (base === 'paint') {
+        const color = (option || 'white').toUpperCase();
+        return [
+          String.raw`
+  [${color}].------------------------.[/${color}]
+  [${color}]|      16-BIT CANVAS     |[/${color}]
+  [${color}]|      COLOR: ${color.padEnd(8, ' ')} |[/${color}]
+  [${color}]|      ###########       |[/${color}]
+  [${color}]'------------------------'[/${color}]
+`,
+          String.raw`
+  [${color}].------------------------.[/${color}]
+  [${color}]|      16-BIT CANVAS     |[/${color}]
+  [${color}]|      COLOR: ${color.padEnd(8, ' ')} |[/${color}]
+  [${color}]|      +++++++++++       |[/${color}]
+  [${color}]'------------------------'[/${color}]
+`,
+          String.raw`
+  [${color}].------------------------.[/${color}]
+  [${color}]|      16-BIT CANVAS     |[/${color}]
+  [${color}]|      COLOR: ${color.padEnd(8, ' ')} |[/${color}]
+  [${color}]|      =========++       |[/${color}]
+  [${color}]'------------------------'[/${color}]
+`
+        ];
+      }
+
+      return [level.artAfter];
+    }
+
+    function startResultAnimation(level) {
+      const frames = buildResultFrames(level);
       let frameIndex = 0;
       ui.sceneArt.innerHTML = renderColoredArt(frames[0]);
-      activeAnimationName = 'wake_dance';
+      activeAnimationName = normalizeCommand(level.command).replace(/\s+/g, '_');
       trackEvent('scene_animation_start', { animation_name: activeAnimationName });
       sceneAnimationTimer = setInterval(() => {
         frameIndex = (frameIndex + 1) % frames.length;
@@ -1021,16 +1184,30 @@ COMMAND: PRESS START TO BEGIN</pre>
     }
 
     function speak(text, options = {}) {
-      if (!gameStarted || !hasTTS()) return;
+      if (!gameStarted || !hasTTS()) return Promise.resolve(false);
       const synth = window.speechSynthesis;
       const interrupt = options.interrupt ?? true;
       if (interrupt) synth.cancel();
-      const utter = new window.SpeechSynthesisUtterance(text);
-      utter.lang = 'ko-KR';
-      utter.rate = options.rate ?? 0.9;
-      utter.pitch = options.pitch ?? 1.0;
-      if (koreanVoice) utter.voice = koreanVoice;
-      synth.speak(utter);
+      return new Promise(resolve => {
+        let settled = false;
+        const finish = success => {
+          if (settled) return;
+          settled = true;
+          resolve(success);
+        };
+
+        const utter = new window.SpeechSynthesisUtterance(text);
+        utter.lang = 'ko-KR';
+        utter.rate = options.rate ?? 0.9;
+        utter.pitch = options.pitch ?? 1.0;
+        if (koreanVoice) utter.voice = koreanVoice;
+        utter.onend = () => finish(true);
+        utter.onerror = () => finish(false);
+        synth.speak(utter);
+
+        const timeoutMs = options.timeoutMs ?? 15000;
+        setTimeout(() => finish(false), timeoutMs);
+      });
     }
 
     function setStatus(text, type = '') {
@@ -1068,45 +1245,47 @@ COMMAND: PRESS START TO BEGIN</pre>
       });
     }
 
-    function completeLevel() {
+    function setInputEnabled(enabled) {
+      ui.commandInput.disabled = !enabled;
+      ui.submitBtn.disabled = !enabled;
+      ui.repeatBtn.disabled = !enabled;
+    }
+
+    async function completeLevel() {
       const level = levels[currentLevel];
       const themeColor = level.themeColor || null;
-      const isDanceStage = normalizeCommand(level.command) === 'wake -dance';
-      const nextDelayMs = isDanceStage ? 4200 : 1800;
+      if (isStageTransitioning) return;
+      isStageTransitioning = true;
+      setInputEnabled(false);
 
-      ui.sceneArt.innerHTML = renderColoredArt(level.artAfter);
       ui.sceneDesc.textContent = level.descAfter;
       applyTheme(themeColor);
       setStatus('OK> MISSION CLEARED. LOADING NEXT LEVEL...', 'ok');
-      speak(level.rewardTTS, { rate: 0.9 });
+      startResultAnimation(level);
+      await speak(level.rewardTTS, { rate: 0.9, timeoutMs: 18000 });
       trackEvent('level_clear', {
         level_index: currentLevel + 1,
         command: normalizeCommand(level.command)
       });
-      if (isDanceStage) {
-        startDanceAnimation();
+      stopSceneAnimation();
+      currentLevel += 1;
+      if (currentLevel >= levels.length) {
+        ui.doneBox.textContent = 'ALL MISSIONS COMPLETE :: LITTLE HACKER CERTIFIED';
+        ui.doneBox.classList.remove('hidden');
+        setStatus('OK> SESSION CLOSED. REFRESH TO PLAY AGAIN.', 'ok');
+        await speak('모든 미션을 성공했어요! 오늘의 꼬마 해커로 임명!', { rate: 0.9, timeoutMs: 16000 });
+        trackEvent('game_complete', { total_levels: levels.length });
+        setInputEnabled(false);
+        isStageTransitioning = false;
+        return;
       }
-
-      setTimeout(() => {
-        stopSceneAnimation();
-        currentLevel += 1;
-        if (currentLevel >= levels.length) {
-          ui.doneBox.textContent = 'ALL MISSIONS COMPLETE :: LITTLE HACKER CERTIFIED';
-          ui.doneBox.classList.remove('hidden');
-          setStatus('OK> SESSION CLOSED. REFRESH TO PLAY AGAIN.', 'ok');
-          speak('모든 미션을 성공했어요! 오늘의 꼬마 해커로 임명!', { rate: 0.9 });
-          trackEvent('game_complete', { total_levels: levels.length });
-          ui.submitBtn.disabled = true;
-          ui.repeatBtn.disabled = true;
-          ui.commandInput.disabled = true;
-          return;
-        }
-        renderLevel();
-      }, nextDelayMs);
+      renderLevel();
+      isStageTransitioning = false;
     }
 
     function handleSubmit() {
       if (currentLevel >= levels.length) return;
+      if (isStageTransitioning) return;
       const level = levels[currentLevel];
       const answer = normalizeCommand(ui.commandInput.value);
       const expected = normalizeCommand(level.command);
@@ -1121,7 +1300,7 @@ COMMAND: PRESS START TO BEGIN</pre>
           level_index: currentLevel + 1,
           command: expected
         });
-        completeLevel();
+        void completeLevel();
       } else {
         trackEvent('command_error', {
           level_index: currentLevel + 1,
