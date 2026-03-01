@@ -419,11 +419,11 @@ COMMAND: PRESS START TO BEGIN</pre>
           {
             descAfter: `캔버스를 ${color.ko}색으로 칠했어요! (${color.hex})`,
             artAfter: String.raw`
-  .------------------------.
-  |      16-BIT CANVAS     |
-  |      COLOR: ${color.key.toUpperCase().padEnd(8, ' ')} |
-  |      ████████████      |
-  '------------------------'
+  [${color.key.toUpperCase()}].------------------------.[/${color.key.toUpperCase()}]
+  [${color.key.toUpperCase()}]|      16-BIT CANVAS     |[/${color.key.toUpperCase()}]
+  [${color.key.toUpperCase()}]|      COLOR: ${color.key.toUpperCase().padEnd(8, ' ')} |[/${color.key.toUpperCase()}]
+  [${color.key.toUpperCase()}]|      ████████████      |[/${color.key.toUpperCase()}]
+  [${color.key.toUpperCase()}]'------------------------'[/${color.key.toUpperCase()}]
 `,
             rewardTTS: `좋아! ${color.ko}색으로 칠하기 성공!`,
             themeColor: color.hex
@@ -714,6 +714,7 @@ COMMAND: PRESS START TO BEGIN</pre>
     let gameStarted = false;
     let koreanVoice = null;
     let lastLetterSpokenAt = 0;
+    let sceneAnimationTimer = null;
 
     const letterKo = {
       A: '에이',
@@ -785,6 +786,49 @@ COMMAND: PRESS START TO BEGIN</pre>
       );
     }
 
+    function stopSceneAnimation() {
+      if (sceneAnimationTimer) {
+        clearInterval(sceneAnimationTimer);
+        sceneAnimationTimer = null;
+      }
+    }
+
+    function startDanceAnimation() {
+      const frames = [
+        String.raw`
+   [ ^o^ ]  *
+  /|DANCE|\
+   |____|
+   /    \\
+`,
+        String.raw`
+   [ ^o^ ] \o
+  \|DANCE|/
+    |__|
+   /    \\
+`,
+        String.raw`
+   [ ^o^ ] o/
+  \|DANCE|/
+    |__|
+   /    \\
+`,
+        String.raw`
+   [ ^o^ ]  *
+  /|DANCE|\
+   |____|
+  _/    \_
+`
+      ];
+
+      let frameIndex = 0;
+      ui.sceneArt.innerHTML = renderColoredArt(frames[0]);
+      sceneAnimationTimer = setInterval(() => {
+        frameIndex = (frameIndex + 1) % frames.length;
+        ui.sceneArt.innerHTML = renderColoredArt(frames[frameIndex]);
+      }, 220);
+    }
+
     function buildIntroTTS(level) {
       const commandUpper = level.command.toUpperCase();
       const spellingKo = commandToSpellingKo(level.command);
@@ -850,6 +894,7 @@ COMMAND: PRESS START TO BEGIN</pre>
 
     function renderLevel() {
       const level = levels[currentLevel];
+      stopSceneAnimation();
       resetTheme();
       renderPalette(level);
       ui.levelTitle.textContent = level.title;
@@ -866,14 +911,20 @@ COMMAND: PRESS START TO BEGIN</pre>
     function completeLevel() {
       const level = levels[currentLevel];
       const themeColor = level.themeColor || null;
+      const isDanceStage = normalizeCommand(level.command) === 'wake -dance';
+      const nextDelayMs = isDanceStage ? 4200 : 1800;
 
       ui.sceneArt.innerHTML = renderColoredArt(level.artAfter);
       ui.sceneDesc.textContent = level.descAfter;
       applyTheme(themeColor);
       setStatus('OK> MISSION CLEARED. LOADING NEXT LEVEL...', 'ok');
       speak(level.rewardTTS, { rate: 0.9 });
+      if (isDanceStage) {
+        startDanceAnimation();
+      }
 
       setTimeout(() => {
+        stopSceneAnimation();
         currentLevel += 1;
         if (currentLevel >= levels.length) {
           ui.doneBox.textContent = 'ALL MISSIONS COMPLETE :: LITTLE HACKER CERTIFIED';
@@ -886,7 +937,7 @@ COMMAND: PRESS START TO BEGIN</pre>
           return;
         }
         renderLevel();
-      }, 1800);
+      }, nextDelayMs);
     }
 
     function handleSubmit() {
