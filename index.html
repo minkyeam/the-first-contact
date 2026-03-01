@@ -32,6 +32,7 @@
       --danger: #ff6b6b;
       --success: #6dff9b;
       --line: #224422;
+      --keyboard-offset: 0px;
     }
 
     * {
@@ -368,7 +369,7 @@
         padding-top: max(8px, env(safe-area-inset-top));
         padding-right: 8px;
         padding-left: 8px;
-        padding-bottom: max(120px, env(safe-area-inset-bottom) + 96px);
+        padding-bottom: calc(max(120px, env(safe-area-inset-bottom) + 96px) + var(--keyboard-offset));
       }
     }
   </style>
@@ -928,6 +929,29 @@ COMMAND: PRESS START TO BEGIN</pre>
         .replace(/\s+/g, ' ');
     }
 
+    function ensureInputVisible() {
+      const active = document.activeElement;
+      if (active !== ui.commandInput) return;
+      const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      const rect = ui.commandInput.getBoundingClientRect();
+      const overlap = rect.bottom - viewportHeight + 18;
+      if (overlap > 0) {
+        window.scrollBy({ top: overlap, behavior: 'smooth' });
+      }
+    }
+
+    function updateKeyboardOffset() {
+      if (window.innerWidth > 768) {
+        document.documentElement.style.setProperty('--keyboard-offset', '0px');
+        return;
+      }
+      if (!window.visualViewport) return;
+      const viewport = window.visualViewport;
+      const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+      document.documentElement.style.setProperty('--keyboard-offset', `${keyboardHeight}px`);
+      ensureInputVisible();
+    }
+
     function requestExternalBrowserOpen() {
       const currentUrl = window.location.href;
       ui.externalOpenLink.href = currentUrl;
@@ -1116,7 +1140,7 @@ COMMAND: PRESS START TO BEGIN</pre>
     ui.commandInput.addEventListener('focus', () => {
       trackEvent('command_input_focus', { level_index: currentLevel + 1 });
       setTimeout(() => {
-        ui.commandInput.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        ensureInputVisible();
       }, 160);
     });
 
@@ -1129,6 +1153,14 @@ COMMAND: PRESS START TO BEGIN</pre>
       ui.compatNote.classList.remove('hidden');
       trackEvent('inapp_detected', { app: 'kakaotalk' });
     }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateKeyboardOffset);
+      window.visualViewport.addEventListener('scroll', updateKeyboardOffset);
+    }
+    window.addEventListener('orientationchange', () => setTimeout(updateKeyboardOffset, 120));
+    window.addEventListener('resize', updateKeyboardOffset);
+    updateKeyboardOffset();
 
     if (hasTTS()) {
       window.speechSynthesis.onvoiceschanged = pickKoreanVoice;
