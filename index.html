@@ -1228,6 +1228,7 @@ COMMAND: PRESS START TO BEGIN</pre>
       stopSceneAnimation();
       resetTheme();
       renderPalette(level);
+      setInputEnabled(true);
       ui.levelTitle.textContent = level.title;
       ui.sceneArt.innerHTML = renderColoredArt(level.artBefore);
       ui.sceneDesc.textContent = level.descBefore;
@@ -1256,7 +1257,6 @@ COMMAND: PRESS START TO BEGIN</pre>
       const themeColor = level.themeColor || null;
       if (isStageTransitioning) return;
       isStageTransitioning = true;
-      setInputEnabled(false);
 
       ui.sceneDesc.textContent = level.descAfter;
       applyTheme(themeColor);
