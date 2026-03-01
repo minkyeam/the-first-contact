@@ -324,6 +324,20 @@
       display: none;
     }
 
+    .compat {
+      margin: 8px 0 0;
+      border: 1px solid #5a3a1d;
+      background: rgba(90, 58, 29, 0.2);
+      color: #ffd7a1;
+      padding: 8px 10px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .compat a {
+      color: #fff3c9;
+    }
+
     .done {
       text-align: center;
       font-size: clamp(18px, 2.8vw, 24px);
@@ -364,6 +378,11 @@
 STATUS: READY
 AUDIO: KO-KR TTS CONNECTED
 COMMAND: PRESS START TO BEGIN</pre>
+        <p id="compatNote" class="compat hidden"></p>
+        <p id="externalOpenHelp" class="compat hidden">
+          외부 브라우저가 자동으로 열리지 않으면
+          <a id="externalOpenLink" href="#" target="_blank" rel="noopener noreferrer">여기를 눌러 열어주세요</a>.
+        </p>
         <button id="startBtn" class="start-btn" type="button">[ START MISSION ]</button>
       </section>
 
@@ -706,6 +725,9 @@ COMMAND: PRESS START TO BEGIN</pre>
       levelTitle: document.getElementById('levelTitle'),
       sceneArt: document.getElementById('sceneArt'),
       sceneDesc: document.getElementById('sceneDesc'),
+      compatNote: document.getElementById('compatNote'),
+      externalOpenHelp: document.getElementById('externalOpenHelp'),
+      externalOpenLink: document.getElementById('externalOpenLink'),
       commandText: document.getElementById('commandText'),
       spellingText: document.getElementById('spellingText'),
       palettePanel: document.getElementById('palettePanel'),
@@ -723,6 +745,16 @@ COMMAND: PRESS START TO BEGIN</pre>
     let koreanVoice = null;
     let lastLetterSpokenAt = 0;
     let sceneAnimationTimer = null;
+    const userAgent = navigator.userAgent || '';
+    const isKakaoInApp = /KAKAOTALK/i.test(userAgent);
+
+    function hasTTS() {
+      return (
+        typeof window !== 'undefined'
+        && 'speechSynthesis' in window
+        && 'SpeechSynthesisUtterance' in window
+      );
+    }
 
     const letterKo = {
       A: '에이',
@@ -875,8 +907,25 @@ COMMAND: PRESS START TO BEGIN</pre>
         .replace(/\s+/g, ' ');
     }
 
+    function requestExternalBrowserOpen() {
+      const currentUrl = window.location.href;
+      ui.externalOpenLink.href = currentUrl;
+      ui.externalOpenHelp.classList.remove('hidden');
+      setStatus('INFO> OPENING SYSTEM BROWSER...', 'ok');
+      try {
+        const externalScheme = `kakaotalk://web/openExternal?url=${encodeURIComponent(currentUrl)}`;
+        window.location.href = externalScheme;
+      } catch (_error) {
+        ui.externalOpenHelp.classList.remove('hidden');
+      }
+    }
+
     function pickKoreanVoice() {
-      const voices = speechSynthesis.getVoices();
+      if (!hasTTS()) {
+        koreanVoice = null;
+        return;
+      }
+      const voices = window.speechSynthesis.getVoices();
       koreanVoice = voices.find(v => /ko-KR/i.test(v.lang) && /google|enhanced|premium/i.test(v.name))
         || voices.find(v => /ko-KR/i.test(v.lang))
         || voices.find(v => /korean|한국/i.test(v.name))
@@ -884,15 +933,16 @@ COMMAND: PRESS START TO BEGIN</pre>
     }
 
     function speak(text, options = {}) {
-      if (!gameStarted || !('speechSynthesis' in window)) return;
+      if (!gameStarted || !hasTTS()) return;
+      const synth = window.speechSynthesis;
       const interrupt = options.interrupt ?? true;
-      if (interrupt) speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text);
+      if (interrupt) synth.cancel();
+      const utter = new window.SpeechSynthesisUtterance(text);
       utter.lang = 'ko-KR';
       utter.rate = options.rate ?? 0.9;
       utter.pitch = options.pitch ?? 1.0;
       if (koreanVoice) utter.voice = koreanVoice;
-      speechSynthesis.speak(utter);
+      synth.speak(utter);
     }
 
     function setStatus(text, type = '') {
@@ -984,8 +1034,12 @@ COMMAND: PRESS START TO BEGIN</pre>
     }
 
     ui.startBtn.addEventListener('click', () => {
+      if (isKakaoInApp) {
+        requestExternalBrowserOpen();
+        return;
+      }
       gameStarted = true;
-      pickKoreanVoice();
+      if (hasTTS()) pickKoreanVoice();
       ui.startScreen.classList.add('hidden');
       ui.gameScreen.classList.remove('hidden');
       trackEvent('game_start');
@@ -1007,11 +1061,16 @@ COMMAND: PRESS START TO BEGIN</pre>
       }
     });
 
-    if ('speechSynthesis' in window) {
-      speechSynthesis.onvoiceschanged = pickKoreanVoice;
+    if (isKakaoInApp) {
+      ui.compatNote.textContent = '카카오톡 인앱브라우저입니다. START MISSION을 누르면 기본 브라우저로 열어요.';
+      ui.compatNote.classList.remove('hidden');
+    }
+
+    if (hasTTS()) {
+      window.speechSynthesis.onvoiceschanged = pickKoreanVoice;
       pickKoreanVoice();
     } else {
-      setStatus('ERR> THIS BROWSER DOES NOT SUPPORT TTS.', 'err');
+      setStatus('WARN> TTS NOT AVAILABLE. TEXT MODE ENABLED.', 'err');
     }
   </script>
 </body>
