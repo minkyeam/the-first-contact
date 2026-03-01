@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Little Hacker's Quest - Voice Edition</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q1SBVDVQ0N"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Q1SBVDVQ0N');
+  </script>
   <style>
     @font-face {
       font-family: "RetroDOS";
@@ -892,6 +900,11 @@ COMMAND: PRESS START TO BEGIN</pre>
       ui.status.className = `status ${type}`.trim();
     }
 
+    function trackEvent(eventName, params = {}) {
+      if (typeof window.gtag !== 'function') return;
+      window.gtag('event', eventName, params);
+    }
+
     function renderLevel() {
       const level = levels[currentLevel];
       stopSceneAnimation();
@@ -919,6 +932,10 @@ COMMAND: PRESS START TO BEGIN</pre>
       applyTheme(themeColor);
       setStatus('OK> MISSION CLEARED. LOADING NEXT LEVEL...', 'ok');
       speak(level.rewardTTS, { rate: 0.9 });
+      trackEvent('level_clear', {
+        level_index: currentLevel + 1,
+        command: normalizeCommand(level.command)
+      });
       if (isDanceStage) {
         startDanceAnimation();
       }
@@ -931,6 +948,7 @@ COMMAND: PRESS START TO BEGIN</pre>
           ui.doneBox.classList.remove('hidden');
           setStatus('OK> SESSION CLOSED. REFRESH TO PLAY AGAIN.', 'ok');
           speak('모든 미션을 성공했어요! 오늘의 꼬마 해커로 임명!', { rate: 0.9 });
+          trackEvent('game_complete', { total_levels: levels.length });
           ui.submitBtn.disabled = true;
           ui.repeatBtn.disabled = true;
           ui.commandInput.disabled = true;
@@ -970,6 +988,7 @@ COMMAND: PRESS START TO BEGIN</pre>
       pickKoreanVoice();
       ui.startScreen.classList.add('hidden');
       ui.gameScreen.classList.remove('hidden');
+      trackEvent('game_start');
       renderLevel();
     });
 
