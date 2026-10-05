@@ -490,31 +490,11 @@ COMMAND: PRESS START TO BEGIN</pre>
       { idx: 15, key: 'white', ko: '하양', hex: '#ffffff' }
     ];
 
-    function createPaintDetails() {
-      return Object.fromEntries(
-        ansi16Palette.map(color => [
-          color.key,
-          {
-            descAfter: `캔버스를 ${color.ko}색으로 칠했어요! (${color.hex})`,
-            artAfter: String.raw`
-  [${color.key.toUpperCase()}].------------------------.[/${color.key.toUpperCase()}]
-  [${color.key.toUpperCase()}]|      16-BIT CANVAS     |[/${color.key.toUpperCase()}]
-  [${color.key.toUpperCase()}]|      COLOR: ${color.key.toUpperCase().padEnd(8, ' ')} |[/${color.key.toUpperCase()}]
-  [${color.key.toUpperCase()}]|      ████████████      |[/${color.key.toUpperCase()}]
-  [${color.key.toUpperCase()}]'------------------------'[/${color.key.toUpperCase()}]
-`,
-            rewardTTS: `좋아! ${color.ko}색으로 칠하기 성공!`,
-            themeColor: color.hex
-          }
-        ])
-      );
-    }
-
+    // 48개월 아이 기준: 2~3글자 단어만, 띄어쓰기·대시 옵션 없음
     const baseLevels = [
       {
-        title: 'Lv.1 마법의 방',
+        title: 'Lv.1 어두운 방',
         command: 'on',
-        spelling: 'O, N',
         artBefore: String.raw`
   .--------------------.
   |      (어두운 방)     |
@@ -529,97 +509,14 @@ COMMAND: PRESS START TO BEGIN</pre>
   |       \ | /         |
   '--------------------'
 `,
-        descBefore: '방이 아주 어두워 보여요.',
+        descBefore: '방이 아주 어두워요.',
         descAfter: '우와! 방이 환하게 밝아졌어요.',
-        contextTTS: '방이 너무 어두워요. 불을 켜 주면 좋겠어요.',
-        rewardTTS: '우와, 성공이야! 방이 정말 환해졌네. 아주 잘했어!',
-        details: {
-          rainbow: {
-            descAfter: '불이 켜지며 무지개 조명이 반짝여요!',
-            artAfter: String.raw`
-  .--------------------.
-  |   (무지개 모드 ON)   |
-  | [RED]RR[/RED][YELLOW]YY[/YELLOW][LIME]GG[/LIME][AQUA]AA[/AQUA][BLUE]BB[/BLUE][FUCHSIA]PP[/FUCHSIA] |
-  |      \ RGB /        |
-  '--------------------'
-`,
-            rewardTTS: '와! 무지개 조명이 켜졌어. 반짝반짝 정말 예쁘다!'
-          },
-          stars: {
-            descAfter: '천장에 별빛이 가득 떠올랐어요.',
-            artAfter: String.raw`
-  .--------------------.
-  |     *  *  *  *     |
-  |   *  STAR LIGHT *  |
-  |     *  *  *  *     |
-  '--------------------'
-`,
-            rewardTTS: '멋져! 별빛 모드가 켜졌어. 밤하늘 같아!'
-          }
-        }
+        contextTTS: '방이 너무 어두워요. 불을 켜 볼까요?',
+        rewardTTS: '우와, 성공이야! 방이 환해졌어. 아주 잘했어!'
       },
       {
-        title: 'Lv.2 배고픈 강아지',
-        command: 'feed',
-        spelling: 'F, E, E, D',
-        artBefore: String.raw`
- / \__
-(    @\___
- /         O
-/   (_____/
-/_____/   U
-`,
-        artAfter: String.raw`
- / \__
-(    ^\___  <3
- /         O  <3
-/   (_____/
-/_____/   U
-`,
-        descBefore: '강아지 초코가 배가 고파 보여요.',
-        descAfter: '초코가 맛있게 먹고 하트를 보여줘요!',
-        contextTTS: '강아지 초코가 배가 고픈가 봐요. 밥을 주면 기뻐할 거예요.',
-        rewardTTS: '정답! 초코가 정말 맛있게 먹고 있어. 멍멍!',
-        details: {
-          icecream: {
-            descAfter: '초코가 아이스크림을 핥으며 신나게 꼬리를 흔들어요!',
-            artAfter: String.raw`
- / \__
-(    ^\___  <3
- /   /V\\   O
-/   (_____/
-/_____/   U
-`,
-            rewardTTS: '오, FEED-ICECREAM 성공! 초코가 아이스크림을 정말 좋아하네!'
-          },
-          snack: {
-            descAfter: '바삭한 간식을 먹고 초코가 기분이 좋아졌어요.',
-            artAfter: String.raw`
- / \__
-(    ^\___  <3
- /   *-*   O
-/   (_____/
-/_____/   U
-`,
-            rewardTTS: '좋아! 초코가 간식을 아삭아삭 맛있게 먹고 있어!'
-          },
-          bone: {
-            descAfter: '커다란 뼈다귀를 받고 초코가 신나게 뛰어요.',
-            artAfter: String.raw`
- / \__
-(    ^\___  <3
- /   (==)   O
-/   (_____/
-/_____/   U
-`,
-            rewardTTS: '멋진 선택! 초코가 뼈다귀를 받고 신났어!'
-          }
-        }
-      },
-      {
-        title: 'Lv.3 잠든 로봇',
-        command: 'wake',
-        spelling: 'W, A, K, E',
+        title: 'Lv.2 잠든 로봇',
+        command: 'hi',
         artBefore: String.raw`
    [ -_- ]
   /|  z |\
@@ -632,56 +529,134 @@ COMMAND: PRESS START TO BEGIN</pre>
    |____|
    /    \\
 `,
-        descBefore: '로봇이 잠들어 있어요.',
+        descBefore: '로봇이 쿨쿨 자고 있어요.',
         descAfter: '로봇이 깨어나서 인사해요!',
-        contextTTS: '로봇이 잠들어 있어요. 살짝 깨워 볼까요?',
-        rewardTTS: '멋져! 로봇이 눈을 뜨고 인사했어. 이제 같이 놀 수 있어!',
-        details: {
-          dance: {
-            descAfter: '로봇이 깨어나자마자 댄스 모드로 흔들흔들 춤춰요!',
-            artAfter: String.raw`
-   [ ^o^ ]  *
-  /| DANCE|\
-   |____|
-   /    \\
-`,
-            rewardTTS: '와! WAKE-DANCE 성공. 로봇이 신나게 춤추고 있어!'
-          },
-          song: {
-            descAfter: '로봇이 깨어나고 귀여운 노래를 부르기 시작해요.',
-            artAfter: String.raw`
-   [ ^_^ ]  *
-  /| SING!|\
-   |____|
-   /    \\
-`,
-            rewardTTS: '좋아! WAKE-SONG 성공. 로봇의 노래가 들려!'
-          }
-        }
+        contextTTS: '로봇이 자고 있어요. 안녕 하고 인사해 볼까요?',
+        rewardTTS: '안녕! 로봇이 눈을 뜨고 손을 흔들었어!'
       },
       {
-        title: 'Lv.4 16비트 페인트',
-        command: 'paint',
-        spelling: 'P, A, I, N, T',
+        title: 'Lv.3 빵빵 자동차',
+        command: 'go',
         artBefore: String.raw`
-  .------------------------.
-  |      16-BIT CANVAS     |
-  |      COLOR: EMPTY      |
-  |      ............      |
-  '------------------------'
+      ______
+   __/  |   \__
+  |  _      _  |
+  '-(_)----(_)-'
 `,
         artAfter: String.raw`
-  .------------------------.
-  |      16-BIT CANVAS     |
-  |      COLOR: WHITE      |
-  |      ████████████      |
-  '------------------------'
+        ______
+=   __/  |   \__
+=  |  _      _  |
+=  '-(_)----(_)-'
 `,
-        descBefore: '색칠할 준비 완료! paint -색상 형식으로 16가지 색을 고를 수 있어요.',
-        descAfter: '캔버스를 멋지게 칠했어요!',
-        contextTTS: '이제 16비트 페인트 시간! paint 다음에 띄어쓰고 하이픈과 색 이름을 넣어 보자.',
-        rewardTTS: '좋아! 멋진 색칠이 완성됐어!',
-        details: createPaintDetails()
+        descBefore: '자동차가 출발을 기다려요.',
+        descAfter: '부릉부릉! 자동차가 달려요!',
+        contextTTS: '자동차가 출발하고 싶대요. 출발 신호를 보내 볼까요?',
+        rewardTTS: '부릉부릉! 자동차가 씽씽 달려가!'
+      },
+      {
+        title: 'Lv.4 배고픈 강아지',
+        command: 'eat',
+        artBefore: String.raw`
+ / \__
+(    @\___
+ /         O
+/   (_____/
+/_____/   U
+`,
+        artAfter: String.raw`
+ / \__
+(    ^\___  <3
+ /   (==)   O
+/   (_____/
+/_____/   U
+`,
+        descBefore: '강아지 초코가 배가 고파요.',
+        descAfter: '초코가 냠냠 맛있게 먹어요!',
+        contextTTS: '강아지 초코가 배가 고프대요. 먹어 라고 말해 줄까요?',
+        rewardTTS: '냠냠! 초코가 맛있게 먹고 있어. 멍멍!'
+      },
+      {
+        title: 'Lv.5 빨간 그림',
+        command: 'red',
+        themeColor: '#ff0000',
+        artBefore: String.raw`
+  .--------------------.
+  |      (그림 종이)     |
+  |     ............    |
+  '--------------------'
+`,
+        artAfter: String.raw`
+  [RED].--------------------.[/RED]
+  [RED]|     ██████████     |[/RED]
+  [RED]|     ██████████     |[/RED]
+  [RED]'--------------------'[/RED]
+`,
+        descBefore: '하얀 종이가 있어요. 빨간색으로 칠해 볼까요?',
+        descAfter: '종이가 빨갛게 칠해졌어요!',
+        contextTTS: '하얀 종이가 있어요. 빨간색으로 칠해 볼까요?',
+        rewardTTS: '와! 빨간색으로 예쁘게 칠했어!'
+      },
+      {
+        title: 'Lv.6 둥실 풍선',
+        command: 'pop',
+        artBefore: String.raw`
+    .-.
+   (   )
+    '-'
+     |
+     |
+`,
+        artAfter: String.raw`
+   \ | /
+  -  *  -
+   / | \
+   POP!
+`,
+        descBefore: '풍선이 둥실둥실 떠 있어요.',
+        descAfter: '펑! 풍선이 터졌어요!',
+        contextTTS: '풍선이 둥실둥실 떠 있어요. 펑 하고 터뜨려 볼까요?',
+        rewardTTS: '펑! 풍선이 터졌어. 깜짝 놀랐지?'
+      },
+      {
+        title: 'Lv.7 아침 해님',
+        command: 'sun',
+        artBefore: String.raw`
+  .--------------------.
+  |   *    (밤)    *   |
+  |      *      *      |
+  |____________________|
+`,
+        artAfter: String.raw`
+  .--------------------.
+  |   [YELLOW]\  |  /[/YELLOW]  (아침)   |
+  |  [YELLOW]-- SUN --[/YELLOW]         |
+  |____________________|
+`,
+        descBefore: '깜깜한 밤이에요. 해님을 불러 볼까요?',
+        descAfter: '해님이 반짝 떠올랐어요!',
+        contextTTS: '깜깜한 밤이에요. 해님을 불러 볼까요?',
+        rewardTTS: '좋은 아침! 해님이 반짝 떴어!'
+      },
+      {
+        title: 'Lv.8 잘 가 로봇',
+        command: 'bye',
+        artBefore: String.raw`
+   [ ^_^ ]
+  /| HELLO|\
+   |____|
+   /    \\
+`,
+        artAfter: String.raw`
+   [ ^_^ ]  o/
+  /| BYE! |
+   |____|
+   /    \\
+`,
+        descBefore: '신나게 놀았어요. 이제 로봇과 인사할 시간이에요.',
+        descAfter: '로봇이 손을 흔들며 인사해요!',
+        contextTTS: '오늘 정말 재미있었어요. 로봇에게 잘 가 하고 인사해 볼까요?',
+        rewardTTS: '안녕, 또 만나! 로봇이 손을 흔들고 있어!'
       }
     ];
 
@@ -739,7 +714,7 @@ COMMAND: PRESS START TO BEGIN</pre>
           descAfter: level.descAfter,
           contextTTS: level.contextTTS,
           rewardTTS: level.rewardTTS,
-          themeColor: null,
+          themeColor: level.themeColor || null,
           showPalette: level.command === 'paint'
         });
 
@@ -902,37 +877,9 @@ COMMAND: PRESS START TO BEGIN</pre>
     }
 
     function buildResultFrames(level) {
-      const parsed = parseCommand(level.command);
-      const base = parsed.base;
-      const option = parsed.option;
+      const base = parseCommand(level.command).base;
 
       if (base === 'on') {
-        if (option === 'rainbow') {
-          return [
-            String.raw`
-  .--------------------.
-  |   (무지개 모드 ON)   |
-  | [RED]RR[/RED][YELLOW]YY[/YELLOW][LIME]GG[/LIME][AQUA]AA[/AQUA][BLUE]BB[/BLUE][FUCHSIA]PP[/FUCHSIA] |
-  |      \ RGB /        |
-  '--------------------'
-`,
-            String.raw`
-  .--------------------.
-  |   (무지개 모드 ON)   |
-  | [YELLOW]YY[/YELLOW][LIME]GG[/LIME][AQUA]AA[/AQUA][BLUE]BB[/BLUE][FUCHSIA]PP[/FUCHSIA][RED]RR[/RED] |
-  |      \ RGB /        |
-  '--------------------'
-`,
-            String.raw`
-  .--------------------.
-  |   (무지개 모드 ON)   |
-  | [LIME]GG[/LIME][AQUA]AA[/AQUA][BLUE]BB[/BLUE][FUCHSIA]PP[/FUCHSIA][RED]RR[/RED][YELLOW]YY[/YELLOW] |
-  |      \ RGB /        |
-  '--------------------'
-`
-          ];
-        }
-
         return [
           String.raw`
   .--------------------.
@@ -951,89 +898,7 @@ COMMAND: PRESS START TO BEGIN</pre>
         ];
       }
 
-      if (base === 'feed') {
-        const item = option === 'icecream' ? '/V\\'
-          : option === 'snack' ? '*-*'
-          : option === 'bone' ? '(==)'
-          : 'FOOD';
-        return [
-          String.raw`
- / \__
-(    ^\___  <3
- /   ${item}   O
-/   (_____/
-/_____/   U
-`,
-          String.raw`
- / \__
-(   ^ \__~  <3
- /   ${item}   O
-/   (_____/
-/_____/   U
-`,
-          String.raw`
- / \__
-(  ^  \___  <3
- /   ${item}   O
-/   (_____/
-/_____/   U
-`
-        ];
-      }
-
-      if (base === 'wake') {
-        if (option === 'dance') {
-          return [
-            String.raw`
-   [ ^o^ ]  *
-  /|DANCE|\
-   |____|
-   /    \\
-`,
-            String.raw`
-   [ ^o^ ] \o
-  \|DANCE|/
-    |__|
-   /    \\
-`,
-            String.raw`
-   [ ^o^ ] o/
-  \|DANCE|/
-    |__|
-   /    \\
-`,
-            String.raw`
-   [ ^o^ ]  *
-  /|DANCE|\
-   |____|
-  _/    \_
-`
-          ];
-        }
-
-        if (option === 'song') {
-          return [
-            String.raw`
-   [ ^_^ ]  *
-  /| SING!|\
-   |____|
-   /    \\
-`,
-            String.raw`
-   [ ^_^ ]  ~
-  /| SING!|\
-   |____|
-   /    \\
-`,
-            String.raw`
-   [ ^_^ ]  *
-  /| SING!|\
-   |____|
-  _/    \_
-`
-          ];
-        }
-
+      if (base === 'hi') {
         return [
           String.raw`
    [ ^_^ ]
@@ -1042,37 +907,139 @@ COMMAND: PRESS START TO BEGIN</pre>
    /    \\
 `,
           String.raw`
-   [ ^_^ ]  *
-  /| HELLO|\
+   [ ^_^ ]  o/
+  /| HELLO|
    |____|
    /    \\
 `
         ];
       }
 
-      if (base === 'paint') {
-        const color = (option || 'white').toUpperCase();
+      if (base === 'go') {
         return [
           String.raw`
-  [${color}].------------------------.[/${color}]
-  [${color}]|      16-BIT CANVAS     |[/${color}]
-  [${color}]|      COLOR: ${color.padEnd(8, ' ')} |[/${color}]
-  [${color}]|      ###########       |[/${color}]
-  [${color}]'------------------------'[/${color}]
+        ______
+=   __/  |   \__
+=  |  _      _  |
+=  '-(_)----(_)-'
 `,
           String.raw`
-  [${color}].------------------------.[/${color}]
-  [${color}]|      16-BIT CANVAS     |[/${color}]
-  [${color}]|      COLOR: ${color.padEnd(8, ' ')} |[/${color}]
-  [${color}]|      +++++++++++       |[/${color}]
-  [${color}]'------------------------'[/${color}]
+           ______
+ =  =  __/  |   \__
+ =  = |  _      _  |
+ =  = '-(_)----(_)-'
 `,
           String.raw`
-  [${color}].------------------------.[/${color}]
-  [${color}]|      16-BIT CANVAS     |[/${color}]
-  [${color}]|      COLOR: ${color.padEnd(8, ' ')} |[/${color}]
-  [${color}]|      =========++       |[/${color}]
-  [${color}]'------------------------'[/${color}]
+              ______
+  =  =  = __/  |   \__
+  =  =  =|  _      _  |
+  =  =  ='-(_)----(_)-'
+`
+        ];
+      }
+
+      if (base === 'eat') {
+        return [
+          String.raw`
+ / \__
+(    ^\___  <3
+ /   (==)   O
+/   (_____/
+/_____/   U
+`,
+          String.raw`
+ / \__
+(   ^ \__~  <3
+ /   (=     O
+/   (_____/
+/_____/   U
+`,
+          String.raw`
+ / \__
+(  ^  \___  <3
+ /          O
+/   (_____/
+/_____/   U
+`
+        ];
+      }
+
+      if (base === 'red') {
+        return [
+          String.raw`
+  [RED].--------------------.[/RED]
+  [RED]|     ███             |[/RED]
+  [RED]|     ███             |[/RED]
+  [RED]'--------------------'[/RED]
+`,
+          String.raw`
+  [RED].--------------------.[/RED]
+  [RED]|     ███████         |[/RED]
+  [RED]|     ███████         |[/RED]
+  [RED]'--------------------'[/RED]
+`,
+          String.raw`
+  [RED].--------------------.[/RED]
+  [RED]|     ██████████     |[/RED]
+  [RED]|     ██████████     |[/RED]
+  [RED]'--------------------'[/RED]
+`
+        ];
+      }
+
+      if (base === 'pop') {
+        return [
+          String.raw`
+    .-.
+   (   )
+    '-'
+     |
+`,
+          String.raw`
+   \ | /
+  -  *  -
+   / | \
+   POP!
+`,
+          String.raw`
+  *     *
+     *
+  *     *
+   POP!
+`
+        ];
+      }
+
+      if (base === 'sun') {
+        return [
+          String.raw`
+  .--------------------.
+  |   [YELLOW]\  |  /[/YELLOW]  (아침)   |
+  |  [YELLOW]-- SUN --[/YELLOW]         |
+  |____________________|
+`,
+          String.raw`
+  .--------------------.
+  |   [YELLOW]/  |  \[/YELLOW]  (아침)   |
+  |  [YELLOW]-* SUN *-[/YELLOW]         |
+  |____________________|
+`
+        ];
+      }
+
+      if (base === 'bye') {
+        return [
+          String.raw`
+   [ ^_^ ]  o/
+  /| BYE! |
+   |____|
+   /    \\
+`,
+          String.raw`
+   [ ^_^ ]  \o
+  /| BYE! |
+   |____|
+   /    \\
 `
         ];
       }
@@ -1237,7 +1204,7 @@ COMMAND: PRESS START TO BEGIN</pre>
       ui.commandInput.value = '';
       ui.commandInput.focus();
       setStatus('SYS> VOICE GUIDE READY. TYPE THE COMMAND.');
-      speak(buildIntroTTS(level), { rate: 0.88 });
+      speak(buildIntroTTS(level), { rate: 0.8 });
       trackEvent('level_view', {
         level_index: currentLevel + 1,
         level_title: level.title,
@@ -1341,7 +1308,7 @@ COMMAND: PRESS START TO BEGIN</pre>
     ui.repeatBtn.addEventListener('click', () => {
       trackEvent('hint_repeat_click', { level_index: currentLevel + 1 });
       if (currentLevel < levels.length) {
-        speak(buildIntroTTS(levels[currentLevel]), { rate: 0.88 });
+        speak(buildIntroTTS(levels[currentLevel]), { rate: 0.8 });
       }
     });
 
