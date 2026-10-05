@@ -189,6 +189,11 @@
     .scene-art .fg-aqua { color: #00ffff; }
     .scene-art .fg-white { color: #ffffff; }
 
+    .scene-art .big-emoji {
+      font-size: 56px;
+      line-height: 1.1;
+    }
+
     .desc {
       margin-top: 10px;
       color: var(--muted);
@@ -212,49 +217,54 @@
       letter-spacing: 0.08em;
     }
 
-    .palette {
-      border: 1px solid #27462f;
-      background: rgba(9, 18, 9, 0.8);
-      padding: 10px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .palette-title {
-      margin: 0 0 8px;
-      color: var(--accent);
-      font-size: 13px;
-      text-transform: uppercase;
-    }
-
-    .palette-grid {
+    .chapter-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 6px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 8px;
+      width: 100%;
     }
 
-    .palette-chip {
-      border: 1px solid #254025;
-      background: #071007;
-      padding: 5px 6px;
+    .chapter-btn {
+      display: grid;
+      gap: 4px;
+      text-align: left;
+      padding: 10px 12px;
+      border-color: var(--line);
+      text-transform: none;
+    }
+
+    .chapter-btn.cleared {
+      border-color: #2b6b43;
+      background: rgba(15, 40, 20, 0.5);
+    }
+
+    .chapter-no {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .chapter-name {
+      color: var(--accent-2);
+      font-size: 18px;
+    }
+
+    .chapter-meta {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .menu-label {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .done-actions {
       display: flex;
-      align-items: center;
-      gap: 6px;
-      min-height: 30px;
-    }
-
-    .swatch {
-      width: 14px;
-      height: 14px;
-      border: 1px solid #0c0c0c;
-      display: inline-block;
-      flex-shrink: 0;
-    }
-
-    .chip-cmd {
-      color: #cfe8cf;
-      font-size: 11px;
-      letter-spacing: 0.02em;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 12px;
     }
 
     .input-area {
@@ -397,10 +407,6 @@
         order: 2;
       }
 
-      #gameScreen .palette {
-        order: 3;
-      }
-
       #gameScreen .status {
         order: 4;
       }
@@ -414,12 +420,13 @@
 <body>
   <main class="app" aria-live="polite">
     <header class="header">
-      <h1 class="title">$ LHQ Voice Terminal v1.6 (16-BIT)</h1>
+      <h1 class="title">$ LHQ Voice Terminal v2.0</h1>
       <div class="controls">
         <label>
           <input id="letterSoundToggle" type="checkbox" checked />
           KEY SOUND ON
         </label>
+        <button id="menuBtn" type="button">[ MENU ]</button>
       </div>
     </header>
 
@@ -428,13 +435,15 @@
         <pre class="boot">BOOT: LITTLE HACKER'S QUEST (VOICE)
 STATUS: READY
 AUDIO: KO-KR TTS CONNECTED
-COMMAND: PRESS START TO BEGIN</pre>
+COMMAND: PRESS START OR PICK A CHAPTER</pre>
         <p id="compatNote" class="compat hidden"></p>
         <p id="externalOpenHelp" class="compat hidden">
           외부 브라우저가 자동으로 열리지 않으면
           <a id="externalOpenLink" href="#" target="_blank" rel="noopener noreferrer">여기를 눌러 열어주세요</a>.
         </p>
         <button id="startBtn" class="start-btn" type="button">[ START MISSION ]</button>
+        <p class="menu-label">&gt; SELECT CHAPTER</p>
+        <div id="chapterGrid" class="chapter-grid"></div>
       </section>
 
       <section id="gameScreen" class="hidden">
@@ -450,342 +459,28 @@ COMMAND: PRESS START TO BEGIN</pre>
           <p id="spellingText"></p>
         </section>
 
-        <section id="palettePanel" class="palette hidden">
-          <p class="palette-title">16-COLOR PALETTE / PAINT SUBCOMMANDS</p>
-          <div id="paletteGrid" class="palette-grid"></div>
-        </section>
-
         <section id="commandBar" class="input-area">
           <label class="prompt-input" for="commandInput">
             <span class="prompt-mark">$</span>
-            <input id="commandInput" type="text" autocomplete="off" spellcheck="false" aria-label="명령어 입력" />
+            <input id="commandInput" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="명령어 입력" />
           </label>
           <button id="submitBtn" type="button">[ ENTER ] RUN</button>
           <button id="repeatBtn" type="button">[ F1 ] REPEAT VOICE</button>
         </section>
 
         <p id="status" class="status"></p>
-        <section id="doneBox" class="done hidden"></section>
+        <section id="doneBox" class="done hidden">
+          <p id="doneText"></p>
+          <div class="done-actions">
+            <button id="nextChapterBtn" type="button">[ NEXT CHAPTER ]</button>
+            <button id="backToMenuBtn" type="button">[ MENU ]</button>
+          </div>
+        </section>
       </section>
     </section>
   </main>
 
   <script>
-    const ansi16Palette = [
-      { idx: 0, key: 'black', ko: '검정', hex: '#000000' },
-      { idx: 1, key: 'maroon', ko: '적갈', hex: '#800000' },
-      { idx: 2, key: 'green', ko: '초록', hex: '#008000' },
-      { idx: 3, key: 'olive', ko: '올리브', hex: '#808000' },
-      { idx: 4, key: 'navy', ko: '남색', hex: '#000080' },
-      { idx: 5, key: 'purple', ko: '보라', hex: '#800080' },
-      { idx: 6, key: 'teal', ko: '청록', hex: '#008080' },
-      { idx: 7, key: 'silver', ko: '은색', hex: '#c0c0c0' },
-      { idx: 8, key: 'gray', ko: '회색', hex: '#808080' },
-      { idx: 9, key: 'red', ko: '빨강', hex: '#ff0000' },
-      { idx: 10, key: 'lime', ko: '라임', hex: '#00ff00' },
-      { idx: 11, key: 'yellow', ko: '노랑', hex: '#ffff00' },
-      { idx: 12, key: 'blue', ko: '파랑', hex: '#0000ff' },
-      { idx: 13, key: 'fuchsia', ko: '자홍', hex: '#ff00ff' },
-      { idx: 14, key: 'aqua', ko: '아쿠아', hex: '#00ffff' },
-      { idx: 15, key: 'white', ko: '하양', hex: '#ffffff' }
-    ];
-
-    // 48개월 아이 기준: 2~3글자 단어만, 띄어쓰기·대시 옵션 없음
-    const baseLevels = [
-      {
-        title: 'Lv.1 어두운 방',
-        command: 'on',
-        artBefore: String.raw`
-  .--------------------.
-  |      (어두운 방)     |
-  |        ....         |
-  |       ......        |
-  '--------------------'
-`,
-        artAfter: String.raw`
-  .--------------------.
-  |      (밝은 방)       |
-  |      \ ON /         |
-  |       \ | /         |
-  '--------------------'
-`,
-        descBefore: '방이 아주 어두워요.',
-        descAfter: '우와! 방이 환하게 밝아졌어요.',
-        contextTTS: '방이 너무 어두워요. 불을 켜 볼까요?',
-        rewardTTS: '우와, 성공이야! 방이 환해졌어. 아주 잘했어!'
-      },
-      {
-        title: 'Lv.2 잠든 로봇',
-        command: 'hi',
-        artBefore: String.raw`
-   [ -_- ]
-  /|  z |\
-   |____|
-   /    \\
-`,
-        artAfter: String.raw`
-   [ ^_^ ]
-  /| HELLO|\
-   |____|
-   /    \\
-`,
-        descBefore: '로봇이 쿨쿨 자고 있어요.',
-        descAfter: '로봇이 깨어나서 인사해요!',
-        contextTTS: '로봇이 자고 있어요. 안녕 하고 인사해 볼까요?',
-        rewardTTS: '안녕! 로봇이 눈을 뜨고 손을 흔들었어!'
-      },
-      {
-        title: 'Lv.3 빵빵 자동차',
-        command: 'go',
-        artBefore: String.raw`
-      ______
-   __/  |   \__
-  |  _      _  |
-  '-(_)----(_)-'
-`,
-        artAfter: String.raw`
-        ______
-=   __/  |   \__
-=  |  _      _  |
-=  '-(_)----(_)-'
-`,
-        descBefore: '자동차가 출발을 기다려요.',
-        descAfter: '부릉부릉! 자동차가 달려요!',
-        contextTTS: '자동차가 출발하고 싶대요. 출발 신호를 보내 볼까요?',
-        rewardTTS: '부릉부릉! 자동차가 씽씽 달려가!'
-      },
-      {
-        title: 'Lv.4 배고픈 강아지',
-        command: 'eat',
-        artBefore: String.raw`
- / \__
-(    @\___
- /         O
-/   (_____/
-/_____/   U
-`,
-        artAfter: String.raw`
- / \__
-(    ^\___  <3
- /   (==)   O
-/   (_____/
-/_____/   U
-`,
-        descBefore: '강아지 초코가 배가 고파요.',
-        descAfter: '초코가 냠냠 맛있게 먹어요!',
-        contextTTS: '강아지 초코가 배가 고프대요. 먹어 라고 말해 줄까요?',
-        rewardTTS: '냠냠! 초코가 맛있게 먹고 있어. 멍멍!'
-      },
-      {
-        title: 'Lv.5 빨간 그림',
-        command: 'red',
-        themeColor: '#ff0000',
-        artBefore: String.raw`
-  .--------------------.
-  |      (그림 종이)     |
-  |     ............    |
-  '--------------------'
-`,
-        artAfter: String.raw`
-  [RED].--------------------.[/RED]
-  [RED]|     ██████████     |[/RED]
-  [RED]|     ██████████     |[/RED]
-  [RED]'--------------------'[/RED]
-`,
-        descBefore: '하얀 종이가 있어요. 빨간색으로 칠해 볼까요?',
-        descAfter: '종이가 빨갛게 칠해졌어요!',
-        contextTTS: '하얀 종이가 있어요. 빨간색으로 칠해 볼까요?',
-        rewardTTS: '와! 빨간색으로 예쁘게 칠했어!'
-      },
-      {
-        title: 'Lv.6 둥실 풍선',
-        command: 'pop',
-        artBefore: String.raw`
-    .-.
-   (   )
-    '-'
-     |
-     |
-`,
-        artAfter: String.raw`
-   \ | /
-  -  *  -
-   / | \
-   POP!
-`,
-        descBefore: '풍선이 둥실둥실 떠 있어요.',
-        descAfter: '펑! 풍선이 터졌어요!',
-        contextTTS: '풍선이 둥실둥실 떠 있어요. 펑 하고 터뜨려 볼까요?',
-        rewardTTS: '펑! 풍선이 터졌어. 깜짝 놀랐지?'
-      },
-      {
-        title: 'Lv.7 아침 해님',
-        command: 'sun',
-        artBefore: String.raw`
-  .--------------------.
-  |   *    (밤)    *   |
-  |      *      *      |
-  |____________________|
-`,
-        artAfter: String.raw`
-  .--------------------.
-  |   [YELLOW]\  |  /[/YELLOW]  (아침)   |
-  |  [YELLOW]-- SUN --[/YELLOW]         |
-  |____________________|
-`,
-        descBefore: '깜깜한 밤이에요. 해님을 불러 볼까요?',
-        descAfter: '해님이 반짝 떠올랐어요!',
-        contextTTS: '깜깜한 밤이에요. 해님을 불러 볼까요?',
-        rewardTTS: '좋은 아침! 해님이 반짝 떴어!'
-      },
-      {
-        title: 'Lv.8 잘 가 로봇',
-        command: 'bye',
-        artBefore: String.raw`
-   [ ^_^ ]
-  /| HELLO|\
-   |____|
-   /    \\
-`,
-        artAfter: String.raw`
-   [ ^_^ ]  o/
-  /| BYE! |
-   |____|
-   /    \\
-`,
-        descBefore: '신나게 놀았어요. 이제 로봇과 인사할 시간이에요.',
-        descAfter: '로봇이 손을 흔들며 인사해요!',
-        contextTTS: '오늘 정말 재미있었어요. 로봇에게 잘 가 하고 인사해 볼까요?',
-        rewardTTS: '안녕, 또 만나! 로봇이 손을 흔들고 있어!'
-      }
-    ];
-
-    function expandStages(levels) {
-      const detailKo = {
-        rainbow: '무지개',
-        stars: '별빛',
-        icecream: '아이스크림',
-        snack: '간식',
-        bone: '뼈다귀',
-        dance: '춤',
-        song: '노래',
-        black: '검정',
-        maroon: '적갈',
-        green: '초록',
-        olive: '올리브',
-        navy: '남색',
-        purple: '보라',
-        teal: '청록',
-        silver: '은색',
-        gray: '회색',
-        red: '빨강',
-        lime: '라임',
-        yellow: '노랑',
-        blue: '파랑',
-        fuchsia: '자홍',
-        aqua: '아쿠아',
-        white: '하양'
-      };
-      const buildDetailPrompt = (command, detailKey) => {
-        const word = detailKo[detailKey] || detailKey;
-        if (command === 'on') return `이제 ${word} 색으로 불을 켜보아요.`;
-        if (command === 'feed') return `이제 ${word}을 초코에게 줘볼까요?`;
-        if (command === 'wake') return `이제 로봇과 ${word}도 해볼까요?`;
-        if (command === 'paint') return `이제 ${word} 색으로 칠해보아요.`;
-        return `이제 ${word}도 해보아요.`;
-      };
-      const buildDetailContextTTS = (command, detailKey) => {
-        const word = detailKo[detailKey] || detailKey;
-        if (command === 'on') return `${word} 색 불빛을 켜볼까요? ${command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`;
-        if (command === 'feed') return `이번에는 ${word}을 줄 차례예요. ${command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`;
-        if (command === 'wake') return `이번에는 로봇과 ${word}을 해봐요. ${command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`;
-        if (command === 'paint') return `${word} 색으로 칠해볼까요? ${command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`;
-        return `${word} 명령을 해봐요. ${command.toUpperCase()} 다음에 띄어쓰고 대시 ${detailKey.toUpperCase()}를 입력해요.`;
-      };
-      const normalizeTitle = title => title.replace(/^Lv\.\d+\s*/, '').trim();
-      const stages = [];
-      for (const level of levels) {
-        stages.push({
-          stageName: normalizeTitle(level.title),
-          command: level.command,
-          artBefore: level.artBefore,
-          artAfter: level.artAfter,
-          descBefore: level.descBefore,
-          descAfter: level.descAfter,
-          contextTTS: level.contextTTS,
-          rewardTTS: level.rewardTTS,
-          themeColor: level.themeColor || null,
-          showPalette: level.command === 'paint'
-        });
-
-        for (const [detailKey, detailValue] of Object.entries(level.details || {})) {
-          const baseTitle = normalizeTitle(level.title);
-          stages.push({
-            stageName: `${baseTitle} / ${detailKey.toUpperCase()}`,
-            command: `${level.command} -${detailKey}`,
-            artBefore: level.artAfter,
-            artAfter: detailValue.artAfter || level.artAfter,
-            descBefore: `${level.descAfter} ${buildDetailPrompt(level.command, detailKey)}`,
-            descAfter: detailValue.descAfter || level.descAfter,
-            contextTTS: buildDetailContextTTS(level.command, detailKey),
-            rewardTTS: detailValue.rewardTTS || level.rewardTTS,
-            themeColor: detailValue.themeColor || null,
-            showPalette: level.command === 'paint'
-          });
-        }
-      }
-
-      return stages.map((stage, index) => ({
-        ...stage,
-        title: `Lv.${index + 1} ${stage.stageName}`
-      }));
-    }
-
-    const levels = expandStages(baseLevels);
-
-    const ui = {
-      startScreen: document.getElementById('startScreen'),
-      gameScreen: document.getElementById('gameScreen'),
-      startBtn: document.getElementById('startBtn'),
-      levelCard: document.getElementById('levelCard'),
-      levelTitle: document.getElementById('levelTitle'),
-      sceneArt: document.getElementById('sceneArt'),
-      sceneDesc: document.getElementById('sceneDesc'),
-      commandBar: document.getElementById('commandBar'),
-      compatNote: document.getElementById('compatNote'),
-      externalOpenHelp: document.getElementById('externalOpenHelp'),
-      externalOpenLink: document.getElementById('externalOpenLink'),
-      commandText: document.getElementById('commandText'),
-      spellingText: document.getElementById('spellingText'),
-      palettePanel: document.getElementById('palettePanel'),
-      paletteGrid: document.getElementById('paletteGrid'),
-      commandInput: document.getElementById('commandInput'),
-      submitBtn: document.getElementById('submitBtn'),
-      repeatBtn: document.getElementById('repeatBtn'),
-      status: document.getElementById('status'),
-      doneBox: document.getElementById('doneBox'),
-      letterSoundToggle: document.getElementById('letterSoundToggle')
-    };
-
-    let currentLevel = 0;
-    let gameStarted = false;
-    let koreanVoice = null;
-    let lastLetterSpokenAt = 0;
-    let sceneAnimationTimer = null;
-    let activeAnimationName = '';
-    let isStageTransitioning = false;
-    const userAgent = navigator.userAgent || '';
-    const isKakaoInApp = /KAKAOTALK/i.test(userAgent);
-    const sessionId = `lhq_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-
-    function hasTTS() {
-      return (
-        typeof window !== 'undefined'
-        && 'speechSynthesis' in window
-        && 'SpeechSynthesisUtterance' in window
-      );
-    }
-
     const letterKo = {
       A: '에이',
       B: '비',
@@ -812,8 +507,554 @@ COMMAND: PRESS START TO BEGIN</pre>
       W: '더블유',
       X: '엑스',
       Y: '와이',
-      Z: '지'
+      Z: '제트'
     };
+
+    // ---------- 큰 글자 (5x5 도트) ----------
+    const bigFont = {
+      A: [' ### ', '#   #', '#####', '#   #', '#   #'],
+      B: ['#### ', '#   #', '#### ', '#   #', '#### '],
+      C: [' ####', '#    ', '#    ', '#    ', ' ####'],
+      D: ['#### ', '#   #', '#   #', '#   #', '#### '],
+      E: ['#####', '#    ', '#### ', '#    ', '#####'],
+      F: ['#####', '#    ', '#### ', '#    ', '#    '],
+      G: [' ####', '#    ', '#  ##', '#   #', ' ####'],
+      H: ['#   #', '#   #', '#####', '#   #', '#   #'],
+      I: ['#####', '  #  ', '  #  ', '  #  ', '#####'],
+      J: ['#####', '   # ', '   # ', '#  # ', ' ##  '],
+      K: ['#   #', '#  # ', '###  ', '#  # ', '#   #'],
+      L: ['#    ', '#    ', '#    ', '#    ', '#####'],
+      M: ['#   #', '## ##', '# # #', '#   #', '#   #'],
+      N: ['#   #', '##  #', '# # #', '#  ##', '#   #'],
+      O: [' ### ', '#   #', '#   #', '#   #', ' ### '],
+      P: ['#### ', '#   #', '#### ', '#    ', '#    '],
+      Q: [' ### ', '#   #', '# # #', '#  # ', ' ## #'],
+      R: ['#### ', '#   #', '#### ', '#  # ', '#   #'],
+      S: [' ####', '#    ', ' ### ', '    #', '#### '],
+      T: ['#####', '  #  ', '  #  ', '  #  ', '  #  '],
+      U: ['#   #', '#   #', '#   #', '#   #', ' ### '],
+      V: ['#   #', '#   #', '#   #', ' # # ', '  #  '],
+      W: ['#   #', '#   #', '# # #', '## ##', '#   #'],
+      X: ['#   #', ' # # ', '  #  ', ' # # ', '#   #'],
+      Y: ['#   #', ' # # ', '  #  ', '  #  ', '  #  '],
+      Z: ['#####', '   # ', '  #  ', ' #   ', '#####']
+    };
+
+    function bigLetter(letter) {
+      return bigFont[letter]
+        .map(row => '  ' + row.replace(/#/g, '██').replace(/ /g, '  '))
+        .join('\n');
+    }
+
+    function colorize(art, color) {
+      return art
+        .split('\n')
+        .map(line => (line.trim() ? `[${color}]${line}[/${color}]` : line))
+        .join('\n');
+    }
+
+    // ---------- 장면 그림 ----------
+    const ROOM_DARK = String.raw`
+.--------------------.
+|                    |
+|       (DARK)       |
+|        ....        |
+'--------------------'
+`;
+    const ROOM_LIT = [
+      String.raw`
+.--------------------.
+|      \  |  /       |
+|     -- ON --       |
+|      /  |  \       |
+'--------------------'
+`,
+      String.raw`
+.--------------------.
+|    \ \  |  / /     |
+|   ---* ON *---     |
+|    / /  |  \ \     |
+'--------------------'
+`
+    ];
+
+    function robot(face, label, waveUp) {
+      const hand = waveUp === undefined ? '' : (waveUp ? '  o/' : '  \\o');
+      const rightArm = waveUp === undefined ? '\\' : '';
+      return [
+        '',
+        `   [ ${face} ]${hand}`,
+        `  /|${label}|${rightArm}`,
+        '   |______|',
+        '   /      \\',
+        ''
+      ].join('\n');
+    }
+    const ROBOT_SLEEP = robot('-_-', '  zz  ');
+
+    const carBody = ['    ______', ' __/  |   \\__', '|  _      _  |', "'-(_)----(_)-'"];
+    function car(x, trail = '') {
+      const lines = carBody.map((line, i) => {
+        if (i === 0 || !trail) return ' '.repeat(x) + line;
+        return ' '.repeat(Math.max(0, x - trail.length)) + trail + line;
+      });
+      return ['', ...lines, '='.repeat(32), ''].join('\n');
+    }
+    const CAR_IDLE = car(2);
+
+    function dog(face, item, heart) {
+      return [
+        '',
+        ' / \\__',
+        `(    ${face}\\___${heart ? '  <3' : ''}`,
+        ` /   ${item.padEnd(4, ' ')}   O`,
+        '/   (_____/',
+        '/_____/   U',
+        ''
+      ].join('\n');
+    }
+    const DOG_HUNGRY = dog('@', '', false);
+    function dogEatFrames(item) {
+      return [dog('^', item, true), dog('^', item.slice(0, Math.ceil(item.length / 2)), true), dog('^', '', true)];
+    }
+
+    const PAPER_BLANK = String.raw`
+.--------------------.
+|                    |
+|    ............    |
+|                    |
+'--------------------'
+`;
+
+    const BALLOON = String.raw`
+   .-.
+  (   )
+   '-'
+    |
+    |
+`;
+    const BIG_BALLOON = String.raw`
+    .---.
+   /     \
+  (       )
+   \     /
+    '---'
+      |
+`;
+
+    const NIGHT = String.raw`
+  *      .      *
+      .     *
+  (NIGHT)   zzz
+________________
+`;
+
+    // ---------- 1~3장: 알파벳 ----------
+    const alphabetWords = {
+      A: { word: 'apple', emoji: '🍎', pron: '애플', ko: '사과' },
+      B: { word: 'ball', emoji: '⚽', pron: '볼', ko: '공' },
+      C: { word: 'cat', emoji: '🐱', pron: '캣', ko: '고양이' },
+      D: { word: 'dog', emoji: '🐶', pron: '독', ko: '강아지' },
+      E: { word: 'egg', emoji: '🥚', pron: '에그', ko: '달걀' },
+      F: { word: 'fish', emoji: '🐟', pron: '피쉬', ko: '물고기' },
+      G: { word: 'gift', emoji: '🎁', pron: '기프트', ko: '선물' },
+      H: { word: 'hat', emoji: '🎩', pron: '햇', ko: '모자' },
+      I: { word: 'ice cream', emoji: '🍦', pron: '아이스크림', ko: '아이스크림' },
+      J: { word: 'juice', emoji: '🧃', pron: '주스', ko: '주스' },
+      K: { word: 'kite', emoji: '🪁', pron: '카이트', ko: '연' },
+      L: { word: 'lion', emoji: '🦁', pron: '라이언', ko: '사자' },
+      M: { word: 'moon', emoji: '🌙', pron: '문', ko: '달' },
+      N: { word: 'nose', emoji: '👃', pron: '노즈', ko: '코' },
+      O: { word: 'orange', emoji: '🍊', pron: '오렌지', ko: '오렌지' },
+      P: { word: 'pig', emoji: '🐷', pron: '피그', ko: '돼지' },
+      Q: { word: 'queen', emoji: '👑', pron: '퀸', ko: '여왕' },
+      R: { word: 'rabbit', emoji: '🐰', pron: '래빗', ko: '토끼' },
+      S: { word: 'star', emoji: '⭐', pron: '스타', ko: '별' },
+      T: { word: 'tree', emoji: '🌳', pron: '트리', ko: '나무' },
+      U: { word: 'umbrella', emoji: '☂️', pron: '엄브렐라', ko: '우산' },
+      V: { word: 'violin', emoji: '🎻', pron: '바이올린', ko: '바이올린' },
+      W: { word: 'whale', emoji: '🐳', pron: '웨일', ko: '고래' },
+      X: { word: 'xylophone', emoji: '🎵', pron: '자일로폰', ko: '실로폰' },
+      Y: { word: 'yo-yo', emoji: '🪀', pron: '요요', ko: '요요' },
+      Z: { word: 'zebra', emoji: '🦓', pron: '지브라', ko: '얼룩말' }
+    };
+
+    function alphabetLevel(letter) {
+      const w = alphabetWords[letter];
+      const lower = letter.toLowerCase();
+      const big = bigLetter(letter);
+      const caption = `  [BIG]${w.emoji}[/BIG]  ${letter} is for ${w.word}`;
+      return {
+        command: lower,
+        name: `${letter} ${lower}`,
+        artBefore: `${big}\n\n  ${letter} ${lower}  ?`,
+        frames: [
+          `${big}\n\n${caption}`,
+          `${colorize(big, 'YELLOW')}\n\n${caption}  *`
+        ],
+        descBefore: `키보드에서 ${letter} 글자를 찾아 누르고 엔터!`,
+        descAfter: `${letter} 는 ${w.word} (${w.ko}) 의 첫 글자!`,
+        contextTTS: `${letterKo[letter]}! ${w.ko}, 영어로 ${w.pron}. ${w.pron}의 첫 글자 ${letterKo[letter]}예요.`,
+        rewardTTS: `딩동댕! ${letterKo[letter]}, ${w.pron}, ${w.ko}!`
+      };
+    }
+
+    // ---------- 4장: 첫 명령어 ----------
+    const commandLevels = [
+      {
+        command: 'on',
+        name: '어두운 방',
+        artBefore: ROOM_DARK,
+        frames: ROOM_LIT,
+        descBefore: '방이 아주 어두워요.',
+        descAfter: '우와! 방이 환하게 밝아졌어요.',
+        contextTTS: '방이 너무 어두워요. 불을 켜 볼까요?',
+        rewardTTS: '우와, 성공이야! 방이 환해졌어. 아주 잘했어!'
+      },
+      {
+        command: 'hi',
+        name: '잠든 로봇',
+        artBefore: ROBOT_SLEEP,
+        frames: [robot('^_^', 'HELLO ', true), robot('^_^', 'HELLO ', false)],
+        descBefore: '로봇이 쿨쿨 자고 있어요.',
+        descAfter: '로봇이 깨어나서 인사해요!',
+        contextTTS: '로봇이 자고 있어요. 안녕 하고 인사해 볼까요?',
+        rewardTTS: '안녕! 로봇이 눈을 뜨고 손을 흔들었어!'
+      },
+      {
+        command: 'go',
+        name: '빵빵 자동차',
+        artBefore: CAR_IDLE,
+        frames: [car(4, '= '), car(8, '= = '), car(12, '= = = ')],
+        descBefore: '자동차가 출발을 기다려요.',
+        descAfter: '부릉부릉! 자동차가 달려요!',
+        contextTTS: '자동차가 출발하고 싶대요. 출발 신호를 보내 볼까요?',
+        rewardTTS: '부릉부릉! 자동차가 씽씽 달려가!'
+      },
+      {
+        command: 'eat',
+        name: '배고픈 강아지',
+        artBefore: DOG_HUNGRY,
+        frames: dogEatFrames('(==)'),
+        descBefore: '강아지 초코가 배가 고파요.',
+        descAfter: '초코가 냠냠 맛있게 먹어요!',
+        contextTTS: '강아지 초코가 배가 고프대요. 먹어 라고 말해 줄까요?',
+        rewardTTS: '냠냠! 초코가 맛있게 먹고 있어. 멍멍!'
+      },
+      {
+        command: 'red',
+        name: '빨간 그림',
+        themeColor: '#ff0000',
+        artBefore: PAPER_BLANK,
+        frames: [
+          colorize(PAPER_BLANK.replace('............', '████        '), 'RED'),
+          colorize(PAPER_BLANK.replace('............', '████████    '), 'RED'),
+          colorize(PAPER_BLANK.replace('............', '████████████'), 'RED')
+        ],
+        descBefore: '하얀 종이가 있어요. 빨간색으로 칠해 볼까요?',
+        descAfter: '종이가 빨갛게 칠해졌어요!',
+        contextTTS: '하얀 종이가 있어요. 빨간색으로 칠해 볼까요?',
+        rewardTTS: '와! 빨간색으로 예쁘게 칠했어!'
+      },
+      {
+        command: 'pop',
+        name: '둥실 풍선',
+        artBefore: BALLOON,
+        frames: [
+          BALLOON,
+          String.raw`
+  \ | /
+ -  *  -
+  / | \
+  POP!
+`,
+          String.raw`
+ *     *
+    *
+ *     *
+  POP!
+`
+        ],
+        descBefore: '풍선이 둥실둥실 떠 있어요.',
+        descAfter: '펑! 풍선이 터졌어요!',
+        contextTTS: '풍선이 둥실둥실 떠 있어요. 펑 하고 터뜨려 볼까요?',
+        rewardTTS: '펑! 풍선이 터졌어. 깜짝 놀랐지?'
+      },
+      {
+        command: 'sun',
+        name: '아침 해님',
+        artBefore: NIGHT,
+        frames: [
+          `${colorize('    \\  |  /\n  --  SUN  --\n    /  |  \\', 'YELLOW')}\n________________`,
+          `${colorize('   \\ \\ | / /\n  -*  SUN  *-\n   / / | \\ \\', 'YELLOW')}\n________________`
+        ],
+        descBefore: '깜깜한 밤이에요. 해님을 불러 볼까요?',
+        descAfter: '해님이 반짝 떠올랐어요!',
+        contextTTS: '깜깜한 밤이에요. 해님을 불러 볼까요?',
+        rewardTTS: '좋은 아침! 해님이 반짝 떴어!'
+      },
+      {
+        command: 'bye',
+        name: '잘 가 로봇',
+        artBefore: robot('^_^', 'HELLO '),
+        frames: [robot('^_^', ' BYE! ', true), robot('^_^', ' BYE! ', false)],
+        descBefore: '신나게 놀았어요. 이제 로봇과 인사할 시간이에요.',
+        descAfter: '로봇이 손을 흔들며 인사해요!',
+        contextTTS: '오늘 정말 재미있었어요. 로봇에게 잘 가 하고 인사해 볼까요?',
+        rewardTTS: '안녕, 또 만나! 로봇이 손을 흔들고 있어!'
+      }
+    ];
+
+    // ---------- 5장: 세 글자 영어 단어 ----------
+    const threeLetterWords = [
+      { word: 'cat', emoji: '🐱', pron: '캣', ko: '고양이' },
+      { word: 'dog', emoji: '🐶', pron: '독', ko: '강아지' },
+      { word: 'pig', emoji: '🐷', pron: '피그', ko: '돼지' },
+      { word: 'cow', emoji: '🐮', pron: '카우', ko: '소' },
+      { word: 'fox', emoji: '🦊', pron: '폭스', ko: '여우' },
+      { word: 'bee', emoji: '🐝', pron: '비', ko: '꿀벌' },
+      { word: 'egg', emoji: '🥚', pron: '에그', ko: '달걀' },
+      { word: 'cup', emoji: '🥤', pron: '컵', ko: '컵' },
+      { word: 'hat', emoji: '🎩', pron: '햇', ko: '모자' },
+      { word: 'bus', emoji: '🚌', pron: '버스', ko: '버스' }
+    ];
+
+    function wordLevel(w) {
+      const letters = w.word.toUpperCase().split('');
+      const reveal = count => letters.map((ch, i) => (i < count ? ch : '_')).join(' ');
+      return {
+        command: w.word,
+        name: `${w.ko} ${w.emoji}`,
+        artBefore: `\n  [BIG]${w.emoji}[/BIG]\n\n  ${reveal(0)}\n`,
+        frames: [
+          `\n  [BIG]${w.emoji}[/BIG]\n\n  ${reveal(1)}\n`,
+          `\n  [BIG]${w.emoji}[/BIG]\n\n  ${reveal(2)}\n`,
+          `\n  [BIG]${w.emoji}[/BIG]\n\n  ${reveal(3)}\n`,
+          `\n  [BIG]${w.emoji}[/BIG]\n\n  [YELLOW]${reveal(3)}[/YELLOW]  *\n`
+        ],
+        descBefore: `${w.ko} 는 영어로 뭘까요?`,
+        descAfter: `${w.ko} = ${w.word.toUpperCase()} (${w.pron})`,
+        contextTTS: `${w.ko}, 영어로 ${w.pron}! ${w.pron} 만들어 볼까요?`,
+        rewardTTS: `잘했어! ${w.pron}, ${w.ko}!`
+      };
+    }
+
+    // ---------- 6~7장: 대시 옵션 ----------
+    // 같은 옵션을 -r(짧게) / --red(길게) 두 가지로 연습해요.
+    const baseSpoken = { on: '온', hi: '하이', go: '고', eat: '잇', pop: '팝' };
+    const commandOptions = [
+      {
+        base: 'on', key: 'red', pron: '레드', ko: '빨강', themeColor: '#ff0000',
+        ask: '방에 빨간 불을 켜 볼까요?',
+        before: ROOM_DARK, frames: ROOM_LIT.map(art => colorize(art, 'RED')),
+        descAfter: '방이 빨갛게 빛나요!', reward: '빨간 불이 켜졌어!'
+      },
+      {
+        base: 'on', key: 'blue', pron: '블루', ko: '파랑', themeColor: '#3b82ff',
+        ask: '이번엔 파란 불을 켜 볼까요?',
+        before: ROOM_DARK, frames: ROOM_LIT.map(art => colorize(art, 'AQUA')),
+        descAfter: '방이 파랗게 빛나요!', reward: '파란 불이 켜졌어!'
+      },
+      {
+        base: 'on', key: 'green', pron: '그린', ko: '초록', themeColor: '#00ff00',
+        ask: '초록 불도 켜 볼까요?',
+        before: ROOM_DARK, frames: ROOM_LIT.map(art => colorize(art, 'LIME')),
+        descAfter: '방이 초록색으로 빛나요!', reward: '초록 불이 켜졌어!'
+      },
+      {
+        base: 'go', key: 'fast', pron: '패스트', ko: '빠르게',
+        ask: '자동차를 아주 빠르게 달리게 해 볼까요?',
+        before: CAR_IDLE, frames: [car(6, '== '), car(14, '=== === '), car(22, '==== ==== ')],
+        descAfter: '슝! 자동차가 엄청 빨라요!', reward: '슝! 자동차가 번개처럼 달려!'
+      },
+      {
+        base: 'go', key: 'slow', pron: '슬로우', ko: '천천히',
+        ask: '이번엔 자동차를 천천히 달리게 해 볼까요?',
+        before: CAR_IDLE, frames: [car(2), car(3, '.'), car(4, '. '), car(5, '. .')],
+        descAfter: '자동차가 엉금엉금 천천히 가요.', reward: '엉금엉금, 자동차가 천천히 가고 있어!'
+      },
+      {
+        base: 'eat', key: 'cake', pron: '케이크', ko: '케이크',
+        ask: '초코에게 케이크를 줘 볼까요?',
+        before: DOG_HUNGRY, frames: dogEatFrames('|^^|'),
+        descAfter: '초코가 케이크를 냠냠 먹어요!', reward: '냠냠! 초코가 케이크를 좋아해!'
+      },
+      {
+        base: 'hi', key: 'wave', pron: '웨이브', ko: '손 흔들기',
+        ask: '로봇이 손을 흔들며 인사하게 해 볼까요?',
+        before: ROBOT_SLEEP, frames: [robot('^o^', ' WAVE ', true), robot('^o^', ' WAVE ', false)],
+        descAfter: '로봇이 손을 마구 흔들어요!', reward: '로봇이 손을 흔들흔들 인사해!'
+      },
+      {
+        base: 'pop', key: 'big', pron: '빅', ko: '크게',
+        ask: '커다란 풍선을 크게 터뜨려 볼까요?',
+        before: BIG_BALLOON,
+        frames: [
+          BIG_BALLOON,
+          String.raw`
+ \  \ | /  /
+ -- BOOM! --
+ /  / | \  \
+`,
+          String.raw`
+ *    *    *
+    *    *
+ *    *    *
+`
+        ],
+        descAfter: '쾅! 커다란 풍선이 터졌어요!', reward: '쾅! 엄청 큰 소리가 났어!'
+      }
+    ];
+
+    function shortOptionLevel(opt, index) {
+      const letter = opt.key[0].toUpperCase();
+      const firstTip = index === 0
+        ? '이번엔 대시를 써 볼 거예요. 대시는 숫자 0 옆에 있는 짧은 막대예요. '
+        : '';
+      return {
+        command: `${opt.base} -${opt.key[0]}`,
+        name: `${opt.ko} (-${opt.key[0]})`,
+        themeColor: opt.themeColor,
+        artBefore: opt.before,
+        frames: opt.frames,
+        descBefore: `${opt.ask} -${opt.key[0]} 의 ${opt.key[0]} 는 ${opt.key} (${opt.ko}) 의 첫 글자예요.`,
+        descAfter: opt.descAfter,
+        contextTTS: `${firstTip}${opt.ask} ${baseSpoken[opt.base]} 다음에 띄어쓰고, 대시 하나, 그리고 ${letterKo[letter]}. ${letterKo[letter]}는 ${opt.pron}의 첫 글자예요.`,
+        rewardTTS: opt.reward
+      };
+    }
+
+    function longOptionLevel(opt, index) {
+      const firstTip = index === 0
+        ? '대시를 두 번 쓰면 한 글자 대신 단어를 통째로 써요. '
+        : '';
+      return {
+        command: `${opt.base} --${opt.key}`,
+        name: `${opt.ko} (--${opt.key})`,
+        themeColor: opt.themeColor,
+        artBefore: opt.before,
+        frames: opt.frames,
+        descBefore: `${opt.ask} --${opt.key} 는 -${opt.key[0]} 와 같은 뜻이에요.`,
+        descAfter: opt.descAfter,
+        contextTTS: `${firstTip}${opt.ask} ${baseSpoken[opt.base]} 다음에 띄어쓰고, 대시 두 개, 그리고 ${opt.pron}.`,
+        rewardTTS: opt.reward
+      };
+    }
+
+    const chapters = [
+      {
+        id: 'abc1',
+        title: '알파벳 A~I',
+        introTTS: '알파벳 놀이를 해요! 큰 글자를 보고 키보드에서 같은 글자를 찾아 누른 다음, 엔터를 눌러요.',
+        levels: 'ABCDEFGHI'.split('').map(alphabetLevel)
+      },
+      {
+        id: 'abc2',
+        title: '알파벳 J~R',
+        introTTS: '알파벳 놀이 두 번째! 글자를 찾아 눌러 봐요.',
+        levels: 'JKLMNOPQR'.split('').map(alphabetLevel)
+      },
+      {
+        id: 'abc3',
+        title: '알파벳 S~Z',
+        introTTS: '알파벳 마지막 판! 끝까지 해 보자.',
+        levels: 'STUVWXYZ'.split('').map(alphabetLevel)
+      },
+      {
+        id: 'cmd',
+        title: '첫 명령어',
+        introTTS: '이제 컴퓨터에게 명령을 내려 봐요! 글자를 차례대로 누르고 엔터!',
+        levels: commandLevels
+      },
+      {
+        id: 'words',
+        title: '영어 단어',
+        introTTS: '세 글자 영어 단어를 만들어 봐요!',
+        levels: threeLetterWords.map(wordLevel)
+      },
+      {
+        id: 'dash1',
+        title: '대시 하나 -',
+        introTTS: '명령어 뒤에 대시를 붙이면 더 자세하게 명령할 수 있어요. 대시 하나 뒤에는 한 글자를 써요.',
+        levels: commandOptions.map(shortOptionLevel)
+      },
+      {
+        id: 'dash2',
+        title: '대시 두 개 --',
+        introTTS: '대시를 두 개 쓰면 뒤에 단어를 다 써요. 대시 하나 알 이랑 대시 두 개 레드는 같은 뜻이에요.',
+        levels: commandOptions.map(longOptionLevel)
+      }
+    ];
+
+    const ui = {
+      startScreen: document.getElementById('startScreen'),
+      gameScreen: document.getElementById('gameScreen'),
+      startBtn: document.getElementById('startBtn'),
+      chapterGrid: document.getElementById('chapterGrid'),
+      menuBtn: document.getElementById('menuBtn'),
+      levelCard: document.getElementById('levelCard'),
+      levelTitle: document.getElementById('levelTitle'),
+      sceneArt: document.getElementById('sceneArt'),
+      sceneDesc: document.getElementById('sceneDesc'),
+      commandBar: document.getElementById('commandBar'),
+      compatNote: document.getElementById('compatNote'),
+      externalOpenHelp: document.getElementById('externalOpenHelp'),
+      externalOpenLink: document.getElementById('externalOpenLink'),
+      commandText: document.getElementById('commandText'),
+      spellingText: document.getElementById('spellingText'),
+      commandInput: document.getElementById('commandInput'),
+      submitBtn: document.getElementById('submitBtn'),
+      repeatBtn: document.getElementById('repeatBtn'),
+      status: document.getElementById('status'),
+      doneBox: document.getElementById('doneBox'),
+      doneText: document.getElementById('doneText'),
+      nextChapterBtn: document.getElementById('nextChapterBtn'),
+      backToMenuBtn: document.getElementById('backToMenuBtn'),
+      letterSoundToggle: document.getElementById('letterSoundToggle')
+    };
+
+    const CLEARED_KEY = 'lhq_cleared_chapters';
+    let currentChapter = 0;
+    let currentLevel = 0;
+    let gameStarted = false;
+    let koreanVoice = null;
+    let lastLetterSpokenAt = 0;
+    let sceneAnimationTimer = null;
+    let activeAnimationName = '';
+    let isStageTransitioning = false;
+    let playToken = 0;
+    const userAgent = navigator.userAgent || '';
+    const isKakaoInApp = /KAKAOTALK/i.test(userAgent);
+    const sessionId = `lhq_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+
+    function hasTTS() {
+      return (
+        typeof window !== 'undefined'
+        && 'speechSynthesis' in window
+        && 'SpeechSynthesisUtterance' in window
+      );
+    }
+
+    function loadCleared() {
+      try {
+        const raw = window.localStorage.getItem(CLEARED_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (_error) {
+        return [];
+      }
+    }
+
+    function saveCleared(chapterId) {
+      const cleared = loadCleared();
+      if (cleared.includes(chapterId)) return;
+      cleared.push(chapterId);
+      try {
+        window.localStorage.setItem(CLEARED_KEY, JSON.stringify(cleared));
+      } catch (_error) {
+        // 저장이 안 되는 환경이면 이번 판에서만 기억해요.
+      }
+    }
 
     function commandToSpellingKo(command) {
       return command
@@ -853,7 +1094,7 @@ COMMAND: PRESS START TO BEGIN</pre>
       return escaped.replace(
         /\[(BLACK|MAROON|GREEN|OLIVE|NAVY|PURPLE|TEAL|SILVER|GRAY|RED|LIME|YELLOW|BLUE|FUCHSIA|AQUA|WHITE)\]([\s\S]*?)\[\/\1\]/gi,
         (_match, color, text) => `<span class="fg-${color.toLowerCase()}">${text}</span>`
-      );
+      ).replace(/\[BIG\]([\s\S]*?)\[\/BIG\]/g, '<span class="big-emoji">$1</span>');
     }
 
     function stopSceneAnimation() {
@@ -867,188 +1108,8 @@ COMMAND: PRESS START TO BEGIN</pre>
       }
     }
 
-    function parseCommand(command) {
-      const normalized = normalizeCommand(command);
-      const parts = normalized.split(' ');
-      return {
-        base: parts[0] || '',
-        option: (parts[1] || '').replace(/^-/, '')
-      };
-    }
-
-    function buildResultFrames(level) {
-      const base = parseCommand(level.command).base;
-
-      if (base === 'on') {
-        return [
-          String.raw`
-  .--------------------.
-  |      (밝은 방)       |
-  |      \ ON /         |
-  |       \ | /         |
-  '--------------------'
-`,
-          String.raw`
-  .--------------------.
-  |      (밝은 방)       |
-  |      \*ON*/         |
-  |       \ | /         |
-  '--------------------'
-`
-        ];
-      }
-
-      if (base === 'hi') {
-        return [
-          String.raw`
-   [ ^_^ ]
-  /| HELLO|\
-   |____|
-   /    \\
-`,
-          String.raw`
-   [ ^_^ ]  o/
-  /| HELLO|
-   |____|
-   /    \\
-`
-        ];
-      }
-
-      if (base === 'go') {
-        return [
-          String.raw`
-        ______
-=   __/  |   \__
-=  |  _      _  |
-=  '-(_)----(_)-'
-`,
-          String.raw`
-           ______
- =  =  __/  |   \__
- =  = |  _      _  |
- =  = '-(_)----(_)-'
-`,
-          String.raw`
-              ______
-  =  =  = __/  |   \__
-  =  =  =|  _      _  |
-  =  =  ='-(_)----(_)-'
-`
-        ];
-      }
-
-      if (base === 'eat') {
-        return [
-          String.raw`
- / \__
-(    ^\___  <3
- /   (==)   O
-/   (_____/
-/_____/   U
-`,
-          String.raw`
- / \__
-(   ^ \__~  <3
- /   (=     O
-/   (_____/
-/_____/   U
-`,
-          String.raw`
- / \__
-(  ^  \___  <3
- /          O
-/   (_____/
-/_____/   U
-`
-        ];
-      }
-
-      if (base === 'red') {
-        return [
-          String.raw`
-  [RED].--------------------.[/RED]
-  [RED]|     ███             |[/RED]
-  [RED]|     ███             |[/RED]
-  [RED]'--------------------'[/RED]
-`,
-          String.raw`
-  [RED].--------------------.[/RED]
-  [RED]|     ███████         |[/RED]
-  [RED]|     ███████         |[/RED]
-  [RED]'--------------------'[/RED]
-`,
-          String.raw`
-  [RED].--------------------.[/RED]
-  [RED]|     ██████████     |[/RED]
-  [RED]|     ██████████     |[/RED]
-  [RED]'--------------------'[/RED]
-`
-        ];
-      }
-
-      if (base === 'pop') {
-        return [
-          String.raw`
-    .-.
-   (   )
-    '-'
-     |
-`,
-          String.raw`
-   \ | /
-  -  *  -
-   / | \
-   POP!
-`,
-          String.raw`
-  *     *
-     *
-  *     *
-   POP!
-`
-        ];
-      }
-
-      if (base === 'sun') {
-        return [
-          String.raw`
-  .--------------------.
-  |   [YELLOW]\  |  /[/YELLOW]  (아침)   |
-  |  [YELLOW]-- SUN --[/YELLOW]         |
-  |____________________|
-`,
-          String.raw`
-  .--------------------.
-  |   [YELLOW]/  |  \[/YELLOW]  (아침)   |
-  |  [YELLOW]-* SUN *-[/YELLOW]         |
-  |____________________|
-`
-        ];
-      }
-
-      if (base === 'bye') {
-        return [
-          String.raw`
-   [ ^_^ ]  o/
-  /| BYE! |
-   |____|
-   /    \\
-`,
-          String.raw`
-   [ ^_^ ]  \o
-  /| BYE! |
-   |____|
-   /    \\
-`
-        ];
-      }
-
-      return [level.artAfter];
-    }
-
     function startResultAnimation(level) {
-      const frames = buildResultFrames(level);
+      const frames = level.frames && level.frames.length ? level.frames : [level.artBefore];
       let frameIndex = 0;
       ui.sceneArt.innerHTML = renderColoredArt(frames[0]);
       activeAnimationName = normalizeCommand(level.command).replace(/\s+/g, '_');
@@ -1056,13 +1117,15 @@ COMMAND: PRESS START TO BEGIN</pre>
       sceneAnimationTimer = setInterval(() => {
         frameIndex = (frameIndex + 1) % frames.length;
         ui.sceneArt.innerHTML = renderColoredArt(frames[frameIndex]);
-      }, 220);
+      }, 260);
     }
 
     function buildIntroTTS(level) {
-      const commandUpper = level.command.toUpperCase();
-      const spellingKo = commandToSpellingKo(level.command);
-      return `${level.contextTTS} 정답 명령어는 ${commandUpper}. 철자는 ${spellingKo}.`;
+      if (level.command.length === 1) {
+        const letter = level.command.toUpperCase();
+        return `${level.contextTTS} ${letterKo[letter]} 키를 찾아서 눌러 보세요.`;
+      }
+      return `${level.contextTTS} 차례대로, ${commandToSpellingKo(level.command)}.`;
     }
 
     function resetTheme() {
@@ -1076,25 +1139,14 @@ COMMAND: PRESS START TO BEGIN</pre>
       ui.commandText.style.color = color;
     }
 
-    function renderPalette(level) {
-      if (!level.showPalette) {
-        ui.palettePanel.classList.add('hidden');
-        ui.paletteGrid.innerHTML = '';
-        return;
-      }
-
-      ui.palettePanel.classList.remove('hidden');
-      ui.paletteGrid.innerHTML = ansi16Palette
-        .map(color => `<div class="palette-chip"><span class="swatch" style="background:${color.hex}"></span><span class="chip-cmd">[${color.idx}] paint -${color.key}</span></div>`)
-        .join('');
-    }
-
     function normalizeCommand(value) {
       return value
+        .replace(/[—–]/g, '--') // iOS 스마트 문장부호가 -- 를 긴 대시로 바꾸는 경우
         .trim()
         .toLowerCase()
-        .replace(/\s*-\s*/g, ' -')
-        .replace(/\s+/g, ' ');
+        .replace(/\s*(-+)\s*/g, ' $1')
+        .replace(/\s+/g, ' ')
+        .trim();
     }
 
     function ensureInputVisible() {
@@ -1177,6 +1229,10 @@ COMMAND: PRESS START TO BEGIN</pre>
       });
     }
 
+    function stopSpeaking() {
+      if (hasTTS()) window.speechSynthesis.cancel();
+    }
+
     function setStatus(text, type = '') {
       ui.status.textContent = text;
       ui.status.className = `status ${type}`.trim();
@@ -1190,13 +1246,69 @@ COMMAND: PRESS START TO BEGIN</pre>
       });
     }
 
-    function renderLevel() {
-      const level = levels[currentLevel];
+    function renderChapterMenu() {
+      const cleared = loadCleared();
+      ui.chapterGrid.innerHTML = '';
+      chapters.forEach((chapter, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'chapter-btn';
+        if (cleared.includes(chapter.id)) button.classList.add('cleared');
+        button.innerHTML = `<span class="chapter-no">CH${index + 1}</span>`
+          + `<span class="chapter-name">${escapeHtml(chapter.title)}</span>`
+          + `<span class="chapter-meta">${chapter.levels.length} MISSIONS${cleared.includes(chapter.id) ? ' ✓' : ''}</span>`;
+        button.addEventListener('click', () => startChapter(index));
+        ui.chapterGrid.appendChild(button);
+      });
+    }
+
+    function firstUnclearedChapter() {
+      const cleared = loadCleared();
+      const index = chapters.findIndex(chapter => !cleared.includes(chapter.id));
+      return index === -1 ? 0 : index;
+    }
+
+    function startChapter(index) {
+      trackEvent('chapter_select', { chapter_id: chapters[index].id });
+      if (isKakaoInApp) {
+        requestExternalBrowserOpen();
+        return;
+      }
+      const firstStart = !gameStarted;
+      gameStarted = true;
+      if (firstStart) {
+        if (hasTTS()) pickKoreanVoice();
+        trackEvent('game_start');
+      }
+      playToken += 1;
+      isStageTransitioning = false;
+      currentChapter = index;
+      currentLevel = 0;
+      ui.startScreen.classList.add('hidden');
+      ui.gameScreen.classList.remove('hidden');
+      ui.doneBox.classList.add('hidden');
+      renderLevel({ withChapterIntro: true });
+    }
+
+    function showMenu() {
+      playToken += 1;
+      isStageTransitioning = false;
+      stopSceneAnimation();
+      stopSpeaking();
+      renderChapterMenu();
+      ui.gameScreen.classList.add('hidden');
+      ui.startScreen.classList.remove('hidden');
+      trackEvent('menu_open');
+    }
+
+    function renderLevel({ withChapterIntro = false } = {}) {
+      const chapter = chapters[currentChapter];
+      const level = chapter.levels[currentLevel];
       stopSceneAnimation();
       resetTheme();
-      renderPalette(level);
       setInputEnabled(true);
-      ui.levelTitle.textContent = level.title;
+      ui.doneBox.classList.add('hidden');
+      ui.levelTitle.textContent = `CH${currentChapter + 1} ${chapter.title} · ${currentLevel + 1}/${chapter.levels.length} · ${level.name}`;
       ui.sceneArt.innerHTML = renderColoredArt(level.artBefore);
       ui.sceneDesc.textContent = level.descBefore;
       ui.commandText.textContent = level.command.toUpperCase();
@@ -1204,12 +1316,13 @@ COMMAND: PRESS START TO BEGIN</pre>
       ui.commandInput.value = '';
       ui.commandInput.focus();
       setStatus('SYS> VOICE GUIDE READY. TYPE THE COMMAND.');
-      speak(buildIntroTTS(level), { rate: 0.8 });
+      const intro = buildIntroTTS(level);
+      speak(withChapterIntro ? `${chapter.introTTS} ${intro}` : intro, { rate: 0.8, timeoutMs: 25000 });
       trackEvent('level_view', {
+        chapter_id: chapter.id,
         level_index: currentLevel + 1,
-        level_title: level.title,
-        command: normalizeCommand(level.command),
-        palette_visible: Boolean(level.showPalette)
+        level_title: level.name,
+        command: normalizeCommand(level.command)
       });
     }
 
@@ -1220,43 +1333,64 @@ COMMAND: PRESS START TO BEGIN</pre>
     }
 
     async function completeLevel() {
-      const level = levels[currentLevel];
-      const themeColor = level.themeColor || null;
+      const chapter = chapters[currentChapter];
+      const level = chapter.levels[currentLevel];
       if (isStageTransitioning) return;
       isStageTransitioning = true;
+      const token = playToken;
 
       ui.sceneDesc.textContent = level.descAfter;
-      applyTheme(themeColor);
+      applyTheme(level.themeColor || null);
       setStatus('OK> MISSION CLEARED. LOADING NEXT LEVEL...', 'ok');
       startResultAnimation(level);
       await speak(level.rewardTTS, { rate: 0.9, timeoutMs: 18000 });
+      if (token !== playToken) return;
       trackEvent('level_clear', {
+        chapter_id: chapter.id,
         level_index: currentLevel + 1,
         command: normalizeCommand(level.command)
       });
       stopSceneAnimation();
       currentLevel += 1;
-      if (currentLevel >= levels.length) {
-        ui.doneBox.textContent = 'ALL MISSIONS COMPLETE :: LITTLE HACKER CERTIFIED';
-        ui.doneBox.classList.remove('hidden');
-        setStatus('OK> SESSION CLOSED. REFRESH TO PLAY AGAIN.', 'ok');
-        await speak('모든 미션을 성공했어요! 오늘의 꼬마 해커로 임명!', { rate: 0.9, timeoutMs: 16000 });
-        trackEvent('game_complete', { total_levels: levels.length });
-        setInputEnabled(false);
-        isStageTransitioning = false;
+      if (currentLevel >= chapter.levels.length) {
+        await completeChapter(token);
         return;
       }
       renderLevel();
       isStageTransitioning = false;
     }
 
+    async function completeChapter(token) {
+      const chapter = chapters[currentChapter];
+      saveCleared(chapter.id);
+      trackEvent('chapter_clear', { chapter_id: chapter.id });
+      const allCleared = chapters.every(item => loadCleared().includes(item.id));
+      const hasNext = currentChapter + 1 < chapters.length;
+      setInputEnabled(false);
+      ui.doneText.textContent = allCleared
+        ? `CHAPTER CLEAR :: ${chapter.title} — ALL CHAPTERS DONE! LITTLE HACKER CERTIFIED`
+        : `CHAPTER CLEAR :: ${chapter.title}`;
+      ui.nextChapterBtn.classList.toggle('hidden', !hasNext);
+      ui.doneBox.classList.remove('hidden');
+      setStatus('OK> CHAPTER COMPLETE.', 'ok');
+      const message = allCleared
+        ? `${chapter.title} 성공! 모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!`
+        : `${chapter.title} 성공! 정말 잘했어요.${hasNext ? ' 다음 챕터도 해 볼까요?' : ''}`;
+      await speak(message, { rate: 0.9, timeoutMs: 16000 });
+      if (token !== playToken) return;
+      if (allCleared) trackEvent('game_complete', { total_chapters: chapters.length });
+      isStageTransitioning = false;
+    }
+
     function handleSubmit() {
-      if (currentLevel >= levels.length) return;
+      const chapter = chapters[currentChapter];
+      if (!chapter || currentLevel >= chapter.levels.length) return;
       if (isStageTransitioning) return;
-      const level = levels[currentLevel];
+      const level = chapter.levels[currentLevel];
       const answer = normalizeCommand(ui.commandInput.value);
       const expected = normalizeCommand(level.command);
       trackEvent('command_submit', {
+        chapter_id: chapter.id,
         level_index: currentLevel + 1,
         answer,
         expected
@@ -1264,52 +1398,57 @@ COMMAND: PRESS START TO BEGIN</pre>
 
       if (answer === expected) {
         trackEvent('command_success', {
+          chapter_id: chapter.id,
           level_index: currentLevel + 1,
           command: expected
         });
         void completeLevel();
       } else {
         trackEvent('command_error', {
+          chapter_id: chapter.id,
           level_index: currentLevel + 1,
           answer,
           expected
         });
         setStatus('ERR> INVALID COMMAND. TRY AGAIN OR PRESS REPEAT.', 'err');
-        speak(`괜찮아, 다시 해보자. 정답은 ${level.command.toUpperCase()}. ${commandToSpellingKo(level.command)}.`, { rate: 0.88 });
+        speak(`괜찮아, 다시 해보자. ${commandToSpellingKo(level.command)}.`, { rate: 0.85 });
       }
     }
 
     function handleLetterSound(event) {
       if (!ui.letterSoundToggle.checked || !gameStarted) return;
       if (event.key.length !== 1) return;
-      if (!/[a-z]/i.test(event.key)) return;
+      let spoken = '';
+      if (/[a-z]/i.test(event.key)) {
+        const letter = event.key.toUpperCase();
+        spoken = letterKo[letter] || letter;
+      } else if (event.key === '-') {
+        spoken = '대시';
+      } else {
+        return;
+      }
       const now = Date.now();
       if (now - lastLetterSpokenAt < 80) return;
       lastLetterSpokenAt = now;
-      const letter = event.key.toUpperCase();
-      speak(letterKo[letter] || letter, { rate: 0.82, pitch: 1.04, interrupt: false });
+      speak(spoken, { rate: 0.82, pitch: 1.04, interrupt: false });
     }
 
     ui.startBtn.addEventListener('click', () => {
       trackEvent('start_button_click', { inapp_kakao: isKakaoInApp });
-      if (isKakaoInApp) {
-        requestExternalBrowserOpen();
-        return;
-      }
-      gameStarted = true;
-      if (hasTTS()) pickKoreanVoice();
-      ui.startScreen.classList.add('hidden');
-      ui.gameScreen.classList.remove('hidden');
-      trackEvent('game_start');
-      renderLevel();
+      startChapter(firstUnclearedChapter());
+    });
+
+    ui.menuBtn.addEventListener('click', showMenu);
+    ui.backToMenuBtn.addEventListener('click', showMenu);
+    ui.nextChapterBtn.addEventListener('click', () => {
+      if (currentChapter + 1 < chapters.length) startChapter(currentChapter + 1);
     });
 
     ui.submitBtn.addEventListener('click', handleSubmit);
     ui.repeatBtn.addEventListener('click', () => {
-      trackEvent('hint_repeat_click', { level_index: currentLevel + 1 });
-      if (currentLevel < levels.length) {
-        speak(buildIntroTTS(levels[currentLevel]), { rate: 0.8 });
-      }
+      trackEvent('hint_repeat_click', { chapter_id: chapters[currentChapter].id, level_index: currentLevel + 1 });
+      const level = chapters[currentChapter].levels[currentLevel];
+      if (level) speak(buildIntroTTS(level), { rate: 0.8, timeoutMs: 25000 });
     });
 
     ui.letterSoundToggle.addEventListener('change', () => {
@@ -1348,6 +1487,7 @@ COMMAND: PRESS START TO BEGIN</pre>
     window.addEventListener('orientationchange', () => setTimeout(updateKeyboardOffset, 120));
     window.addEventListener('resize', updateKeyboardOffset);
     updateKeyboardOffset();
+    renderChapterMenu();
 
     if (hasTTS()) {
       window.speechSynthesis.onvoiceschanged = pickKoreanVoice;
