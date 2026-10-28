@@ -586,9 +586,16 @@ COMMAND: PRESS START OR PICK A CHAPTER</pre>
     }
 
     function colorize(art, color) {
+      const open = `[${color}]`;
+      const close = `[/${color}]`;
       return art
         .split('\n')
-        .map(line => (line.trim() ? `[${color}]${line}[/${color}]` : line))
+        .map(line => {
+          if (!line.trim()) return line;
+          // Keep the indent outside the tag so later frames share a column.
+          const indent = line.match(/^ */)[0];
+          return `${indent}${open}${line.slice(indent.length)}${close}`;
+        })
         .join('\n');
     }
 
@@ -1112,15 +1119,51 @@ ________________
         .join(', ');
     }
 
+    const ART_TAG_PATTERN = String.raw`\[\/?(?:BLACK|MAROON|GREEN|OLIVE|NAVY|PURPLE|TEAL|SILVER|GRAY|RED|LIME|YELLOW|BLUE|FUCHSIA|AQUA|WHITE|BIG)\]`;
+
+    function stripArtTags(line) {
+      return line.replace(new RegExp(ART_TAG_PATTERN, 'gi'), '');
+    }
+
+    function leadingVisualSpaces(line) {
+      const match = stripArtTags(line).match(/^ */);
+      return match ? match[0].length : 0;
+    }
+
+    function stripLeadingVisualSpaces(line, count) {
+      if (count <= 0) return line;
+      let left = count;
+      let index = 0;
+      let kept = '';
+      const tagRe = new RegExp(`^${ART_TAG_PATTERN}`, 'i');
+      while (index < line.length && left > 0) {
+        const tag = line.slice(index).match(tagRe);
+        if (tag) {
+          kept += tag[0];
+          index += tag[0].length;
+          continue;
+        }
+        if (line[index] === ' ') {
+          left -= 1;
+          index += 1;
+          continue;
+        }
+        break;
+      }
+      return kept + line.slice(index);
+    }
+
     function normalizeArt(art) {
       const lines = art.replace(/\r/g, '').split('\n');
       if (lines[0] === '') lines.shift();
-      while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
+      while (lines.length && stripArtTags(lines[lines.length - 1]).trim() === '') lines.pop();
       const minIndent = lines
-        .filter(line => line.trim().length > 0)
-        .reduce((min, line) => Math.min(min, line.match(/^ */)[0].length), Infinity);
+        .filter(line => stripArtTags(line).trim().length > 0)
+        .reduce((min, line) => Math.min(min, leadingVisualSpaces(line)), Infinity);
       const indent = Number.isFinite(minIndent) ? minIndent : 0;
-      return lines.map(line => line.slice(indent).replace(/\s+$/g, '')).join('\n');
+      return lines
+        .map(line => stripLeadingVisualSpaces(line, indent).replace(/[ \t]+$/g, ''))
+        .join('\n');
     }
 
     function escapeHtml(value) {
