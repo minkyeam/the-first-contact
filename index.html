@@ -454,7 +454,7 @@
   </style>
 </head>
 <body>
-  <main class="app" aria-live="polite">
+  <main class="app">
     <header class="header">
       <h1 class="title">$ LHQ Voice Terminal v2.0</h1>
       <div class="controls">
@@ -488,7 +488,7 @@ COMMAND: PRESS START OR PICK A CHAPTER</pre>
       <section id="gameScreen" class="hidden">
         <article class="level" id="levelCard">
           <h2 class="level-title" id="levelTitle"></h2>
-          <pre id="sceneArt" class="scene-art"></pre>
+          <pre id="sceneArt" class="scene-art" aria-hidden="true"></pre>
           <p class="desc" id="sceneDesc"></p>
         </article>
 
@@ -507,7 +507,7 @@ COMMAND: PRESS START OR PICK A CHAPTER</pre>
           <button id="repeatBtn" type="button">[ F1 ] REPEAT VOICE</button>
         </section>
 
-        <p id="status" class="status"></p>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
         <section id="doneBox" class="done hidden">
           <p id="doneText"></p>
           <div class="done-actions">
