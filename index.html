@@ -1037,6 +1037,9 @@ ________________
     let gameStarted = false;
     let koreanVoice = null;
     let lastLetterSpokenAt = 0;
+    let letterSoundBaseline = '';
+    let speechToken = 0;
+    let resolveActiveSpeech = null;
     let sceneAnimationTimer = null;
     let isStageTransitioning = false;
     let playToken = 0;
@@ -1214,34 +1217,138 @@ ________________
     }
 
     function speak(text, options = {}) {
-      if (!gameStarted || !hasTTS()) return Promise.resolve(false);
+      if (!gameStarted || !hasTTS() || !text) return Promise.resolve(false);
       const synth = window.speechSynthesis;
-      const interrupt = options.interrupt ?? true;
-      if (interrupt) synth.cancel();
+      const token = ++speechToken;
+      if (resolveActiveSpeech) {
+        const resolvePrev = resolveActiveSpeech;
+        resolveActiveSpeech = null;
+        resolvePrev(false);
+      }
+
+      // Chrome/Safari drop speak() called in the same turn as cancel().
+      const needsGap = !!(synth.speaking || synth.pending);
+      if (needsGap) {
+        try { synth.cancel(); } catch (_error) { /* ignore */ }
+      }
+      if (synth.paused) {
+        try { synth.resume(); } catch (_error) { /* ignore */ }
+      }
+
+      const maxWait = Math.min(
+        options.timeoutMs ?? 14000,
+        Math.max(2500, String(text).length * 320 + 1800)
+      );
+
       return new Promise(resolve => {
         let settled = false;
-        const finish = success => {
-          if (settled) return;
-          settled = true;
-          resolve(success);
+        let started = false;
+        let attempts = 0;
+        let launchId = 0;
+        let retrying = false;
+        let startTimer = 0;
+        let maxTimer = 0;
+
+        const cleanup = () => {
+          if (startTimer) clearTimeout(startTimer);
+          if (maxTimer) clearTimeout(maxTimer);
+          startTimer = 0;
+          maxTimer = 0;
         };
 
-        const utter = new window.SpeechSynthesisUtterance(text);
-        utter.lang = 'ko-KR';
-        utter.rate = options.rate ?? 0.9;
-        utter.pitch = options.pitch ?? 1.0;
-        if (koreanVoice) utter.voice = koreanVoice;
-        utter.onend = () => finish(true);
-        utter.onerror = () => finish(false);
-        synth.speak(utter);
+        const finish = (success) => {
+          if (settled) return;
+          settled = true;
+          if (resolveActiveSpeech === finish) resolveActiveSpeech = null;
+          cleanup();
+          resolve(success);
+        };
+        resolveActiveSpeech = finish;
 
-        const timeoutMs = options.timeoutMs ?? 15000;
-        setTimeout(() => finish(false), timeoutMs);
+        const armMax = (ms) => {
+          if (maxTimer) clearTimeout(maxTimer);
+          maxTimer = setTimeout(() => {
+            if (settled || token !== speechToken) return;
+            if (!started && (synth.speaking || synth.pending)) {
+              started = true;
+              armMax(maxWait);
+              return;
+            }
+            try { synth.cancel(); } catch (_error) { /* ignore */ }
+            finish(false);
+          }, ms);
+        };
+
+        const launch = () => {
+          if (settled || token !== speechToken) return;
+          const myLaunch = ++launchId;
+          attempts += 1;
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = 'ko-KR';
+          utter.rate = options.rate ?? 0.9;
+          utter.pitch = options.pitch ?? 1.0;
+          if (koreanVoice) utter.voice = koreanVoice;
+          utter.onstart = () => {
+            if (settled || token !== speechToken || myLaunch !== launchId) return;
+            started = true;
+            if (startTimer) {
+              clearTimeout(startTimer);
+              startTimer = 0;
+            }
+            armMax(maxWait);
+          };
+          utter.onend = () => {
+            if (settled || token !== speechToken || myLaunch !== launchId) return;
+            finish(true);
+          };
+          utter.onerror = () => {
+            if (retrying || settled || token !== speechToken || myLaunch !== launchId) return;
+            finish(false);
+          };
+          try {
+            if (synth.paused) synth.resume();
+            synth.speak(utter);
+          } catch (_error) {
+            finish(false);
+            return;
+          }
+
+          if (!needsGap) return;
+          if (startTimer) clearTimeout(startTimer);
+          startTimer = setTimeout(() => {
+            if (settled || started || token !== speechToken || myLaunch !== launchId) return;
+            const dropped = !synth.speaking && !synth.pending;
+            if (dropped && attempts < 2) {
+              retrying = true;
+              try { synth.cancel(); } catch (_error) { /* ignore */ }
+              retrying = false;
+              launch();
+              return;
+            }
+            if (!started) {
+              try { synth.cancel(); } catch (_error) { /* ignore */ }
+              finish(false);
+            }
+          }, 700);
+        };
+
+        // If speech never starts, continue the game instead of waiting out the full line.
+        armMax(Math.min(maxWait, 2200));
+        if (needsGap) setTimeout(launch, 50);
+        else launch();
       });
     }
 
     function stopSpeaking() {
-      if (hasTTS()) window.speechSynthesis.cancel();
+      speechToken += 1;
+      if (resolveActiveSpeech) {
+        const resolvePrev = resolveActiveSpeech;
+        resolveActiveSpeech = null;
+        resolvePrev(false);
+      }
+      if (hasTTS()) {
+        try { window.speechSynthesis.cancel(); } catch (_error) { /* ignore */ }
+      }
     }
 
     function setStatus(text, type = '') {
@@ -1341,6 +1448,7 @@ ________________
       ui.commandText.textContent = level.command.toUpperCase();
       ui.spellingText.textContent = `철자 힌트: ${level.command.toUpperCase()} (${commandToSpellingKo(level.command)})`;
       ui.commandInput.value = '';
+      letterSoundBaseline = '';
       ui.commandInput.focus();
       setStatus('SYS> VOICE GUIDE READY. TYPE THE COMMAND.');
       const intro = buildIntroTTS(level);
@@ -1437,14 +1545,13 @@ ________________
       }
     }
 
-    function handleLetterSound(event) {
-      if (!ui.letterSoundToggle.checked || !gameStarted) return;
-      if (event.key.length !== 1) return;
+    function speakTypedChar(ch) {
+      if (!ui.letterSoundToggle.checked || !gameStarted || isStageTransitioning) return;
       let spoken = '';
-      if (/[a-z]/i.test(event.key)) {
-        const letter = event.key.toUpperCase();
+      if (/[a-z]/i.test(ch)) {
+        const letter = ch.toUpperCase();
         spoken = letterKo[letter] || letter;
-      } else if (event.key === '-') {
+      } else if (ch === '-' || ch === '\u2013' || ch === '\u2014') {
         spoken = '대시';
       } else {
         return;
@@ -1452,7 +1559,22 @@ ________________
       const now = Date.now();
       if (now - lastLetterSpokenAt < 80) return;
       lastLetterSpokenAt = now;
-      speak(spoken, { rate: 0.82, pitch: 1.04, interrupt: false });
+      // Interrupt so the letter is heard now, not after the current narration.
+      speak(spoken, { rate: 0.82, pitch: 1.04, timeoutMs: 2500 });
+    }
+
+    function handleCommandInput() {
+      const next = ui.commandInput.value;
+      const prev = letterSoundBaseline;
+      letterSoundBaseline = next;
+      if (!next || next.length < prev.length) return;
+      let index = 0;
+      const limit = Math.min(prev.length, next.length);
+      while (index < limit && prev[index] === next[index]) index += 1;
+      const inserted = next.slice(index);
+      const chars = inserted.match(/[a-zA-Z\u2014\u2013-]/g);
+      if (!chars) return;
+      speakTypedChar(chars[chars.length - 1]);
     }
 
     ui.startBtn.addEventListener('click', () => {
@@ -1478,12 +1600,11 @@ ________________
     });
 
     ui.commandInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        handleSubmit();
-      } else {
-        handleLetterSound(event);
-      }
+      if (event.key === 'Enter') handleSubmit();
     });
+
+    // Gboard often reports keydown key as "Unidentified". The input event has the character.
+    ui.commandInput.addEventListener('input', handleCommandInput);
 
     ui.commandInput.addEventListener('focus', () => {
       setTimeout(() => {
