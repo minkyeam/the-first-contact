@@ -368,8 +368,26 @@
       line-height: 1.4;
     }
 
+    .compat p {
+      margin: 0;
+    }
+
+    .compat-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
     .compat a {
       color: #fff3c9;
+    }
+
+    #playHereBtn {
+      text-transform: none;
+      font-size: 13px;
+      padding: 8px 10px;
     }
 
     .done {
@@ -455,10 +473,13 @@ STATUS: READY
 AUDIO: KO-KR TTS CONNECTED
 COMMAND: PRESS START OR PICK A CHAPTER</pre>
         <p id="compatNote" class="compat hidden"></p>
-        <p id="externalOpenHelp" class="compat hidden">
-          외부 브라우저가 자동으로 열리지 않으면
-          <a id="externalOpenLink" href="#" target="_blank" rel="noopener noreferrer">여기를 눌러 열어주세요</a>.
-        </p>
+        <div id="externalOpenHelp" class="compat hidden">
+          <p>카카오톡 안에서는 소리가 잘 안 들릴 수 있어요. 외부 브라우저에서 열면 더 잘 들려요.</p>
+          <div class="compat-actions">
+            <a id="externalOpenLink" href="#">외부 브라우저로 열기</a>
+            <button id="playHereBtn" type="button">그냥 여기서 하기</button>
+          </div>
+        </div>
         <button id="startBtn" class="start-btn" type="button">[ START MISSION ]</button>
         <p class="menu-label">&gt; SELECT CHAPTER</p>
         <div id="chapterGrid" class="chapter-grid"></div>
@@ -1018,6 +1039,7 @@ ________________
       compatNote: document.getElementById('compatNote'),
       externalOpenHelp: document.getElementById('externalOpenHelp'),
       externalOpenLink: document.getElementById('externalOpenLink'),
+      playHereBtn: document.getElementById('playHereBtn'),
       commandText: document.getElementById('commandText'),
       spellingText: document.getElementById('spellingText'),
       commandInput: document.getElementById('commandInput'),
@@ -1045,6 +1067,8 @@ ________________
     let playToken = 0;
     const userAgent = navigator.userAgent || '';
     const isKakaoInApp = /KAKAOTALK/i.test(userAgent);
+    let allowKakaoInAppPlay = false;
+    let pendingChapterIndex = null;
     const sessionId = `lhq_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
     function hasTTS() {
@@ -1189,19 +1213,16 @@ ________________
       ensureInputVisible();
     }
 
-    function requestExternalBrowserOpen() {
-      const currentUrl = window.location.href;
-      ui.externalOpenLink.href = currentUrl;
+    function showKakaoPlayChoice() {
       ui.externalOpenHelp.classList.remove('hidden');
-      setStatus('INFO> OPENING SYSTEM BROWSER...', 'ok');
-      trackEvent('external_browser_open_attempt', { source: 'kakao_inapp' });
-      try {
-        const externalScheme = `kakaotalk://web/openExternal?url=${encodeURIComponent(currentUrl)}`;
-        window.location.href = externalScheme;
-      } catch (_error) {
-        ui.externalOpenHelp.classList.remove('hidden');
-        trackEvent('external_browser_open_failed', { source: 'kakao_inapp' });
-      }
+      ui.compatNote.textContent = '카카오톡 인앱브라우저예요. 외부 브라우저를 권장하지만, 여기서도 바로 할 수 있어요.';
+      ui.compatNote.classList.remove('hidden');
+    }
+
+    function openKakaoExternalBrowser() {
+      trackEvent('external_browser_open_manual_click', { source: 'kakao_inapp_help' });
+      const externalScheme = `kakaotalk://web/openExternal?url=${encodeURIComponent(window.location.href)}`;
+      window.location.href = externalScheme;
     }
 
     function pickKoreanVoice() {
@@ -1404,8 +1425,9 @@ ________________
 
     function startChapter(index) {
       trackEvent('chapter_select', { chapter_id: chapters[index].id });
-      if (isKakaoInApp) {
-        requestExternalBrowserOpen();
+      if (isKakaoInApp && !allowKakaoInAppPlay) {
+        pendingChapterIndex = index;
+        showKakaoPlayChoice();
         return;
       }
       const firstStart = !gameStarted;
@@ -1612,13 +1634,24 @@ ________________
       }, 160);
     });
 
-    ui.externalOpenLink.addEventListener('click', () => {
-      trackEvent('external_browser_open_manual_click', { source: 'kakao_inapp_help' });
+    ui.externalOpenLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      openKakaoExternalBrowser();
+    });
+
+    ui.playHereBtn.addEventListener('click', () => {
+      if (allowKakaoInAppPlay) return;
+      allowKakaoInAppPlay = true;
+      ui.playHereBtn.disabled = true;
+      trackEvent('inapp_play_here', { source: 'kakao_inapp' });
+      const index = pendingChapterIndex;
+      pendingChapterIndex = null;
+      if (index === null || index === undefined) return;
+      startChapter(index);
     });
 
     if (isKakaoInApp) {
-      ui.compatNote.textContent = '카카오톡 인앱브라우저입니다. START MISSION을 누르면 기본 브라우저로 열어요.';
-      ui.compatNote.classList.remove('hidden');
+      showKakaoPlayChoice();
       trackEvent('inapp_detected', { app: 'kakaotalk' });
     }
 
