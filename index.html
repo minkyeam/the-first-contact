@@ -4,13 +4,31 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Little Hacker's Quest - Voice Edition</title>
-  <!-- Google tag (gtag.js) -->
+  <!-- Google tag (gtag.js). No ads personalization, no Google signals. -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q1SBVDVQ0N"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-Q1SBVDVQ0N');
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'granted',
+      functionality_storage: 'denied',
+      personalization_storage: 'denied',
+      security_storage: 'granted'
+    });
+    gtag('set', 'allow_google_signals', false);
+    gtag('set', 'allow_ad_personalization_signals', false);
+    gtag('set', 'ads_data_redaction', true);
+    gtag('config', 'G-Q1SBVDVQ0N', {
+      anonymize_ip: true,
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false,
+      ads_data_redaction: true,
+      restricted_data_processing: true
+    });
   </script>
   <!-- Vercel Web Analytics (static HTML) -->
   <script defer src="/_vercel/insights/script.js"></script>
@@ -1020,7 +1038,6 @@ ________________
     let koreanVoice = null;
     let lastLetterSpokenAt = 0;
     let sceneAnimationTimer = null;
-    let activeAnimationName = '';
     let isStageTransitioning = false;
     let playToken = 0;
     const userAgent = navigator.userAgent || '';
@@ -1101,10 +1118,6 @@ ________________
       if (sceneAnimationTimer) {
         clearInterval(sceneAnimationTimer);
         sceneAnimationTimer = null;
-        if (activeAnimationName) {
-          trackEvent('scene_animation_stop', { animation_name: activeAnimationName });
-          activeAnimationName = '';
-        }
       }
     }
 
@@ -1112,8 +1125,6 @@ ________________
       const frames = level.frames && level.frames.length ? level.frames : [level.artBefore];
       let frameIndex = 0;
       ui.sceneArt.innerHTML = renderColoredArt(frames[0]);
-      activeAnimationName = normalizeCommand(level.command).replace(/\s+/g, '_');
-      trackEvent('scene_animation_start', { animation_name: activeAnimationName });
       sceneAnimationTimer = setInterval(() => {
         frameIndex = (frameIndex + 1) % frames.length;
         ui.sceneArt.innerHTML = renderColoredArt(frames[frameIndex]);
@@ -1180,7 +1191,7 @@ ________________
       ui.externalOpenLink.href = currentUrl;
       ui.externalOpenHelp.classList.remove('hidden');
       setStatus('INFO> OPENING SYSTEM BROWSER...', 'ok');
-      trackEvent('external_browser_open_attempt', { source: 'kakao_inapp', target_url: currentUrl });
+      trackEvent('external_browser_open_attempt', { source: 'kakao_inapp' });
       try {
         const externalScheme = `kakaotalk://web/openExternal?url=${encodeURIComponent(currentUrl)}`;
         window.location.href = externalScheme;
@@ -1238,12 +1249,28 @@ ________________
       ui.status.className = `status ${type}`.trim();
     }
 
+    // 아이가 친 글자는 분석으로 보내지 않아요. 정오와 레벨 정보만 남겨요.
+    const ANALYTICS_BLOCKED_KEYS = new Set([
+      'answer',
+      'expected',
+      'input',
+      'text',
+      'typed',
+      'query',
+      'target_url',
+      'command'
+    ]);
+
     function trackEvent(eventName, params = {}) {
       if (typeof window.gtag !== 'function') return;
-      window.gtag('event', eventName, {
-        session_id: sessionId,
-        ...params
+      const safe = { session_id: sessionId };
+      Object.keys(params).forEach((key) => {
+        if (ANALYTICS_BLOCKED_KEYS.has(key)) return;
+        const value = params[key];
+        if (value == null) return;
+        safe[key] = value;
       });
+      window.gtag('event', eventName, safe);
     }
 
     function renderChapterMenu() {
@@ -1321,8 +1348,7 @@ ________________
       trackEvent('level_view', {
         chapter_id: chapter.id,
         level_index: currentLevel + 1,
-        level_title: level.name,
-        command: normalizeCommand(level.command)
+        level_title: level.name
       });
     }
 
@@ -1347,8 +1373,7 @@ ________________
       if (token !== playToken) return;
       trackEvent('level_clear', {
         chapter_id: chapter.id,
-        level_index: currentLevel + 1,
-        command: normalizeCommand(level.command)
+        level_index: currentLevel + 1
       });
       stopSceneAnimation();
       currentLevel += 1;
@@ -1389,26 +1414,23 @@ ________________
       const level = chapter.levels[currentLevel];
       const answer = normalizeCommand(ui.commandInput.value);
       const expected = normalizeCommand(level.command);
+      const correct = answer === expected;
       trackEvent('command_submit', {
         chapter_id: chapter.id,
         level_index: currentLevel + 1,
-        answer,
-        expected
+        correct
       });
 
-      if (answer === expected) {
+      if (correct) {
         trackEvent('command_success', {
           chapter_id: chapter.id,
-          level_index: currentLevel + 1,
-          command: expected
+          level_index: currentLevel + 1
         });
         void completeLevel();
       } else {
         trackEvent('command_error', {
           chapter_id: chapter.id,
-          level_index: currentLevel + 1,
-          answer,
-          expected
+          level_index: currentLevel + 1
         });
         setStatus('ERR> INVALID COMMAND. TRY AGAIN OR PRESS REPEAT.', 'err');
         speak(`괜찮아, 다시 해보자. ${commandToSpellingKo(level.command)}.`, { rate: 0.85 });
@@ -1464,7 +1486,6 @@ ________________
     });
 
     ui.commandInput.addEventListener('focus', () => {
-      trackEvent('command_input_focus', { level_index: currentLevel + 1 });
       setTimeout(() => {
         ensureInputVisible();
       }, 160);
