@@ -1653,11 +1653,27 @@ ________________
       if (currentChapter + 1 < chapters.length) startChapter(currentChapter + 1);
     });
 
+    function repeatVoice() {
+      if (!gameStarted || ui.gameScreen.classList.contains('hidden') || ui.repeatBtn.disabled) return;
+      const chapter = chapters[currentChapter];
+      const level = chapter && chapter.levels[currentLevel];
+      if (!level) return;
+      trackEvent('hint_repeat_click', { chapter_id: chapter.id, level_index: currentLevel + 1 });
+      speak(buildIntroTTS(level), { rate: 0.8, timeoutMs: 25000 });
+    }
+
     ui.submitBtn.addEventListener('click', handleSubmit);
-    ui.repeatBtn.addEventListener('click', () => {
-      trackEvent('hint_repeat_click', { chapter_id: chapters[currentChapter].id, level_index: currentLevel + 1 });
-      const level = chapters[currentChapter].levels[currentLevel];
-      if (level) speak(buildIntroTTS(level), { rate: 0.8, timeoutMs: 25000 });
+    ui.repeatBtn.addEventListener('click', repeatVoice);
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key !== 'F1' && event.code !== 'F1') return;
+      event.preventDefault();
+      if (event.repeat) return;
+      repeatVoice();
+    });
+    window.addEventListener('keyup', (event) => {
+      if (event.key !== 'F1' && event.code !== 'F1') return;
+      event.preventDefault();
     });
 
     ui.letterSoundToggle.addEventListener('change', () => {
