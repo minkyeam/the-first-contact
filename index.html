@@ -1382,17 +1382,16 @@ ________________
           startTimer = setTimeout(() => {
             if (settled || started || token !== speechToken || myLaunch !== launchId) return;
             const dropped = !synth.speaking && !synth.pending;
-            if (dropped && attempts < 2) {
+            // Still queued or speaking: leave it alone. Only a dropped speak() is retried.
+            if (!dropped) return;
+            if (attempts < 2) {
               retrying = true;
               try { synth.cancel(); } catch (_error) { /* ignore */ }
               retrying = false;
               launch();
               return;
             }
-            if (!started) {
-              try { synth.cancel(); } catch (_error) { /* ignore */ }
-              finish(false);
-            }
+            finish(false);
           }, 700);
         };
 
