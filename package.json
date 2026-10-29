@@ -1,5 +1,8 @@
 {
-  "dependencies": {
-    "@vercel/analytics": "^1.6.1"
+  "name": "little-hackers-quest",
+  "private": true,
+  "description": "Little Hacker's Quest - Voice Edition. A static browser game for a 4-year-old.",
+  "scripts": {
+    "start": "python3 -m http.server 4173"
   }
 }

@@ -4,13 +4,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Little Hacker's Quest - Voice Edition</title>
-  <!-- Google tag (gtag.js) -->
+  <meta name="description" content="만 4세 아이를 위한 음성 안내 CLI 놀이. 한국어로 들으며 알파벳과 첫 명령어를 연습해요." />
+  <meta property="og:title" content="Little Hacker's Quest - Voice Edition" />
+  <meta property="og:description" content="만 4세 아이를 위한 음성 안내 CLI 놀이. 한국어로 들으며 알파벳과 첫 명령어를 연습해요." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta property="og:url" content="https://the-first-contact.vercel.app/" />
+  <meta property="og:image" content="https://the-first-contact.vercel.app/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Little Hacker's Quest - Voice Edition" />
+  <meta name="twitter:description" content="만 4세 아이를 위한 음성 안내 CLI 놀이. 한국어로 들으며 알파벳과 첫 명령어를 연습해요." />
+  <meta name="twitter:image" content="https://the-first-contact.vercel.app/og.png" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <!-- Google tag (gtag.js). No ads personalization, no Google signals. -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q1SBVDVQ0N"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-Q1SBVDVQ0N');
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'granted',
+      functionality_storage: 'denied',
+      personalization_storage: 'denied',
+      security_storage: 'granted'
+    });
+    gtag('set', 'allow_google_signals', false);
+    gtag('set', 'allow_ad_personalization_signals', false);
+    gtag('set', 'ads_data_redaction', true);
+    gtag('config', 'G-Q1SBVDVQ0N', {
+      anonymize_ip: true,
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false,
+      ads_data_redaction: true,
+      restricted_data_processing: true
+    });
   </script>
   <!-- Vercel Web Analytics (static HTML) -->
   <script defer src="/_vercel/insights/script.js"></script>
@@ -350,8 +382,26 @@
       line-height: 1.4;
     }
 
+    .compat p {
+      margin: 0;
+    }
+
+    .compat-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
     .compat a {
       color: #fff3c9;
+    }
+
+    #playHereBtn {
+      text-transform: none;
+      font-size: 13px;
+      padding: 8px 10px;
     }
 
     .done {
@@ -418,7 +468,7 @@
   </style>
 </head>
 <body>
-  <main class="app" aria-live="polite">
+  <main class="app">
     <header class="header">
       <h1 class="title">$ LHQ Voice Terminal v2.0</h1>
       <div class="controls">
@@ -437,10 +487,13 @@ STATUS: READY
 AUDIO: KO-KR TTS CONNECTED
 COMMAND: PRESS START OR PICK A CHAPTER</pre>
         <p id="compatNote" class="compat hidden"></p>
-        <p id="externalOpenHelp" class="compat hidden">
-          외부 브라우저가 자동으로 열리지 않으면
-          <a id="externalOpenLink" href="#" target="_blank" rel="noopener noreferrer">여기를 눌러 열어주세요</a>.
-        </p>
+        <div id="externalOpenHelp" class="compat hidden">
+          <p>카카오톡 안에서는 소리가 잘 안 들릴 수 있어요. 외부 브라우저에서 열면 더 잘 들려요.</p>
+          <div class="compat-actions">
+            <a id="externalOpenLink" href="#">외부 브라우저로 열기</a>
+            <button id="playHereBtn" type="button">그냥 여기서 하기</button>
+          </div>
+        </div>
         <button id="startBtn" class="start-btn" type="button">[ START MISSION ]</button>
         <p class="menu-label">&gt; SELECT CHAPTER</p>
         <div id="chapterGrid" class="chapter-grid"></div>
@@ -449,7 +502,7 @@ COMMAND: PRESS START OR PICK A CHAPTER</pre>
       <section id="gameScreen" class="hidden">
         <article class="level" id="levelCard">
           <h2 class="level-title" id="levelTitle"></h2>
-          <pre id="sceneArt" class="scene-art"></pre>
+          <pre id="sceneArt" class="scene-art" aria-hidden="true"></pre>
           <p class="desc" id="sceneDesc"></p>
         </article>
 
@@ -468,7 +521,7 @@ COMMAND: PRESS START OR PICK A CHAPTER</pre>
           <button id="repeatBtn" type="button">[ F1 ] REPEAT VOICE</button>
         </section>
 
-        <p id="status" class="status"></p>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
         <section id="doneBox" class="done hidden">
           <p id="doneText"></p>
           <div class="done-actions">
@@ -547,9 +600,16 @@ COMMAND: PRESS START OR PICK A CHAPTER</pre>
     }
 
     function colorize(art, color) {
+      const open = `[${color}]`;
+      const close = `[/${color}]`;
       return art
         .split('\n')
-        .map(line => (line.trim() ? `[${color}]${line}[/${color}]` : line))
+        .map(line => {
+          if (!line.trim()) return line;
+          // Keep the indent outside the tag so later frames share a column.
+          const indent = line.match(/^ */)[0];
+          return `${indent}${open}${line.slice(indent.length)}${close}`;
+        })
         .join('\n');
     }
 
@@ -1000,6 +1060,7 @@ ________________
       compatNote: document.getElementById('compatNote'),
       externalOpenHelp: document.getElementById('externalOpenHelp'),
       externalOpenLink: document.getElementById('externalOpenLink'),
+      playHereBtn: document.getElementById('playHereBtn'),
       commandText: document.getElementById('commandText'),
       spellingText: document.getElementById('spellingText'),
       commandInput: document.getElementById('commandInput'),
@@ -1019,12 +1080,17 @@ ________________
     let gameStarted = false;
     let koreanVoice = null;
     let lastLetterSpokenAt = 0;
+    let letterSoundBaseline = '';
+    let speechToken = 0;
+    let resolveActiveSpeech = null;
+    let synthCancelledAt = 0;
     let sceneAnimationTimer = null;
-    let activeAnimationName = '';
     let isStageTransitioning = false;
     let playToken = 0;
     const userAgent = navigator.userAgent || '';
     const isKakaoInApp = /KAKAOTALK/i.test(userAgent);
+    let allowKakaoInAppPlay = false;
+    let pendingChapterIndex = null;
     const sessionId = `lhq_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
     function hasTTS() {
@@ -1068,15 +1134,51 @@ ________________
         .join(', ');
     }
 
+    const ART_TAG_PATTERN = String.raw`\[\/?(?:BLACK|MAROON|GREEN|OLIVE|NAVY|PURPLE|TEAL|SILVER|GRAY|RED|LIME|YELLOW|BLUE|FUCHSIA|AQUA|WHITE|BIG)\]`;
+
+    function stripArtTags(line) {
+      return line.replace(new RegExp(ART_TAG_PATTERN, 'gi'), '');
+    }
+
+    function leadingVisualSpaces(line) {
+      const match = stripArtTags(line).match(/^ */);
+      return match ? match[0].length : 0;
+    }
+
+    function stripLeadingVisualSpaces(line, count) {
+      if (count <= 0) return line;
+      let left = count;
+      let index = 0;
+      let kept = '';
+      const tagRe = new RegExp(`^${ART_TAG_PATTERN}`, 'i');
+      while (index < line.length && left > 0) {
+        const tag = line.slice(index).match(tagRe);
+        if (tag) {
+          kept += tag[0];
+          index += tag[0].length;
+          continue;
+        }
+        if (line[index] === ' ') {
+          left -= 1;
+          index += 1;
+          continue;
+        }
+        break;
+      }
+      return kept + line.slice(index);
+    }
+
     function normalizeArt(art) {
       const lines = art.replace(/\r/g, '').split('\n');
       if (lines[0] === '') lines.shift();
-      while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
+      while (lines.length && stripArtTags(lines[lines.length - 1]).trim() === '') lines.pop();
       const minIndent = lines
-        .filter(line => line.trim().length > 0)
-        .reduce((min, line) => Math.min(min, line.match(/^ */)[0].length), Infinity);
+        .filter(line => stripArtTags(line).trim().length > 0)
+        .reduce((min, line) => Math.min(min, leadingVisualSpaces(line)), Infinity);
       const indent = Number.isFinite(minIndent) ? minIndent : 0;
-      return lines.map(line => line.slice(indent).replace(/\s+$/g, '')).join('\n');
+      return lines
+        .map(line => stripLeadingVisualSpaces(line, indent).replace(/[ \t]+$/g, ''))
+        .join('\n');
     }
 
     function escapeHtml(value) {
@@ -1101,10 +1203,6 @@ ________________
       if (sceneAnimationTimer) {
         clearInterval(sceneAnimationTimer);
         sceneAnimationTimer = null;
-        if (activeAnimationName) {
-          trackEvent('scene_animation_stop', { animation_name: activeAnimationName });
-          activeAnimationName = '';
-        }
       }
     }
 
@@ -1112,8 +1210,6 @@ ________________
       const frames = level.frames && level.frames.length ? level.frames : [level.artBefore];
       let frameIndex = 0;
       ui.sceneArt.innerHTML = renderColoredArt(frames[0]);
-      activeAnimationName = normalizeCommand(level.command).replace(/\s+/g, '_');
-      trackEvent('scene_animation_start', { animation_name: activeAnimationName });
       sceneAnimationTimer = setInterval(() => {
         frameIndex = (frameIndex + 1) % frames.length;
         ui.sceneArt.innerHTML = renderColoredArt(frames[frameIndex]);
@@ -1175,19 +1271,16 @@ ________________
       ensureInputVisible();
     }
 
-    function requestExternalBrowserOpen() {
-      const currentUrl = window.location.href;
-      ui.externalOpenLink.href = currentUrl;
+    function showKakaoPlayChoice() {
       ui.externalOpenHelp.classList.remove('hidden');
-      setStatus('INFO> OPENING SYSTEM BROWSER...', 'ok');
-      trackEvent('external_browser_open_attempt', { source: 'kakao_inapp', target_url: currentUrl });
-      try {
-        const externalScheme = `kakaotalk://web/openExternal?url=${encodeURIComponent(currentUrl)}`;
-        window.location.href = externalScheme;
-      } catch (_error) {
-        ui.externalOpenHelp.classList.remove('hidden');
-        trackEvent('external_browser_open_failed', { source: 'kakao_inapp' });
-      }
+      ui.compatNote.textContent = '카카오톡 인앱브라우저예요. 외부 브라우저를 권장하지만, 여기서도 바로 할 수 있어요.';
+      ui.compatNote.classList.remove('hidden');
+    }
+
+    function openKakaoExternalBrowser() {
+      trackEvent('external_browser_open_manual_click', { source: 'kakao_inapp_help' });
+      const externalScheme = `kakaotalk://web/openExternal?url=${encodeURIComponent(window.location.href)}`;
+      window.location.href = externalScheme;
     }
 
     function pickKoreanVoice() {
@@ -1343,6 +1436,13 @@ ________________
         try { stop(); } catch (_error) { /* ignore */ }
       }
       dropped.forEach(item => item.finish(false));
+      synthCancelledAt = performance.now();
+      speechToken += 1;
+      if (resolveActiveSpeech) {
+        const resolvePrev = resolveActiveSpeech;
+        resolveActiveSpeech = null;
+        resolvePrev(false);
+      }
       if (hasTTS()) {
         try { window.speechSynthesis.cancel(); } catch (_error) { /* ignore */ }
       }
@@ -1493,10 +1593,11 @@ ________________
     }
 
     function speak(text, options = {}) {
-      if (!gameStarted) return Promise.resolve(false);
+      if (!gameStarted || !text) return Promise.resolve(false);
       if (!ttsManifestSettled) return ttsManifestReady.then(() => speak(text, options));
       const norm = normalizeSpeech(text);
-      const rel = norm && ttsManifest && ttsManifest.clips ? ttsManifest.clips[norm] : '';
+      if (!norm) return Promise.resolve(false);
+      const rel = ttsManifest && ttsManifest.clips ? ttsManifest.clips[norm] : '';
       if (rel) return enqueueClip(text, options);
       const interrupt = options.interrupt ?? true;
       if (interrupt) cancelClipQueue();
@@ -1504,34 +1605,130 @@ ________________
       return speakSynth(text, options);
     }
 
+    // speechSynthesis is only the fallback. Retry once if cancel() drops the next speak().
     function speakSynth(text, options = {}) {
-      if (!gameStarted || !hasTTS()) return Promise.resolve(false);
+      if (!gameStarted || !hasTTS() || !text) return Promise.resolve(false);
       const synth = window.speechSynthesis;
-      const interrupt = options.interrupt ?? true;
-      if (interrupt) synth.cancel();
+      const interrupt = options.interrupt !== false;
+      const token = ++speechToken;
+      if (resolveActiveSpeech) {
+        const resolvePrev = resolveActiveSpeech;
+        resolveActiveSpeech = null;
+        resolvePrev(false);
+      }
+
+      const cancelledRecently = performance.now() - synthCancelledAt < 120;
+      const alreadySpeaking = !!(synth.speaking || synth.pending);
+      const needsGap = cancelledRecently || (interrupt && alreadySpeaking);
+      if (interrupt && alreadySpeaking) {
+        synthCancelledAt = performance.now();
+        try { synth.cancel(); } catch (_error) { /* ignore */ }
+      }
+      if (synth.paused) {
+        try { synth.resume(); } catch (_error) { /* ignore */ }
+      }
+
+      const maxWait = Math.min(
+        options.timeoutMs ?? 14000,
+        Math.max(2500, String(text).length * 320 + 1800)
+      );
+
       return new Promise(resolve => {
         let settled = false;
-        const finish = success => {
-          if (settled) return;
-          settled = true;
-          resolve(success);
+        let started = false;
+        let attempts = 0;
+        let launchId = 0;
+        let retrying = false;
+        let startTimer = 0;
+        let maxTimer = 0;
+
+        const cleanup = () => {
+          if (startTimer) clearTimeout(startTimer);
+          if (maxTimer) clearTimeout(maxTimer);
+          startTimer = 0;
+          maxTimer = 0;
         };
 
-        const utter = new window.SpeechSynthesisUtterance(text);
-        utter.lang = 'ko-KR';
-        utter.rate = options.rate ?? 0.9;
-        utter.pitch = options.pitch ?? 1.0;
-        if (koreanVoice) utter.voice = koreanVoice;
-        utter.onend = () => finish(true);
-        utter.onerror = () => finish(false);
-        try {
-          synth.speak(utter);
-        } catch (_error) {
-          finish(false);
-        }
+        const finish = (success) => {
+          if (settled) return;
+          settled = true;
+          if (resolveActiveSpeech === finish) resolveActiveSpeech = null;
+          cleanup();
+          resolve(success);
+        };
+        resolveActiveSpeech = finish;
 
-        const timeoutMs = options.timeoutMs ?? 15000;
-        setTimeout(() => finish(false), timeoutMs);
+        const armMax = (ms) => {
+          if (maxTimer) clearTimeout(maxTimer);
+          maxTimer = setTimeout(() => {
+            if (settled || token !== speechToken) return;
+            if (!started && (synth.speaking || synth.pending)) {
+              started = true;
+              armMax(maxWait);
+              return;
+            }
+            try { synth.cancel(); } catch (_error) { /* ignore */ }
+            finish(false);
+          }, ms);
+        };
+
+        const launch = () => {
+          if (settled || token !== speechToken) return;
+          const myLaunch = ++launchId;
+          attempts += 1;
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = 'ko-KR';
+          utter.rate = options.rate ?? 0.9;
+          utter.pitch = options.pitch ?? 1.0;
+          if (koreanVoice) utter.voice = koreanVoice;
+          utter.onstart = () => {
+            if (settled || token !== speechToken || myLaunch !== launchId) return;
+            started = true;
+            if (startTimer) {
+              clearTimeout(startTimer);
+              startTimer = 0;
+            }
+            armMax(maxWait);
+          };
+          utter.onend = () => {
+            if (settled || token !== speechToken || myLaunch !== launchId) return;
+            finish(true);
+          };
+          utter.onerror = () => {
+            if (retrying || settled || token !== speechToken || myLaunch !== launchId) return;
+            finish(false);
+          };
+          try {
+            if (synth.paused) synth.resume();
+            synth.speak(utter);
+          } catch (_error) {
+            finish(false);
+            return;
+          }
+
+          if (!needsGap) return;
+          if (startTimer) clearTimeout(startTimer);
+          startTimer = setTimeout(() => {
+            if (settled || started || token !== speechToken || myLaunch !== launchId) return;
+            const dropped = !synth.speaking && !synth.pending;
+            // Still queued or speaking: leave it alone. Only a dropped speak() is retried.
+            if (!dropped) return;
+            if (attempts < 2) {
+              retrying = true;
+              synthCancelledAt = performance.now();
+              try { synth.cancel(); } catch (_error) { /* ignore */ }
+              retrying = false;
+              setTimeout(launch, 50);
+              return;
+            }
+            finish(false);
+          }, 700);
+        };
+
+        // If speech never starts, continue the game instead of waiting out the full line.
+        armMax(Math.min(maxWait, 2200));
+        if (needsGap) setTimeout(launch, 50);
+        else launch();
       });
     }
 
@@ -1550,12 +1747,28 @@ ________________
       ui.status.className = `status ${type}`.trim();
     }
 
+    // 아이가 친 글자는 분석으로 보내지 않아요. 정오와 레벨 정보만 남겨요.
+    const ANALYTICS_BLOCKED_KEYS = new Set([
+      'answer',
+      'expected',
+      'input',
+      'text',
+      'typed',
+      'query',
+      'target_url',
+      'command'
+    ]);
+
     function trackEvent(eventName, params = {}) {
       if (typeof window.gtag !== 'function') return;
-      window.gtag('event', eventName, {
-        session_id: sessionId,
-        ...params
+      const safe = { session_id: sessionId };
+      Object.keys(params).forEach((key) => {
+        if (ANALYTICS_BLOCKED_KEYS.has(key)) return;
+        const value = params[key];
+        if (value == null) return;
+        safe[key] = value;
       });
+      window.gtag('event', eventName, safe);
     }
 
     function renderChapterMenu() {
@@ -1582,8 +1795,9 @@ ________________
 
     function startChapter(index) {
       trackEvent('chapter_select', { chapter_id: chapters[index].id });
-      if (isKakaoInApp) {
-        requestExternalBrowserOpen();
+      if (isKakaoInApp && !allowKakaoInAppPlay) {
+        pendingChapterIndex = index;
+        showKakaoPlayChoice();
         return;
       }
       const firstStart = !gameStarted;
@@ -1626,6 +1840,7 @@ ________________
       ui.commandText.textContent = level.command.toUpperCase();
       ui.spellingText.textContent = `철자 힌트: ${level.command.toUpperCase()} (${commandToSpellingKo(level.command)})`;
       ui.commandInput.value = '';
+      letterSoundBaseline = '';
       ui.commandInput.focus();
       setStatus('SYS> VOICE GUIDE READY. TYPE THE COMMAND.');
       const intro = buildIntroTTS(level);
@@ -1633,8 +1848,7 @@ ________________
       trackEvent('level_view', {
         chapter_id: chapter.id,
         level_index: currentLevel + 1,
-        level_title: level.name,
-        command: normalizeCommand(level.command)
+        level_title: level.name
       });
     }
 
@@ -1659,8 +1873,7 @@ ________________
       if (token !== playToken) return;
       trackEvent('level_clear', {
         chapter_id: chapter.id,
-        level_index: currentLevel + 1,
-        command: normalizeCommand(level.command)
+        level_index: currentLevel + 1
       });
       stopSceneAnimation();
       currentLevel += 1;
@@ -1701,40 +1914,36 @@ ________________
       const level = chapter.levels[currentLevel];
       const answer = normalizeCommand(ui.commandInput.value);
       const expected = normalizeCommand(level.command);
+      const correct = answer === expected;
       trackEvent('command_submit', {
         chapter_id: chapter.id,
         level_index: currentLevel + 1,
-        answer,
-        expected
+        correct
       });
 
-      if (answer === expected) {
+      if (correct) {
         trackEvent('command_success', {
           chapter_id: chapter.id,
-          level_index: currentLevel + 1,
-          command: expected
+          level_index: currentLevel + 1
         });
         void completeLevel();
       } else {
         trackEvent('command_error', {
           chapter_id: chapter.id,
-          level_index: currentLevel + 1,
-          answer,
-          expected
+          level_index: currentLevel + 1
         });
         setStatus('ERR> INVALID COMMAND. TRY AGAIN OR PRESS REPEAT.', 'err');
         speak(`괜찮아, 다시 해보자. ${commandToSpellingKo(level.command)}.`, { rate: 0.85 });
       }
     }
 
-    function handleLetterSound(event) {
-      if (!ui.letterSoundToggle.checked || !gameStarted) return;
-      if (event.key.length !== 1) return;
+    function speakTypedChar(ch) {
+      if (!ui.letterSoundToggle.checked || !gameStarted || isStageTransitioning) return;
       let spoken = '';
-      if (/[a-z]/i.test(event.key)) {
-        const letter = event.key.toUpperCase();
+      if (/[a-z]/i.test(ch)) {
+        const letter = ch.toUpperCase();
         spoken = letterKo[letter] || letter;
-      } else if (event.key === '-') {
+      } else if (ch === '-' || ch === '\u2013' || ch === '\u2014') {
         spoken = '대시';
       } else {
         return;
@@ -1742,7 +1951,22 @@ ________________
       const now = Date.now();
       if (now - lastLetterSpokenAt < 80) return;
       lastLetterSpokenAt = now;
-      speak(spoken, { rate: 0.82, pitch: 1.04, interrupt: false });
+      // Interrupt so the letter is heard now, not after the current narration.
+      speak(spoken, { rate: 0.82, pitch: 1.04, timeoutMs: 2500 });
+    }
+
+    function handleCommandInput() {
+      const next = ui.commandInput.value;
+      const prev = letterSoundBaseline;
+      letterSoundBaseline = next;
+      if (!next || next.length < prev.length) return;
+      let index = 0;
+      const limit = Math.min(prev.length, next.length);
+      while (index < limit && prev[index] === next[index]) index += 1;
+      const inserted = next.slice(index);
+      const chars = inserted.match(/[a-zA-Z\u2014\u2013-]/g);
+      if (!chars) return;
+      speakTypedChar(chars[chars.length - 1]);
     }
 
     ui.startBtn.addEventListener('click', () => {
@@ -1756,11 +1980,33 @@ ________________
       if (currentChapter + 1 < chapters.length) startChapter(currentChapter + 1);
     });
 
+    function repeatVoice() {
+      if (!gameStarted || ui.gameScreen.classList.contains('hidden') || ui.repeatBtn.disabled) return;
+      if (window.__lhqBirthdayState === 'party') return;
+      if (window.__lhqBirthdayState === 'candles' && window.__lhqBirthdayRepeatLine) {
+        trackEvent('hint_repeat_click', { chapter_id: 'birthday', level_index: 0 });
+        speak(window.__lhqBirthdayRepeatLine, { rate: 0.86, pitch: 1.05, timeoutMs: 14000 });
+        return;
+      }
+      const chapter = chapters[currentChapter];
+      const level = chapter && chapter.levels[currentLevel];
+      if (!level) return;
+      trackEvent('hint_repeat_click', { chapter_id: chapter.id, level_index: currentLevel + 1 });
+      speak(buildIntroTTS(level), { rate: 0.8, timeoutMs: 25000 });
+    }
+
     ui.submitBtn.addEventListener('click', handleSubmit);
-    ui.repeatBtn.addEventListener('click', () => {
-      trackEvent('hint_repeat_click', { chapter_id: chapters[currentChapter].id, level_index: currentLevel + 1 });
-      const level = chapters[currentChapter].levels[currentLevel];
-      if (level) speak(buildIntroTTS(level), { rate: 0.8, timeoutMs: 25000 });
+    ui.repeatBtn.addEventListener('click', repeatVoice);
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key !== 'F1' && event.code !== 'F1') return;
+      event.preventDefault();
+      if (event.repeat) return;
+      repeatVoice();
+    });
+    window.addEventListener('keyup', (event) => {
+      if (event.key !== 'F1' && event.code !== 'F1') return;
+      event.preventDefault();
     });
 
     ui.letterSoundToggle.addEventListener('change', () => {
@@ -1768,27 +2014,36 @@ ________________
     });
 
     ui.commandInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        handleSubmit();
-      } else {
-        handleLetterSound(event);
-      }
+      if (event.key === 'Enter') handleSubmit();
     });
 
+    // Gboard often reports keydown key as "Unidentified". The input event has the character.
+    ui.commandInput.addEventListener('input', handleCommandInput);
+
     ui.commandInput.addEventListener('focus', () => {
-      trackEvent('command_input_focus', { level_index: currentLevel + 1 });
       setTimeout(() => {
         ensureInputVisible();
       }, 160);
     });
 
-    ui.externalOpenLink.addEventListener('click', () => {
-      trackEvent('external_browser_open_manual_click', { source: 'kakao_inapp_help' });
+    ui.externalOpenLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      openKakaoExternalBrowser();
+    });
+
+    ui.playHereBtn.addEventListener('click', () => {
+      if (allowKakaoInAppPlay) return;
+      allowKakaoInAppPlay = true;
+      ui.playHereBtn.disabled = true;
+      trackEvent('inapp_play_here', { source: 'kakao_inapp' });
+      const index = pendingChapterIndex;
+      pendingChapterIndex = null;
+      if (index === null || index === undefined) return;
+      startChapter(index);
     });
 
     if (isKakaoInApp) {
-      ui.compatNote.textContent = '카카오톡 인앱브라우저입니다. START MISSION을 누르면 기본 브라우저로 열어요.';
-      ui.compatNote.classList.remove('hidden');
+      showKakaoPlayChoice();
       trackEvent('inapp_detected', { app: 'kakaotalk' });
     }
 
@@ -1860,8 +2115,13 @@ ________________
       const phrase = agePhrase(age);
       const candleTotal = Math.min(5, age);
       const greetLine = `생일 축하해 재윤아! 오늘 재윤이 ${phrase} 됐네!`;
+      window.__lhqBirthdayRepeatLine = `${greetLine} 키를 눌러 초를 꺼 봐.`;
       let candlesLit = candleTotal;
       let birthdayState = null;
+      function publishBirthday(state) {
+        birthdayState = state;
+        window.__lhqBirthdayState = state || '';
+      }
       let birthdayPlayedThisLoad = false;
       let pendingBirthdayChapter = 0;
       let birthdayToken = 0;
@@ -2093,7 +2353,7 @@ ________________
 
       async function celebrateChoco() {
         const token = birthdayToken;
-        birthdayState = 'party';
+        publishBirthday('party');
         stopSceneAnimation();
         applyTheme('#ff4fa3');
         ui.levelTitle.textContent = `HAPPY BIRTHDAY · 초코 · ${age}살`;
@@ -2121,7 +2381,7 @@ ________________
         }
         stopSong();
         const next = pendingBirthdayChapter;
-        birthdayState = null;
+        publishBirthday(null);
         pendingBirthdayChapter = null;
         isStageTransitioning = false;
         originalStartChapter(next);
@@ -2161,7 +2421,7 @@ ________________
         playToken += 1;
         birthdayToken = playToken;
         isStageTransitioning = true;
-        birthdayState = 'candles';
+        publishBirthday('candles');
         pendingBirthdayChapter = index;
         candlesLit = candleTotal;
         ui.startScreen.classList.add('hidden');
@@ -2182,7 +2442,7 @@ ________________
 
       const originalStartChapter = startChapter;
       startChapter = function (index) {
-        if (isKakaoInApp) return originalStartChapter(index);
+        if (isKakaoInApp && !allowKakaoInAppPlay) return originalStartChapter(index);
         if (birthdayState === 'candles' || birthdayState === 'party') return;
         if (birthdayPlayedThisLoad) return originalStartChapter(index);
         birthdayPlayedThisLoad = true;
@@ -2203,7 +2463,7 @@ ________________
 
       function leaveBirthday() {
         if (birthdayState !== 'candles' && birthdayState !== 'party') return;
-        birthdayState = null;
+        publishBirthday(null);
         pendingBirthdayChapter = null;
         stopSong();
         stopSpeaking();
