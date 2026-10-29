@@ -9,6 +9,7 @@ A missing file must fall back to speechSynthesis.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -151,6 +152,8 @@ def press_key(page, key: str) -> float:
           input.focus();
           const t0 = performance.now();
           input.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+          input.value = (input.value || '') + key;
+          input.dispatchEvent(new InputEvent('input', { bubbles: true, data: key, inputType: 'insertText' }));
           const last = window.__lhqLastPlay;
           if (!last || last.t < t0) return -1;
           return last.t - t0;
@@ -210,16 +213,39 @@ def full_play(page, errors: list[str]) -> tuple[str, str]:
     decoded = page.evaluate("() => window.__lhqDecodedCount()")
     if decoded < 27:
         raise SystemExit(f"only decoded {decoded} clips before letter keys")
-    letter_dt = press_key(page, "b")
+    letter_key = (command_text(page)[:1] or "b").lower()
+    letter_dt = press_key(page, letter_key)
     letter_text = page.evaluate("() => window.__lhqLastPlay && window.__lhqLastPlay.text")
     if letter_dt < 0 or letter_dt > 50:
         raise SystemExit(f"letter key was not instant ({letter_dt} ms, text={letter_text})")
     if not letter_text or len(letter_text) > 4:
         raise SystemExit(f"unexpected letter clip {letter_text!r}")
     wait_quiet(page)
+    page.evaluate("() => { document.querySelector('#commandInput').value = ''; }")
+    page.evaluate(
+        """() => {
+          const input = document.querySelector('#commandInput');
+          input.value = 'm';
+          input.dispatchEvent(new InputEvent('input', { bubbles: true, data: 'm', inputType: 'insertText' }));
+        }"""
+    )
+    page.wait_for_function(
+        """() => window.__lhqTtsLog.some(event => event.type === 'mp3' && event.text.includes('Moon'))""",
+        timeout=15000,
+    )
+    if page.evaluate("() => window.__lhqTtsStats.fallback") != 0:
+        raise SystemExit("wrong-key discovery used speechSynthesis")
+    print("wrong-key discovery played from mp3")
+    wait_quiet(page)
+    page.wait_for_function(
+        """() => window.__lhqTtsLog.some(event => event.type === 'mp3' && (event.text.includes('가운데 줄') || event.text.includes('맨 아랫줄') || event.text.includes('맨 윗줄')))""",
+        timeout=12000,
+    )
+    print("keyboard position hint played from mp3")
+    wait_quiet(page)
     dash_dt = press_key(page, "-")
     dash_text = page.evaluate("() => window.__lhqLastPlay && window.__lhqLastPlay.text")
-    if dash_dt < 0 or dash_dt > 50:
+    if dash_text == "대시" and (dash_dt < 0 or dash_dt > 50):
         raise SystemExit(f"dash key was not instant ({dash_dt} ms, text={dash_text})")
     wait_quiet(page)
     print(f"letter {letter_text!r} in {letter_dt:.1f} ms, dash {dash_text!r} in {dash_dt:.1f} ms")
@@ -277,13 +303,14 @@ def full_play(page, errors: list[str]) -> tuple[str, str]:
     if "ALL CHAPTERS DONE" not in done_text:
         raise SystemExit("missing final clear line")
     if stats["fallback"] != 0:
-        raise SystemExit(f"fallbacks during full play: {stats['fallback']}")
+        fallbacks = [event["text"] for event in log if event["type"] == "fallback"]
+        raise SystemExit(f"fallbacks during full play: {stats['fallback']} {fallbacks[:8]}")
     if stats["mp3"] < missions * 2:
         raise SystemExit(f"too few mp3 plays: {stats['mp3']}")
     check_pairs(log)
     if not reward_text:
         raise SystemExit("could not capture a reward line")
-    return reward_text, letter_text
+    return reward_text, letter_text, letter_key
 
 
 def move_aside(text: str) -> tuple[Path, Path]:
@@ -310,7 +337,7 @@ def expect_fallback(page, text: str) -> None:
         raise SystemExit(f"speechSynthesis was not used for {text!r}; calls={calls[:4]}")
 
 
-def fallback_letter(browser, port: int, letter_text: str) -> None:
+def fallback_letter(browser, port: int, letter_text: str, letter_key: str) -> None:
     path, backup = move_aside(letter_text)
     try:
         page, errors = new_page(browser, port)
@@ -321,7 +348,7 @@ def fallback_letter(browser, port: int, letter_text: str) -> None:
         wait_quiet(page)
         if page.evaluate("() => window.__lhqTtsStats.fallback") != 0:
             raise SystemExit("intro fell back even though its clip exists")
-        press_key(page, "b")
+        press_key(page, letter_key)
         expect_fallback(page, letter_text)
         print(f"missing letter file fell back: {letter_text}")
         page.context.close()
@@ -461,7 +488,7 @@ def play_birthday(browser, port: int, path: str, date_iso: str | None, expect_ph
         timeout=25000,
     )
     page.wait_for_function(
-        """() => window.__lhqTtsLog.some(event => event.type === 'mp3' && event.text.includes('알파벳 놀이를 해요'))""",
+        """() => window.__lhqTtsLog.some(event => event.type === 'mp3' && (event.text.includes('2층버스') || event.text.includes('알파벳 놀이를 해요')))""",
         timeout=15000,
     )
     stats = page.evaluate("() => window.__lhqTtsStats")
@@ -489,6 +516,47 @@ def cancel_and_restart(page) -> None:
     print("cancel and restart ok")
 
 
+def old_saved_progress(browser, port: int) -> None:
+    page, errors = new_page(browser, port)
+    page.evaluate(
+        """() => {
+          localStorage.setItem('lhq_cleared_chapters', JSON.stringify(['abc1', 'abc2', 'abc3', 'cmd', 'words', 'nope']));
+          localStorage.removeItem('lhq_progress_version');
+        }"""
+    )
+    page.reload(wait_until="domcontentloaded")
+    page.wait_for_function("() => window.__lhqTtsReady === true")
+    page.wait_for_selector("#chapterGrid .chapter-btn")
+    state = page.evaluate(
+        """() => {
+          const buttons = [...document.querySelectorAll('.chapter-btn')].map(btn => ({
+            text: btn.textContent.replace(/\\s+/g, ' ').trim(),
+            cleared: btn.classList.contains('cleared')
+          }));
+          return {
+            version: localStorage.getItem('lhq_progress_version'),
+            cleared: JSON.parse(localStorage.getItem('lhq_cleared_chapters') || '[]'),
+            buttons
+          };
+        }"""
+    )
+    if errors:
+        raise SystemExit("old progress page errors:\n" + "\n".join(errors[:8]))
+    if state["version"] != "2":
+        raise SystemExit(f"progress version was not migrated: {state['version']}")
+    for chapter_id in ("abc1", "abc2", "abc3"):
+        if chapter_id in state["cleared"]:
+            raise SystemExit(f"rewritten chapter stayed cleared: {chapter_id}")
+    if "cmd" not in state["cleared"]:
+        raise SystemExit(f"command clear was dropped: {state['cleared']}")
+    abc1 = next(btn for btn in state["buttons"] if "재윤이 정류장" in btn["text"])
+    cmd = next(btn for btn in state["buttons"] if "첫 명령어" in btn["text"])
+    if abc1["cleared"] or not cmd["cleared"]:
+        raise SystemExit(f"menu checks wrong: {abc1} {cmd}")
+    print("old saved progress migrated without breaking the menu")
+    page.context.close()
+
+
 def main() -> None:
     from playwright.sync_api import sync_playwright
 
@@ -496,19 +564,21 @@ def main() -> None:
     try:
         with sync_playwright() as playwright:
             browser = launch(playwright)
-            play_birthday(browser, port, "/index.html", "2026-10-31T12:00:00", "네 살")
-            play_birthday(browser, port, "/index.html", "2027-10-31T12:00:00", "다섯 살")
-            play_birthday(browser, port, "/index.html?birthday=1", None, "네 살")
+            if not os.environ.get("VERIFY_PLAY_ONLY"):
+                play_birthday(browser, port, "/index.html", "2026-10-31T12:00:00", "네 살")
+                play_birthday(browser, port, "/index.html", "2027-10-31T12:00:00", "다섯 살")
+                play_birthday(browser, port, "/index.html?birthday=1", None, "네 살")
 
-            page, _errors = new_page(browser, port)
-            cancel_and_restart(page)
-            page.context.close()
+                page, _errors = new_page(browser, port)
+                cancel_and_restart(page)
+                page.context.close()
 
+                old_saved_progress(browser, port)
             page, errors = new_page(browser, port)
-            reward, letter_text = full_play(page, errors)
+            reward, letter_text, letter_key = full_play(page, errors)
             page.context.close()
 
-            fallback_letter(browser, port, letter_text)
+            fallback_letter(browser, port, letter_text, letter_key)
             fallback_reward(browser, port, reward)
             browser.close()
     finally:

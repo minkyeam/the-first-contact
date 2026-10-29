@@ -709,55 +709,698 @@ COMMAND: PRESS START OR PICK A CHAPTER</pre>
 ________________
 `;
 
-    // ---------- 1~3장: 알파벳 ----------
+    // ---------- 알파벳 이야기 (짧은 챕터, 글자마다 결과) ----------
+    // 글자 이름 받침. 에프/에스/엑스/제트는 아이 말에서 는/를.
+    function spokenBatchim(word) {
+      if (!word) return false;
+      const code = word.charCodeAt(word.length - 1);
+      if (code < 0xac00 || code > 0xd7a3) return false;
+      const jong = (code - 0xac00) % 28;
+      if (jong === 7 || jong === 19) return false;
+      return jong !== 0;
+    }
+
+    function latinTopic(letter) {
+      const name = letterKo[letter] || letter;
+      return `${letter}${spokenBatchim(name) ? '은' : '는'}`;
+    }
+
+    function latinObject(letter) {
+      const name = letterKo[letter] || letter;
+      return `${letter}${spokenBatchim(name) ? '을' : '를'}`;
+    }
+
+    const QWERTY_POS = {};
+    const ORDINAL_KO = ['', '첫', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열'];
+    [
+      ['맨 윗줄', 'QWERTYUIOP'],
+      ['가운데 줄', 'ASDFGHJKL'],
+      ['맨 아랫줄', 'ZXCVBNM']
+    ].forEach(([row, letters]) => {
+      letters.split('').forEach((ch, index) => {
+        QWERTY_POS[ch] = { row, index: index + 1 };
+      });
+    });
+
+    function positionHint(letter) {
+      const pos = QWERTY_POS[letter];
+      if (!pos) return '';
+      return `${latinTopic(letter)} ${pos.row}, 왼쪽에서 ${ORDINAL_KO[pos.index]} 번째에 있어`;
+    }
+
     const alphabetWords = {
-      A: { word: 'apple', emoji: '🍎', pron: '애플', ko: '사과' },
-      B: { word: 'ball', emoji: '⚽', pron: '볼', ko: '공' },
-      C: { word: 'cat', emoji: '🐱', pron: '캣', ko: '고양이' },
-      D: { word: 'dog', emoji: '🐶', pron: '독', ko: '강아지' },
-      E: { word: 'egg', emoji: '🥚', pron: '에그', ko: '달걀' },
-      F: { word: 'fish', emoji: '🐟', pron: '피쉬', ko: '물고기' },
-      G: { word: 'gift', emoji: '🎁', pron: '기프트', ko: '선물' },
-      H: { word: 'hat', emoji: '🎩', pron: '햇', ko: '모자' },
-      I: { word: 'ice cream', emoji: '🍦', pron: '아이스크림', ko: '아이스크림' },
-      J: { word: 'juice', emoji: '🧃', pron: '주스', ko: '주스' },
-      K: { word: 'kite', emoji: '🪁', pron: '카이트', ko: '연' },
-      L: { word: 'lion', emoji: '🦁', pron: '라이언', ko: '사자' },
-      M: { word: 'moon', emoji: '🌙', pron: '문', ko: '달' },
-      N: { word: 'nose', emoji: '👃', pron: '노즈', ko: '코' },
-      O: { word: 'orange', emoji: '🍊', pron: '오렌지', ko: '오렌지' },
-      P: { word: 'pig', emoji: '🐷', pron: '피그', ko: '돼지' },
-      Q: { word: 'queen', emoji: '👑', pron: '퀸', ko: '여왕' },
-      R: { word: 'rabbit', emoji: '🐰', pron: '래빗', ko: '토끼' },
-      S: { word: 'star', emoji: '⭐', pron: '스타', ko: '별' },
-      T: { word: 'tree', emoji: '🌳', pron: '트리', ko: '나무' },
-      U: { word: 'umbrella', emoji: '☂️', pron: '엄브렐라', ko: '우산' },
-      V: { word: 'violin', emoji: '🎻', pron: '바이올린', ko: '바이올린' },
-      W: { word: 'whale', emoji: '🐳', pron: '웨일', ko: '고래' },
-      X: { word: 'xylophone', emoji: '🎵', pron: '자일로폰', ko: '실로폰' },
-      Y: { word: 'yo-yo', emoji: '🪀', pron: '요요', ko: '요요' },
-      Z: { word: 'zebra', emoji: '🦓', pron: '지브라', ko: '얼룩말' }
+      A: { word: 'Apple', ko: '사과' },
+      B: { word: 'Bus', ko: '버스' },
+      C: { word: 'Choco', ko: '초코' },
+      D: { word: 'Dog', ko: '강아지' },
+      E: { word: 'Egg', ko: '달걀' },
+      F: { word: 'Fish', ko: '물고기' },
+      G: { word: 'Go', ko: '출발' },
+      H: { word: 'Hat', ko: '모자' },
+      I: { word: 'Ice', ko: '아이스크림' },
+      J: { word: 'Jae', ko: '재윤' },
+      K: { word: 'Kite', ko: '연' },
+      L: { word: 'Lion', ko: '사자' },
+      M: { word: 'Moon', ko: '달' },
+      N: { word: 'Nose', ko: '코' },
+      O: { word: 'Orange', ko: '오렌지' },
+      P: { word: 'Pig', ko: '돼지' },
+      Q: { word: 'Queen', ko: '여왕' },
+      R: { word: 'Red', ko: '빨강' },
+      S: { word: 'Star', ko: '별' },
+      T: { word: 'Truck', ko: '트럭' },
+      U: { word: 'Umbrella', ko: '우산' },
+      V: { word: 'Van', ko: '밴' },
+      W: { word: 'Wheel', ko: '바퀴' },
+      X: { word: 'Xylophone', ko: '실로폰' },
+      Y: { word: 'Yellow', ko: '노랑' },
+      Z: { word: 'Zebra', ko: '얼룩말' }
     };
 
-    function alphabetLevel(letter) {
-      const w = alphabetWords[letter];
-      const lower = letter.toLowerCase();
-      const big = bigLetter(letter);
-      const caption = `  [BIG]${w.emoji}[/BIG]  ${letter} is for ${w.word}`;
-      return {
-        command: lower,
-        name: `${letter} ${lower}`,
-        artBefore: `${big}\n\n  ${letter} ${lower}  ?`,
-        frames: [
-          `${big}\n\n${caption}`,
-          `${colorize(big, 'YELLOW')}\n\n${caption}  *`
-        ],
-        descBefore: `키보드에서 ${letter} 글자를 찾아 누르고 엔터!`,
-        descAfter: `${letter} 는 ${w.word} (${w.ko}) 의 첫 글자!`,
-        contextTTS: `${letterKo[letter]}! ${w.ko}, 영어로 ${w.pron}. ${w.pron}의 첫 글자 ${letterKo[letter]}예요.`,
-        rewardTTS: `딩동댕! ${letterKo[letter]}, ${w.pron}, ${w.ko}!`
+    function shiftArt(art, spaces) {
+      const pad = ' '.repeat(Math.max(0, spaces | 0));
+      return String(art).split('\n').map(line => (line.trim() ? pad + line : line)).join('\n');
+    }
+
+    function withLetter(letter, scene) {
+      return `${bigLetter(letter)}\n${scene}`;
+    }
+
+    function busArt(opts) {
+      const open = !!(opts && opts.open);
+      const shift = (opts && opts.shift) || 0;
+      const caption = (opts && opts.caption) || '';
+      const door = open ? '  ' : '||';
+      const width = 18;
+      const fit = (text) => (text.length >= width ? text.slice(0, width) : text + ' '.repeat(width - text.length));
+      const edge = (ch) => `|${ch.repeat(width)}|`;
+      const lines = [
+        ` ${'_'.repeat(width)} `,
+        `|${fit(' [] [] [] [] [] ')}|`,
+        `|${fit(' [] [] [] [] [] ')}|`,
+        edge('='),
+        `|${fit(` [] [] [] [${door}]`)}|`,
+        `|${fit(` [] [] [] [${door}]`)}|`,
+        edge('_'),
+        `   (O)${' '.repeat(width - 7)}(O)`
+      ];
+      if (caption) lines.push(caption);
+      const pad = ' '.repeat(shift);
+      return lines.map(line => pad + line).join('\n');
+    }
+
+    function lamp(active, tag) {
+      return active ? `[${tag}](#)[/${tag}]` : '( )';
+    }
+
+    function trafficArt(active) {
+      return [
+        '  .-----.',
+        `  | ${lamp(active === 'R', 'RED')} |`,
+        `  | ${lamp(active === 'Y', 'YELLOW')} |`,
+        `  | ${lamp(active === 'G', 'LIME')} |`,
+        "  '-----'",
+        '     |',
+        '   ====='
+      ].join('\n');
+    }
+
+    function roadScene(active, vehicle, caption) {
+      const cap = caption ? `\n  ${caption}` : '';
+      return `${trafficArt(active)}${cap}\n${vehicle}`;
+    }
+
+    function eatFrames(item, note) {
+      return dogEatFrames(item).map((frame, index) => `${frame}${note}${index === 2 ? '  멍멍!' : '  냠냠!'}`);
+    }
+
+    function dogHat(face) {
+      const body = dog(face, '', true).split('\n');
+      body.splice(1, 0, '   .---.', '   |___|');
+      return body.join('\n');
+    }
+
+    function dogCrown() {
+      const body = dog('^', '', true).split('\n');
+      body.splice(1, 0, '   [YELLOW]\\^/[/YELLOW]');
+      return body.join('\n');
+    }
+
+    function dogUmbrella() {
+      return ['', '     .-. ', '   _|___|_', '     |||', ''].join('\n') + dog('^', '', true);
+    }
+
+    function kiteFrame(lift) {
+      const sky = '\n'.repeat(lift);
+      return `${sky}    /\\\n   /  \\\n   \\  /\n    \\/ ~\n     |\n    / \\`;
+    }
+
+    function starFrame(dense) {
+      const star = '[YELLOW]*[/YELLOW]';
+      const alt = dense ? star : '.';
+      return `\n   ${star}    ${alt}    ${star}\n      ${star}     ${alt}\n  ________________`;
+    }
+
+    function moonFrame(wide) {
+      const moon = wide ? '[YELLOW](  )[/YELLOW]' : '[YELLOW]( )[/YELLOW]';
+      return `\n      ${moon}\n   [YELLOW]*[/YELLOW]       [YELLOW]*[/YELLOW]\n  ________________`;
+    }
+
+    function truckFrame(x, trail) {
+      return `${' '.repeat(x)}   [====]\n${car(x, trail || '')}`;
+    }
+
+    function vanFrame(x) {
+      const pad = ' '.repeat(x);
+      return [
+        '',
+        `${pad}  __________`,
+        `${pad} |  V A N   |`,
+        `${pad} | []    [] |`,
+        `${pad} '-O------O-'`,
+        '='.repeat(28),
+        ''
+      ].join('\n');
+    }
+
+    function wheelFrame(x, mark) {
+      return `${' '.repeat(x)}바퀴 ${mark}\n${car(x, mark === 'O' ? '' : '. ')}`;
+    }
+
+    function palFrames(emoji, cry) {
+      return [
+        `\n  ${emoji}  ${cry}\n${dog('o', '', false)}`,
+        `\n  ${emoji}  ${cry}\n${dog('^', '', true)}`,
+        `\n  ${emoji}  ${cry}!\n${dog('^', '<3 ', true)}`
+      ];
+    }
+
+    function xyloFrames() {
+      return [true, false, true].map(up => {
+        const notes = up ? '[YELLOW]* ~ * ~ *[/YELLOW]' : '[AQUA]~ * ~ * ~[/AQUA]';
+        return `\n  ${notes}\n  | | | | |\n  =========\n${robot(up ? '^_^' : '^o^', up ? ' DING ' : ' DONG ', up)}`;
+      });
+    }
+
+    function jumpFrames() {
+      return [
+        `폴짝!\n${dog('^', '', true)}`,
+        `폴짝!\n${dog('^', '<3 ', true)}`,
+        dog('^', '', true)
+      ];
+    }
+
+    function sneezeFrames() {
+      return [
+        `${dog('@', '', false)}에취!`,
+        `${dog('o', '', false)}에취!`,
+        `${dog('^', '', true)}간지러워!`
+      ];
+    }
+
+    function chocoThanks(line) {
+      return [
+        `${dog('^', '', true)}${line}`,
+        `${dog('^', '<3 ', true)}${line}`
+      ];
+    }
+
+    function namePaint(word) {
+      const upper = word.toUpperCase();
+      return function paint(count) {
+        const chars = upper.split('').map((ch, index) => (index < count ? `[YELLOW]${ch}[/YELLOW]` : '_')).join(' ');
+        const next = count < upper.length ? bigLetter(upper[count]) : '';
+        const pup = shiftArt(dog(count ? '^' : 'o', '', count > 0), Math.max(0, 8 - count * 2));
+        return `${next}\n${pup}\n  ${chars}`;
       };
     }
+
+    function nameFrames(word, caption) {
+      const shown = `[YELLOW]${word.toUpperCase().split('').join(' ')}[/YELLOW]`;
+      return [
+        `${shiftArt(dog('^', '', true), 8)}\n  ${shown}\n  ${caption}`,
+        `${shiftArt(dog('^', '', true), 3)}\n  ${shown}\n  ${caption}`,
+        `${dog('^', '<3 ', true)}\n  ${shown}\n  ${caption}`
+      ];
+    }
+
+    function letterMission(letter, spec) {
+      return {
+        command: letter.toLowerCase(),
+        name: spec.name,
+        story: true,
+        waits: spec.waits,
+        artBefore: withLetter(letter, spec.before),
+        frames: spec.frames,
+        descBefore: spec.descBefore,
+        descAfter: spec.descAfter,
+        contextTTS: spec.ask,
+        rewardTTS: spec.reward,
+        themeColor: spec.themeColor
+      };
+    }
+
+    function nameMission(word, spec) {
+      const paint = namePaint(word);
+      return {
+        command: word,
+        name: spec.name,
+        story: true,
+        guide: true,
+        waits: spec.waits,
+        paint,
+        artBefore: paint(0),
+        frames: nameFrames(word, spec.doneLine),
+        descBefore: spec.descBefore,
+        descAfter: spec.descAfter,
+        contextTTS: spec.ask,
+        rewardTTS: spec.reward
+      };
+    }
+
+    function storyChapter(spec) {
+      return {
+        id: spec.id,
+        title: spec.title,
+        introTTS: spec.intro,
+        collectPrefix: spec.prefix,
+        collect: spec.collect,
+        collectLabel: spec.label,
+        levels: spec.levels,
+        thanksFrames: chocoThanks(spec.thanksLine),
+        thanksDesc: spec.thanksDesc,
+        thanksTTS: spec.thanks
+      };
+    }
+
+    const storyChapters = [
+      storyChapter({
+        id: 'abc1',
+        title: '재윤이 정류장',
+        intro: '2층버스 놀이! 글자 누르고 엔터.',
+        prefix: ['2층버스'],
+        collect: ['재윤', '초코', '출발'],
+        label: '탄 사람',
+        thanksLine: '고마워! 멍멍!',
+        thanksDesc: '초코가 버스에서 꼬리를 흔들며 고마워해요.',
+        thanks: '버스 재미있었지? 초코가 꼬리를 흔들며 고마워해. 멍멍!',
+        levels: [
+          letterMission('J', {
+            name: 'J 정류장',
+            waits: '문은',
+            before: busArt({ caption: '문이 닫혀 있어요' }),
+            frames: [
+              busArt({ open: true, caption: '치익~' }),
+              busArt({ open: true, caption: '문이 열렸어요' }),
+              busArt({ open: true, caption: '재윤이가 탔어요' })
+            ],
+            descBefore: '2층버스가 J 정류장에 왔어요. J를 치면 문이 열려요.',
+            descAfter: '치익~ 문이 열렸어요! 재윤이가 탔어요.',
+            ask: '2층버스가 재윤이 정류장에 왔어! 제이 눌러줄래?',
+            reward: '치익~ 문이 열렸어! 재윤이가 탔어.'
+          }),
+          letterMission('C', {
+            name: 'C 초코 탑승',
+            waits: '초코는',
+            before: `${busArt({ open: true, caption: '재윤이가 타고 있어요' })}\n${shiftArt(dog('o', '', false), 8)}`,
+            frames: [
+              `${busArt({ open: true, caption: '초코가 달려와요' })}\n${shiftArt(dog('^', '', true), 4)}`,
+              `${busArt({ open: true, caption: '멍멍!' })}\n${shiftArt(dog('^', '', true), 1)}`,
+              `${busArt({ open: true, caption: '초코가 탔어요' })}\n${dog('^', '', true)}`
+            ],
+            descBefore: '초코도 버스를 타고 싶어 해요. C를 치면 초코가 타요.',
+            descAfter: '멍멍! 초코가 재윤이 옆에 탔어요.',
+            ask: '초코도 타고 싶대! 씨 눌러줄래?',
+            reward: '멍멍! 초코가 재윤이 옆에 탔어.'
+          }),
+          letterMission('B', {
+            name: 'B 버스 출발',
+            waits: '버스는',
+            before: busArt({ open: true, caption: '재윤이랑 초코가 탔어요' }),
+            frames: [
+              busArt({ open: true, shift: 0, caption: '부릉!' }),
+              busArt({ open: true, shift: 3, caption: '부릉!' }),
+              busArt({ open: true, shift: 6, caption: '2층버스가 달렸어요' })
+            ],
+            descBefore: 'B는 Bus, 2층버스예요. B를 치면 버스가 출발해요.',
+            descAfter: '부릉! 2층버스가 출발했어요.',
+            ask: '비는 버스야! 비 누르면 2층버스가 가.',
+            reward: '부릉! 2층버스가 달렸어.'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'abc2',
+        title: '신호등',
+        intro: '신호등 놀이!',
+        collect: ['빨간불', '노란불', '초록불'],
+        label: '신호등',
+        thanksLine: '안전해서 고마워!',
+        thanksDesc: '초코가 안전해서 고마워해요.',
+        thanks: '신호를 잘 봤어. 초코가 안전해서 고마워해!',
+        levels: [
+          letterMission('R', {
+            name: 'R 빨간 불',
+            waits: '신호등은',
+            themeColor: '#ff0000',
+            before: roadScene('', car(8, '= ')),
+            frames: [
+              roadScene('R', car(4), '빨간 불'),
+              roadScene('R', car(2), '정지'),
+              roadScene('R', car(2), '멈췄어')
+            ],
+            descBefore: '빨간 불이면 멈춰요. R은 Red, 빨강이에요.',
+            descAfter: '빨간 불! 자동차가 멈췄어요.',
+            ask: '빨간 불이야! 알은 멈춰. 알 눌러줄래?',
+            reward: '빨간 불! 차가 멈췄어.'
+          }),
+          letterMission('Y', {
+            name: 'Y 노란 불',
+            waits: '신호등은',
+            themeColor: '#ffd43b',
+            before: roadScene('', car(2)),
+            frames: [
+              roadScene('Y', car(2), '노란 불'),
+              roadScene('Y', car(3, '.'), '천천히'),
+              roadScene('Y', car(4, '. '), '천천히')
+            ],
+            descBefore: '노란 불은 천천히예요. Y는 Yellow, 노랑이에요.',
+            descAfter: '노란 불! 자동차가 천천히 가요.',
+            ask: '노란 불이야. 와이는 천천히. 와이 눌러줄래?',
+            reward: '노란 불! 차가 천천히 가.'
+          }),
+          letterMission('G', {
+            name: 'G 초록 불',
+            waits: '신호등은',
+            themeColor: '#00ff00',
+            before: roadScene('', car(2)),
+            frames: [
+              roadScene('G', car(4, '= '), '초록 불'),
+              roadScene('G', car(10, '== '), '출발'),
+              roadScene('G', car(16, '=== '), '부릉!')
+            ],
+            descBefore: '초록 불이면 가도 돼요. G는 Go, 출발이에요.',
+            descAfter: '초록 불! 자동차가 씽씽 달려요.',
+            ask: '초록 불이야! 지는 가. 지 눌러줄래?',
+            reward: '초록 불! 부릉, 차가 달려.'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'abc3',
+        title: '초코 밥',
+        intro: '초코에게 밥 주기!',
+        collect: ['사과', '달걀', '오렌지', '물고기'],
+        label: '초코 그릇',
+        thanksLine: '배불러! 고마워!',
+        thanksDesc: '배부른 초코가 고마워해요.',
+        thanks: '배부른 초코가 핥짝. 재윤아 고마워!',
+        levels: [
+          letterMission('A', {
+            name: 'A 사과',
+            waits: '초코는',
+            before: `${DOG_HUNGRY}사과를 기다려요`,
+            frames: eatFrames('(@)', '사과'),
+            descBefore: '초코가 배고파요. 사과는 Apple이에요. A를 치면 사과를 줄 수 있어요.',
+            descAfter: '초코가 사과를 냠냠 먹었어요.',
+            ask: '초코가 사과 먹고 싶대! 에이 눌러줄래?',
+            reward: '냠냠! 멍멍!'
+          }),
+          letterMission('E', {
+            name: 'E 달걀',
+            waits: '초코는',
+            before: `${DOG_HUNGRY}달걀을 기다려요`,
+            frames: eatFrames('(o)', '달걀'),
+            descBefore: '달걀은 Egg예요. E를 치면 초코 그릇에 달걀이 들어가요.',
+            descAfter: '초코가 달걀을 먹었어요.',
+            ask: '달걀도 줄래? 이는 에그야. 이 눌러줄래?',
+            reward: '냠냠! 달걀도 먹었어.'
+          }),
+          letterMission('O', {
+            name: 'O 오렌지',
+            waits: '초코는',
+            before: `${DOG_HUNGRY}오렌지를 기다려요`,
+            frames: eatFrames('(#)', '오렌지'),
+            descBefore: '오렌지는 Orange예요. O를 치면 초코가 먹어요.',
+            descAfter: '초코가 오렌지를 먹었어요.',
+            ask: '오렌지는 오야. 오 눌러줄래?',
+            reward: '냠냠! 오렌지 맛있어.'
+          }),
+          letterMission('F', {
+            name: 'F 물고기',
+            waits: '초코는',
+            before: `${DOG_HUNGRY}물고기를 기다려요`,
+            frames: eatFrames('><>', '물고기'),
+            descBefore: '물고기는 Fish예요. F를 치면 초코가 먹어요.',
+            descAfter: '초코가 물고기를 먹고 배가 불렀어요.',
+            ask: '물고기는 피쉬, 에프야. 에프 눌러줄래?',
+            reward: '냠냠! 물고기 먹었어. 멍멍!'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'abc4',
+        title: '이름 부르기',
+        intro: '이름 부르기!',
+        collect: ['재윤', '모자', '초코'],
+        label: '부른 이름',
+        thanksLine: '이름 듣고 폴짝!',
+        thanksDesc: '초코가 이름을 듣고 고마워해요.',
+        thanks: '이름을 불러 줘서 초코가 폴짝. 고마워!',
+        levels: [
+          nameMission('jae', {
+            name: '재윤 이름',
+            waits: '이름은',
+            doneLine: '재윤이 이름 완성!',
+            descBefore: 'J, A, E를 차례로 누르고, 다 쓰면 엔터!',
+            descAfter: '재윤이 이름 완성!',
+            ask: '재윤이 이름을 쓰자! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.',
+            reward: '재윤이 이름 완성!'
+          }),
+          letterMission('H', {
+            name: 'H 모자',
+            waits: '모자는',
+            before: dog('o', '', false),
+            frames: [dogHat('^'), dogHat('o'), dogHat('^')],
+            descBefore: '모자는 Hat이에요. H를 치면 초코가 모자를 써요.',
+            descAfter: '초코가 모자를 쓰고 웃어요.',
+            ask: '모자는 햇이야. 에이치 누르면 초코가 모자를 써.',
+            reward: '초코가 모자를 썼어! 멋져.'
+          }),
+          nameMission('choco', {
+            name: '초코 이름',
+            waits: '초코는',
+            doneLine: '초코가 뛰어왔어요!',
+            descBefore: 'C, H, O, C, O를 차례로 누르고, 다 쓰면 엔터!',
+            descAfter: '초코가 재윤이 부르는 소리를 듣고 뛰어왔어요!',
+            ask: '초코를 불러 보자! 먼저 씨. 다 쓰면 엔터.',
+            reward: '초코가 재윤이 부르는 소리를 듣고 뛰어왔어!'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'abc5',
+        title: '초코랑 놀기',
+        intro: '초코랑 놀자!',
+        collect: ['강아지', '아이스크림', '연', '코'],
+        label: '초코랑',
+        thanksLine: '놀아 줘서 고마워!',
+        thanksDesc: '초코가 같이 놀아 줘서 고마워해요.',
+        thanks: '같이 놀아 줘서 초코가 고마워해. 멍멍!',
+        levels: [
+          letterMission('D', {
+            name: 'D 강아지',
+            waits: '초코는',
+            before: dog('o', '', false),
+            frames: jumpFrames(),
+            descBefore: 'D는 Dog, 강아지예요. D를 치면 초코가 뛰어요.',
+            descAfter: '멍멍! 초코가 폴짝 뛰었어요.',
+            ask: '디는 독, 강아지야. 디 눌러줄래?',
+            reward: '멍멍! 초코가 폴짝 뛰었어.'
+          }),
+          letterMission('I', {
+            name: 'I 아이스크림',
+            waits: '초코는',
+            before: DOG_HUNGRY,
+            frames: eatFrames('ICE', '아이스크림'),
+            descBefore: '아이스크림은 Ice예요. I를 치면 초코가 먹어요.',
+            descAfter: '초코가 아이스크림을 냠냠 먹었어요.',
+            ask: '아이스크림은 아이야. 아이 눌러줄래?',
+            reward: '냠냠! 시원해. 멍멍!'
+          }),
+          letterMission('K', {
+            name: 'K 연',
+            waits: '연은',
+            before: kiteFrame(0),
+            frames: [kiteFrame(1), kiteFrame(3), kiteFrame(2)],
+            descBefore: '연은 Kite예요. K를 치면 연이 날아올라요.',
+            descAfter: '연이 하늘로 올라갔어요!',
+            ask: '연은 카이트, 케이야. 케이 눌러줄래?',
+            reward: '연이 하늘로 올라갔어!'
+          }),
+          letterMission('N', {
+            name: 'N 코',
+            waits: '초코는',
+            before: dog('o', '', false),
+            frames: sneezeFrames(),
+            descBefore: '코는 Nose예요. N을 치면 초코가 재채기해요.',
+            descAfter: '에취! 초코 코가 간지러워요.',
+            ask: '코는 노즈, 엔이야. 엔 눌러줄래?',
+            reward: '에취! 초코 코가 간지러워.'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'abc6',
+        title: '밤하늘',
+        intro: '밤하늘 놀이!',
+        collect: ['별', '달', '우산', '왕관'],
+        label: '밤하늘',
+        thanksLine: '밤하늘 고마워!',
+        thanksDesc: '초코가 밤하늘을 보며 고마워해요.',
+        thanks: '밤하늘을 보여 줘서 초코가 고마워해.',
+        levels: [
+          letterMission('S', {
+            name: 'S 별',
+            waits: '별은',
+            before: NIGHT,
+            frames: [starFrame(false), starFrame(true), starFrame(true)],
+            descBefore: '별은 Star예요. S를 치면 별이 켜져요.',
+            descAfter: '별이 반짝 켜졌어요!',
+            ask: '별은 스타, 에스야. 에스 눌러줄래?',
+            reward: '별이 반짝 켜졌어!'
+          }),
+          letterMission('M', {
+            name: 'M 달',
+            waits: '달은',
+            before: NIGHT,
+            frames: [moonFrame(false), moonFrame(true), moonFrame(true)],
+            descBefore: '달은 Moon이에요. M을 치면 달이 떠요.',
+            descAfter: '달이 동그랗게 떴어요.',
+            ask: '달은 문, 엠이야. 엠 눌러줄래?',
+            reward: '달이 동그랗게 떴어.'
+          }),
+          letterMission('U', {
+            name: 'U 우산',
+            waits: '우산은',
+            before: `  .  .  .  .  .  .\n${dog('o', '', false)}`,
+            frames: [
+              `${dogUmbrella()}\n비야`,
+              `${dogUmbrella()}\n우산!`,
+              dogUmbrella()
+            ],
+            descBefore: '비가 와요. 우산은 Umbrella예요. U를 치면 우산이 펴져요.',
+            descAfter: '우산 아래 초코가 폭신해요.',
+            ask: '비가 와. 우산은 유야. 유 눌러줄래?',
+            reward: '우산 아래 초코가 폭신해.'
+          }),
+          letterMission('Q', {
+            name: 'Q 왕관',
+            waits: '왕관은',
+            before: dog('o', '', false),
+            frames: [dogCrown(), dogCrown(), `${dogCrown()}\n왕!`],
+            descBefore: '여왕은 Queen이에요. Q를 치면 초코가 왕관을 써요.',
+            descAfter: '초코가 왕이 되었어요!',
+            ask: '왕관은 퀸, 큐야. 큐 눌러줄래?',
+            reward: '초코가 왕이 됐어!'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'abc7',
+        title: '자동차',
+        intro: '자동차 놀이!',
+        collect: ['트럭', '바퀴', '밴'],
+        label: '자동차',
+        thanksLine: '차 고마워!',
+        thanksDesc: '초코가 자동차를 보고 고마워해요.',
+        thanks: '차를 보여 줘서 초코가 신났어. 고마워!',
+        levels: [
+          letterMission('T', {
+            name: 'T 트럭',
+            waits: '트럭은',
+            before: truckFrame(2),
+            frames: [truckFrame(4, '= '), truckFrame(8, '== '), truckFrame(12, '=== ')],
+            descBefore: '트럭은 Truck이에요. T를 치면 트럭이 출발해요.',
+            descAfter: '부릉! 트럭이 달려요.',
+            ask: '트럭은 티야. 티 눌러줄래?',
+            reward: '부릉! 트럭이 가.'
+          }),
+          letterMission('W', {
+            name: 'W 바퀴',
+            waits: '바퀴는',
+            before: wheelFrame(2, 'O'),
+            frames: [wheelFrame(4, 'O'), wheelFrame(7, '+'), wheelFrame(10, 'X')],
+            descBefore: '바퀴는 Wheel이에요. W를 치면 바퀴가 굴러요.',
+            descAfter: '바퀴가 데굴데굴 굴러요.',
+            ask: '바퀴는 휠, 더블유야. 더블유 눌러줄래?',
+            reward: '바퀴가 데굴데굴 굴러.'
+          }),
+          letterMission('V', {
+            name: 'V 밴',
+            waits: '밴은',
+            before: vanFrame(1),
+            frames: [vanFrame(3), vanFrame(7), vanFrame(11)],
+            descBefore: '밴은 Van이에요. V를 치면 밴이 지나가요.',
+            descAfter: '붕붕! 밴이 지나갔어요.',
+            ask: '밴은 브이야. 브이 눌러줄래?',
+            reward: '붕붕! 밴이 지나갔어.'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'abc8',
+        title: '동물 친구',
+        intro: '동물 친구 놀이!',
+        collect: ['돼지', '사자', '얼룩말', '실로폰'],
+        label: '친구',
+        thanksLine: '친구 고마워! 멍멍!',
+        thanksDesc: '초코가 친구들과 고마워해요.',
+        thanks: '친구들을 불러 줘서 초코가 고마워해. 멍멍!',
+        levels: [
+          letterMission('P', {
+            name: 'P 돼지',
+            waits: '돼지는',
+            before: dog('o', '', false),
+            frames: palFrames('🐷', '꿀꿀'),
+            descBefore: '돼지는 Pig예요. P를 치면 돼지 친구가 와요.',
+            descAfter: '꿀꿀! 돼지 친구가 왔어요.',
+            ask: '돼지는 피그, 피야. 피 눌러줄래?',
+            reward: '꿀꿀! 돼지 친구가 왔어.'
+          }),
+          letterMission('L', {
+            name: 'L 사자',
+            waits: '사자는',
+            before: dog('o', '', false),
+            frames: palFrames('🦁', '어흥'),
+            descBefore: '사자는 Lion이에요. L을 치면 사자가 나타나요.',
+            descAfter: '어흥! 사자가 나타났어요.',
+            ask: '사자는 라이언, 엘이야. 엘 눌러줄래?',
+            reward: '어흥! 사자가 나타났어.'
+          }),
+          letterMission('Z', {
+            name: 'Z 얼룩말',
+            waits: '얼룩말은',
+            before: dog('o', '', false),
+            frames: palFrames('🦓', '달려와'),
+            descBefore: '얼룩말은 Zebra예요. Z를 치면 얼룩말이 달려와요.',
+            descAfter: '얼룩말이 달려왔어요!',
+            ask: '얼룩말은 지브라, 제트야. 제트 눌러줄래?',
+            reward: '얼룩말이 달려왔어!'
+          }),
+          letterMission('X', {
+            name: 'X 실로폰',
+            waits: '실로폰은',
+            before: robot('-_-', '  ..  '),
+            frames: xyloFrames(),
+            descBefore: '실로폰은 Xylophone이에요. X를 치면 띵동 소리가 나요.',
+            descAfter: '띵동! 초코가 음악에 꼬리를 흔들어요.',
+            ask: '실로폰은 엑스야. 엑스 눌러줄래?',
+            reward: '띵동! 초코가 꼬리를 흔들어.'
+          })
+        ]
+      })
+    ];
 
     // ---------- 4장: 첫 명령어 ----------
     const commandLevels = [
@@ -969,7 +1612,7 @@ ________________
     function shortOptionLevel(opt, index) {
       const letter = opt.key[0].toUpperCase();
       const firstTip = index === 0
-        ? '이번엔 대시를 써 볼 거예요. 대시는 숫자 0 옆에 있는 짧은 막대예요. '
+        ? '대시는 숫자 0 옆에 있는 짧은 막대야. 신호등 R, 빨강이랑 같아. '
         : '';
       return {
         command: `${opt.base} -${opt.key[0]}`,
@@ -986,7 +1629,7 @@ ________________
 
     function longOptionLevel(opt, index) {
       const firstTip = index === 0
-        ? '대시를 두 번 쓰면 한 글자 대신 단어를 통째로 써요. '
+        ? '대시를 두 번 쓰면 한 글자 대신 단어를 통째로 써. 빨강은 red야. '
         : '';
       return {
         command: `${opt.base} --${opt.key}`,
@@ -1002,46 +1645,29 @@ ________________
     }
 
     const chapters = [
-      {
-        id: 'abc1',
-        title: '알파벳 A~I',
-        introTTS: '알파벳 놀이를 해요! 큰 글자를 보고 키보드에서 같은 글자를 찾아 누른 다음, 엔터를 눌러요.',
-        levels: 'ABCDEFGHI'.split('').map(alphabetLevel)
-      },
-      {
-        id: 'abc2',
-        title: '알파벳 J~R',
-        introTTS: '알파벳 놀이 두 번째! 글자를 찾아 눌러 봐요.',
-        levels: 'JKLMNOPQR'.split('').map(alphabetLevel)
-      },
-      {
-        id: 'abc3',
-        title: '알파벳 S~Z',
-        introTTS: '알파벳 마지막 판! 끝까지 해 보자.',
-        levels: 'STUVWXYZ'.split('').map(alphabetLevel)
-      },
+      ...storyChapters,
       {
         id: 'cmd',
         title: '첫 명령어',
-        introTTS: '이제 컴퓨터에게 명령을 내려 봐요! 글자를 차례대로 누르고 엔터!',
+        introTTS: '글자 놀이는 여기까지! 이제 짧은 명령을 내려 보자. 글자를 차례로 누르고 엔터.',
         levels: commandLevels
       },
       {
         id: 'words',
         title: '영어 단어',
-        introTTS: '세 글자 영어 단어를 만들어 봐요!',
+        introTTS: '아는 글자로 세 글자 단어를 만들어 보자!',
         levels: threeLetterWords.map(wordLevel)
       },
       {
         id: 'dash1',
         title: '대시 하나 -',
-        introTTS: '명령어 뒤에 대시를 붙이면 더 자세하게 명령할 수 있어요. 대시 하나 뒤에는 한 글자를 써요.',
+        introTTS: '신호등에서 R은 빨강, 멈추기였지? 이제 명령 뒤에 대시 하나랑 글자를 붙여 보자.',
         levels: commandOptions.map(shortOptionLevel)
       },
       {
         id: 'dash2',
         title: '대시 두 개 --',
-        introTTS: '대시를 두 개 쓰면 뒤에 단어를 다 써요. 대시 하나 알 이랑 대시 두 개 레드는 같은 뜻이에요.',
+        introTTS: '대시 두 개는 단어를 통째로 쓰는 거야. 대시 R이랑 대시 두 개 red는 같은 빨강이야.',
         levels: commandOptions.map(longOptionLevel)
       }
     ];
@@ -1075,6 +1701,9 @@ ________________
     };
 
     const CLEARED_KEY = 'lhq_cleared_chapters';
+    const PROGRESS_VERSION_KEY = 'lhq_progress_version';
+    // 알파벳 챕터는 이야기를 통째로 바꿨다. 예전 클리어는 명령 챕터만 남긴다.
+    const REWRITTEN_CHAPTER_IDS = new Set(['abc1', 'abc2', 'abc3']);
     let currentChapter = 0;
     let currentLevel = 0;
     let gameStarted = false;
@@ -1087,6 +1716,13 @@ ________________
     let sceneAnimationTimer = null;
     let isStageTransitioning = false;
     let playToken = 0;
+    let hintTimer = 0;
+    let hintGen = 0;
+    let hintCount = 0;
+    let discoveryGen = 0;
+    let lastDiscoveryAt = 0;
+    const KEY_HINT_DELAY_MS = 6500;
+    const HINT_LIMIT = 2;
     const userAgent = navigator.userAgent || '';
     const isKakaoInApp = /KAKAOTALK/i.test(userAgent);
     let allowKakaoInAppPlay = false;
@@ -1105,7 +1741,24 @@ ________________
       try {
         const raw = window.localStorage.getItem(CLEARED_KEY);
         const parsed = raw ? JSON.parse(raw) : [];
-        return Array.isArray(parsed) ? parsed : [];
+        let cleared = Array.isArray(parsed) ? parsed.filter(id => typeof id === 'string') : [];
+        let version = 1;
+        try {
+          const stored = window.localStorage.getItem(PROGRESS_VERSION_KEY);
+          version = stored ? Number(stored) : 1;
+        } catch (_error) {
+          version = 1;
+        }
+        if (!Number.isFinite(version) || version < 2) {
+          cleared = cleared.filter(id => !REWRITTEN_CHAPTER_IDS.has(id));
+          try {
+            window.localStorage.setItem(CLEARED_KEY, JSON.stringify(cleared));
+            window.localStorage.setItem(PROGRESS_VERSION_KEY, '2');
+          } catch (_error) {
+            // 저장이 안 되면 이번 화면에서만 새 알파벳을 연다.
+          }
+        }
+        return cleared;
       } catch (_error) {
         return [];
       }
@@ -1206,17 +1859,206 @@ ________________
       }
     }
 
+    function withCollect(art, chapter, filled) {
+      if (!chapter || !chapter.collect || !chapter.collect.length) return art;
+      const cells = [];
+      (chapter.collectPrefix || []).forEach(item => cells.push(`[${item}]`));
+      chapter.collect.forEach((item, index) => {
+        cells.push(index < filled ? `[${item}]` : '[  ]');
+      });
+      const label = chapter.collectLabel || '모은 것';
+      return `${String(art).replace(/\s*$/, '')}\n> ${label}: ${cells.join('')}`;
+    }
+
     function startResultAnimation(level) {
+      const chapter = chapters[currentChapter];
       const frames = level.frames && level.frames.length ? level.frames : [level.artBefore];
+      const filled = Number.isInteger(level.collectFilled) ? level.collectFilled : currentLevel + 1;
+      const draw = (art) => renderColoredArt(withCollect(art, chapter, filled));
       let frameIndex = 0;
-      ui.sceneArt.innerHTML = renderColoredArt(frames[0]);
+      ui.sceneArt.innerHTML = draw(frames[0]);
       sceneAnimationTimer = setInterval(() => {
         frameIndex = (frameIndex + 1) % frames.length;
-        ui.sceneArt.innerHTML = renderColoredArt(frames[frameIndex]);
+        ui.sceneArt.innerHTML = draw(frames[frameIndex]);
       }, 260);
     }
 
+    function storyAnswer(level, raw) {
+      const source = raw == null ? ui.commandInput.value : raw;
+      const normalized = normalizeCommand(source);
+      if (level && level.story) return normalized.replace(/ /g, '');
+      return normalized;
+    }
+
+    function clearKeyHint() {
+      hintGen += 1;
+      if (hintTimer) {
+        clearTimeout(hintTimer);
+        hintTimer = 0;
+      }
+    }
+
+    function hintLine(level) {
+      const expected = storyAnswer(level, level.command);
+      const typed = storyAnswer(level);
+      if (typed === expected) return '좋아. 이제 엔터!';
+      if (level.guide && expected.startsWith(typed)) {
+        const next = expected[typed.length];
+        if (!next) return '좋아. 이제 엔터!';
+        return positionHint(next.toUpperCase());
+      }
+      let matched = 0;
+      if (level.guide) {
+        while (matched < typed.length && matched < expected.length && typed[matched] === expected[matched]) matched += 1;
+      }
+      const letter = level.guide ? expected[matched] : expected;
+      return letter ? positionHint(letter.toUpperCase()) : '';
+    }
+
+    function armKeyHint(delay) {
+      const chapter = chapters[currentChapter];
+      const level = chapter && chapter.levels[currentLevel];
+      if (!level || !level.story || hintCount >= HINT_LIMIT) return;
+      const gen = ++hintGen;
+      if (hintTimer) clearTimeout(hintTimer);
+      const token = playToken;
+      const levelIndex = currentLevel;
+      const chapterIndex = currentChapter;
+      hintTimer = setTimeout(() => {
+        hintTimer = 0;
+        if (gen !== hintGen || token !== playToken) return;
+        if (currentChapter !== chapterIndex || currentLevel !== levelIndex || isStageTransitioning) return;
+        const now = chapters[chapterIndex].levels[levelIndex];
+        if (!now || !now.story) return;
+        const line = hintLine(now);
+        if (!line) return;
+        hintCount += 1;
+        speak(line, { rate: 0.95, timeoutMs: 9000 });
+      }, delay);
+    }
+
+    function noteActivityForHint() {
+      const chapter = chapters[currentChapter];
+      const level = chapter && chapter.levels[currentLevel];
+      if (!level || !level.story || isStageTransitioning) return;
+      armKeyHint(KEY_HINT_DELAY_MS);
+    }
+
+    function scheduleStoryHint(said) {
+      const token = playToken;
+      const levelIndex = currentLevel;
+      const chapterIndex = currentChapter;
+      void said.then(() => {
+        if (token !== playToken || currentLevel !== levelIndex || currentChapter !== chapterIndex) return;
+        if (isStageTransitioning) return;
+        armKeyHint(KEY_HINT_DELAY_MS);
+      });
+    }
+
+    function setTyped(value) {
+      ui.commandInput.value = value;
+      letterSoundBaseline = value;
+      try { ui.commandInput.setSelectionRange(value.length, value.length); } catch (_error) { /* ignore */ }
+    }
+
+    function renderGuideArt() {
+      const chapter = chapters[currentChapter];
+      const level = chapter && chapter.levels[currentLevel];
+      if (!level || !level.paint || isStageTransitioning) return;
+      const typed = storyAnswer(level);
+      const expected = storyAnswer(level, level.command);
+      let count = 0;
+      while (count < typed.length && count < expected.length && typed[count] === expected[count]) count += 1;
+      ui.sceneArt.innerHTML = renderColoredArt(withCollect(level.paint(count), chapter, currentLevel));
+    }
+
+    function nonLetterDiscovery(level, target, mid) {
+      if (mid) return `어, 글자가 아니야. 다음은 ${letterKo[target]}.`;
+      return `어, 글자가 아니야. ${level.waits} ${latinObject(target)} 기다려.`;
+    }
+
+    function discoverySpeech(level, wrong, target, mid) {
+      const info = alphabetWords[wrong];
+      const meaning = info ? `${latinTopic(wrong)} ${info.word}~ ${info.ko}. ` : '';
+      const need = mid
+        ? `다음은 ${letterKo[target]}.`
+        : `${level.waits} ${latinObject(target)} 기다려.`;
+      return `어, 그건 ${wrong}이네! ${meaning}${need}`;
+    }
+
+    function speakDiscovery(speech) {
+      const gen = ++discoveryGen;
+      clearKeyHint();
+      lastDiscoveryAt = Date.now();
+      setStatus(`...> ${speech}`, '');
+      const token = playToken;
+      const levelIndex = currentLevel;
+      const chapterIndex = currentChapter;
+      return speak(speech, { rate: 0.95, timeoutMs: 11000 }).then(() => {
+        if (gen !== discoveryGen) return;
+        if (token !== playToken || currentLevel !== levelIndex || currentChapter !== chapterIndex) return;
+        if (isStageTransitioning) return;
+        armKeyHint(KEY_HINT_DELAY_MS);
+      });
+    }
+
+    function handleStoryTyping(prev, next) {
+      const level = chapters[currentChapter].levels[currentLevel];
+      const typed = storyAnswer(level, next);
+      const before = storyAnswer(level, prev);
+      const expected = storyAnswer(level, level.command);
+      if (level.guide) {
+        let matched = 0;
+        while (matched < typed.length && matched < expected.length && typed[matched] === expected[matched]) matched += 1;
+        if (typed.length > matched) {
+          if (matched >= expected.length) {
+            setTyped(expected);
+            renderGuideArt();
+            speak('됐어, 엔터!', { rate: 0.95, timeoutMs: 4000 });
+            return 'handled';
+          }
+          const wrongChar = typed[matched].toUpperCase();
+          const target = expected[matched].toUpperCase();
+          setTyped(expected.slice(0, matched));
+          renderGuideArt();
+          if (/^[A-Z]$/.test(wrongChar)) speakDiscovery(discoverySpeech(level, wrongChar, target, matched > 0));
+          else speakDiscovery(nonLetterDiscovery(level, target, true));
+          return 'discovery';
+        }
+        renderGuideArt();
+        if (typed.length > before.length) {
+          const just = typed[typed.length - 1].toUpperCase();
+          if (typed.length >= expected.length) speak(`${letterKo[just]}! 됐어, 엔터!`, { rate: 0.95, timeoutMs: 5000 });
+          else speak(`${letterKo[just]}! 다음은 ${letterKo[expected[typed.length].toUpperCase()]}.`, { rate: 0.95, timeoutMs: 5000 });
+        }
+        return 'handled';
+      }
+      if (!typed) return 'handled';
+      if (typed === expected) return 'letter';
+      if (typed.startsWith(expected)) {
+        setTyped(expected);
+        speak(`${expected.toUpperCase()}만 누르고 엔터 해 줘.`, { rate: 0.95, timeoutMs: 5000 });
+        return 'handled';
+      }
+      const last = typed[typed.length - 1].toUpperCase();
+      setTyped('');
+      if (/^[A-Z]$/.test(last)) speakDiscovery(discoverySpeech(level, last, expected.toUpperCase(), false));
+      else speakDiscovery(nonLetterDiscovery(level, expected.toUpperCase(), false));
+      return 'discovery';
+    }
+
     function buildIntroTTS(level) {
+      if (level.story) {
+        const expected = storyAnswer(level, level.command);
+        const typed = storyAnswer(level);
+        if (typed === expected) return '좋아. 이제 엔터!';
+        if (level.guide && expected.startsWith(typed) && typed.length > 0) {
+          const next = expected[typed.length];
+          if (!next) return '좋아. 이제 엔터!';
+          return `다음은 ${letterKo[next.toUpperCase()]}. 다 쓰면 엔터.`;
+        }
+        return level.contextTTS;
+      }
       if (level.command.length === 1) {
         const letter = level.command.toUpperCase();
         return `${level.contextTTS} ${letterKo[letter]} 키를 찾아서 눌러 보세요.`;
@@ -1819,6 +2661,7 @@ ________________
     function showMenu() {
       playToken += 1;
       isStageTransitioning = false;
+      clearKeyHint();
       stopSceneAnimation();
       stopSpeaking();
       renderChapterMenu();
@@ -1835,16 +2678,23 @@ ________________
       setInputEnabled(true);
       ui.doneBox.classList.add('hidden');
       ui.levelTitle.textContent = `CH${currentChapter + 1} ${chapter.title} · ${currentLevel + 1}/${chapter.levels.length} · ${level.name}`;
-      ui.sceneArt.innerHTML = renderColoredArt(level.artBefore);
+      const scene = level.paint ? level.paint(0) : level.artBefore;
+      ui.sceneArt.innerHTML = renderColoredArt(withCollect(scene, chapter, currentLevel));
       ui.sceneDesc.textContent = level.descBefore;
       ui.commandText.textContent = level.command.toUpperCase();
       ui.spellingText.textContent = `철자 힌트: ${level.command.toUpperCase()} (${commandToSpellingKo(level.command)})`;
       ui.commandInput.value = '';
       letterSoundBaseline = '';
+      hintCount = 0;
+      clearKeyHint();
       ui.commandInput.focus();
       setStatus('SYS> VOICE GUIDE READY. TYPE THE COMMAND.');
       const intro = buildIntroTTS(level);
-      speak(withChapterIntro ? `${chapter.introTTS} ${intro}` : intro, { rate: 0.8, timeoutMs: 25000 });
+      const said = speak(withChapterIntro ? `${chapter.introTTS} ${intro}` : intro, {
+        rate: level.story ? 0.95 : 0.8,
+        timeoutMs: level.story ? 12000 : 25000
+      });
+      if (level.story) scheduleStoryHint(said);
       trackEvent('level_view', {
         chapter_id: chapter.id,
         level_index: currentLevel + 1,
@@ -1863,6 +2713,7 @@ ________________
       const level = chapter.levels[currentLevel];
       if (isStageTransitioning) return;
       isStageTransitioning = true;
+      clearKeyHint();
       const token = playToken;
 
       ui.sceneDesc.textContent = level.descAfter;
@@ -1892,19 +2743,62 @@ ________________
       const allCleared = chapters.every(item => loadCleared().includes(item.id));
       const hasNext = currentChapter + 1 < chapters.length;
       setInputEnabled(false);
+      if (chapter.thanksFrames) {
+        ui.sceneDesc.textContent = chapter.thanksDesc || ui.sceneDesc.textContent;
+        startResultAnimation({ frames: chapter.thanksFrames });
+      }
       ui.doneText.textContent = allCleared
         ? `CHAPTER CLEAR :: ${chapter.title} — ALL CHAPTERS DONE! LITTLE HACKER CERTIFIED`
         : `CHAPTER CLEAR :: ${chapter.title}`;
       ui.nextChapterBtn.classList.toggle('hidden', !hasNext);
       ui.doneBox.classList.remove('hidden');
       setStatus('OK> CHAPTER COMPLETE.', 'ok');
-      const message = allCleared
-        ? `${chapter.title} 성공! 모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!`
-        : `${chapter.title} 성공! 정말 잘했어요.${hasNext ? ' 다음 챕터도 해 볼까요?' : ''}`;
-      await speak(message, { rate: 0.9, timeoutMs: 16000 });
+      let message;
+      if (allCleared) {
+        const lead = chapter.thanksTTS ? `${chapter.thanksTTS} ` : '';
+        message = `${lead}모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!`;
+      } else if (chapter.thanksTTS) {
+        message = `${chapter.thanksTTS}${hasNext ? ' 다음도 해 볼까?' : ''}`;
+      } else {
+        message = `${chapter.title} 성공! 정말 잘했어요.${hasNext ? ' 다음 챕터도 해 볼까요?' : ''}`;
+      }
+      await speak(message, { rate: 0.9, timeoutMs: 20000 });
       if (token !== playToken) return;
       if (allCleared) trackEvent('game_complete', { total_chapters: chapters.length });
       isStageTransitioning = false;
+    }
+
+    function handleStoryMiss(level, answer) {
+      const expected = storyAnswer(level, level.command);
+      if (!answer) {
+        if (Date.now() - lastDiscoveryAt < 1600) return;
+        const target = (level.guide ? expected[0] : expected).toUpperCase();
+        const speech = level.guide
+          ? `아직은 비어 있어. 먼저 ${letterKo[target]}.`
+          : `${level.waits} ${latinObject(target)} 기다려.`;
+        speakDiscovery(speech);
+        return;
+      }
+      if (level.guide && expected.startsWith(answer)) {
+        const next = expected[answer.length].toUpperCase();
+        const just = answer[answer.length - 1].toUpperCase();
+        speakDiscovery(`좋아, ${letterKo[just]}. 다음은 ${letterKo[next]}. 다 쓰면 엔터.`);
+        return;
+      }
+      let matched = 0;
+      if (level.guide) {
+        while (matched < answer.length && matched < expected.length && answer[matched] === expected[matched]) matched += 1;
+      }
+      const target = (level.guide ? expected[Math.min(matched, expected.length - 1)] : expected).toUpperCase();
+      const letters = answer.toUpperCase().match(/[A-Z]/g) || [];
+      const wrong = letters.find((ch, index) => (level.guide ? index >= matched : ch !== expected.toUpperCase())) || '';
+      setTyped(level.guide ? expected.slice(0, matched) : '');
+      renderGuideArt();
+      if (wrong && alphabetWords[wrong]) {
+        speakDiscovery(discoverySpeech(level, wrong, target, level.guide && matched > 0));
+        return;
+      }
+      speakDiscovery(nonLetterDiscovery(level, target, level.guide && matched > 0));
     }
 
     function handleSubmit() {
@@ -1912,8 +2806,8 @@ ________________
       if (!chapter || currentLevel >= chapter.levels.length) return;
       if (isStageTransitioning) return;
       const level = chapter.levels[currentLevel];
-      const answer = normalizeCommand(ui.commandInput.value);
-      const expected = normalizeCommand(level.command);
+      const answer = level.story ? storyAnswer(level) : normalizeCommand(ui.commandInput.value);
+      const expected = level.story ? storyAnswer(level, level.command) : normalizeCommand(level.command);
       const correct = answer === expected;
       trackEvent('command_submit', {
         chapter_id: chapter.id,
@@ -1927,14 +2821,18 @@ ________________
           level_index: currentLevel + 1
         });
         void completeLevel();
-      } else {
-        trackEvent('command_error', {
-          chapter_id: chapter.id,
-          level_index: currentLevel + 1
-        });
-        setStatus('ERR> INVALID COMMAND. TRY AGAIN OR PRESS REPEAT.', 'err');
-        speak(`괜찮아, 다시 해보자. ${commandToSpellingKo(level.command)}.`, { rate: 0.85 });
+        return;
       }
+      trackEvent('command_error', {
+        chapter_id: chapter.id,
+        level_index: currentLevel + 1
+      });
+      if (level.story) {
+        handleStoryMiss(level, answer);
+        return;
+      }
+      setStatus('ERR> INVALID COMMAND. TRY AGAIN OR PRESS REPEAT.', 'err');
+      speak(`괜찮아, 다시 해보자. ${commandToSpellingKo(level.command)}.`, { rate: 0.85 });
     }
 
     function speakTypedChar(ch) {
@@ -1959,6 +2857,14 @@ ________________
       const next = ui.commandInput.value;
       const prev = letterSoundBaseline;
       letterSoundBaseline = next;
+      if (!gameStarted || isStageTransitioning) return;
+      const chapter = chapters[currentChapter];
+      const level = chapter && chapter.levels[currentLevel];
+      if (level && level.story) {
+        const mode = handleStoryTyping(prev, next);
+        if (mode !== 'discovery') noteActivityForHint();
+        if (mode !== 'letter') return;
+      }
       if (!next || next.length < prev.length) return;
       let index = 0;
       const limit = Math.min(prev.length, next.length);
@@ -1992,7 +2898,13 @@ ________________
       const level = chapter && chapter.levels[currentLevel];
       if (!level) return;
       trackEvent('hint_repeat_click', { chapter_id: chapter.id, level_index: currentLevel + 1 });
-      speak(buildIntroTTS(level), { rate: 0.8, timeoutMs: 25000 });
+      hintCount = 0;
+      clearKeyHint();
+      const said = speak(buildIntroTTS(level), {
+        rate: level.story ? 0.95 : 0.8,
+        timeoutMs: level.story ? 12000 : 25000
+      });
+      if (level.story) scheduleStoryHint(said);
     }
 
     ui.submitBtn.addEventListener('click', handleSubmit);
