@@ -55,12 +55,18 @@ ENUM_INJECT = r"""
       : [];
     window.__lhqChapterIds = [];
     window.__lhqLevelTotal = 0;
+    window.__lhqPlainLevels = 0;
     try {
       if (typeof chapters !== 'undefined') {
         window.__lhqChapterIds = chapters.map(function (chapter) { return chapter.id; });
         window.__lhqLevelTotal = chapters.reduce(function (sum, chapter) {
           return sum + ((chapter.levels && chapter.levels.length) || 0);
         }, 0);
+        chapters.forEach(function (chapter) {
+          (chapter.levels || []).forEach(function (level) {
+            if (!level || !level.story) window.__lhqPlainLevels += 1;
+          });
+        });
       }
     } catch (_error) { /* ignore */ }
     window.__lhqHasBirthday = typeof agePhrase === 'function';
@@ -113,6 +119,10 @@ ENUM_INJECT = r"""
                     try { add(discoverySpeech(level, wrong, target, true)); } catch (_error) {}
                   });
                   add('어, 글자가 아니야. 다음은 ' + letterKo[target] + '.');
+                  if (typeof nonLetterDiscovery === 'function') {
+                    try { add(nonLetterDiscovery(level, target, false)); } catch (_error) {}
+                    try { add(nonLetterDiscovery(level, target, true)); } catch (_error) {}
+                  }
                 });
               }
             });
@@ -500,6 +510,7 @@ def collect_lines() -> dict:
             collector.absorb(extra)
             letter_names = page.evaluate("() => window.__lhqLetterNames")
             has_birthday = page.evaluate("() => window.__lhqHasBirthday")
+            plain_levels = page.evaluate("() => window.__lhqPlainLevels || window.__lhqLevelTotal")
 
             if has_birthday:
                 print("collecting birthday ages 1-20", flush=True)
@@ -542,11 +553,20 @@ def collect_lines() -> dict:
                 raise SystemExit(f"missing birthday line: {required}")
     if "괜찮아, 다시 해보자" in source:
         errors_found = [line for line in unique if line.startswith("괜찮아")]
-        if len(errors_found) < level_total:
-            raise SystemExit(f"expected {level_total} retry lines, found {len(errors_found)}")
+        # Story missions speak a discovery line instead of this retry.
+        retry_need = plain_levels if "function discoverySpeech" in source else level_total
+        if len(errors_found) < retry_need:
+            raise SystemExit(f"expected {retry_need} retry lines, found {len(errors_found)}")
     if "성공!" in source:
         successes = [line for line in unique if "성공" in line]
-        if len(successes) < len(ids) + 1:
+        clear_need = len(ids) + 1
+        if "function discoverySpeech" in source:
+            # Story chapters thank Choco instead of saying 성공, and the
+            # all-clear line says 해냈어요.
+            if not any("해냈어요" in line for line in unique):
+                raise SystemExit("missing all-clear line")
+            clear_need = 1
+        if len(successes) < clear_need:
             raise SystemExit(f"expected chapter clear lines, found {len(successes)}")
 
     next_out = {}

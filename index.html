@@ -1972,6 +1972,11 @@ ________________
       ui.sceneArt.innerHTML = renderColoredArt(withCollect(level.paint(count), chapter, currentLevel));
     }
 
+    function nonLetterDiscovery(level, target, mid) {
+      if (mid) return `어, 글자가 아니야. 다음은 ${letterKo[target]}.`;
+      return `어, 글자가 아니야. ${level.waits} ${latinObject(target)} 기다려.`;
+    }
+
     function discoverySpeech(level, wrong, target, mid) {
       const info = alphabetWords[wrong];
       const meaning = info ? `${latinTopic(wrong)} ${info.word}~ ${info.ko}. ` : '';
@@ -2017,7 +2022,7 @@ ________________
           setTyped(expected.slice(0, matched));
           renderGuideArt();
           if (/^[A-Z]$/.test(wrongChar)) speakDiscovery(discoverySpeech(level, wrongChar, target, matched > 0));
-          else speakDiscovery(`어, 글자가 아니야. 다음은 ${letterKo[target]}.`);
+          else speakDiscovery(nonLetterDiscovery(level, target, true));
           return 'discovery';
         }
         renderGuideArt();
@@ -2038,7 +2043,7 @@ ________________
       const last = typed[typed.length - 1].toUpperCase();
       setTyped('');
       if (/^[A-Z]$/.test(last)) speakDiscovery(discoverySpeech(level, last, expected.toUpperCase(), false));
-      else speakDiscovery(`어, 글자가 아니야. ${level.waits} ${latinObject(expected.toUpperCase())} 기다려.`);
+      else speakDiscovery(nonLetterDiscovery(level, expected.toUpperCase(), false));
       return 'discovery';
     }
 
@@ -2793,10 +2798,7 @@ ________________
         speakDiscovery(discoverySpeech(level, wrong, target, level.guide && matched > 0));
         return;
       }
-      const fallback = level.guide && matched > 0
-        ? `어, 글자가 아니야. 다음은 ${letterKo[target]}.`
-        : `어, 글자가 아니야. ${level.waits} ${latinObject(target)} 기다려.`;
-      speakDiscovery(fallback);
+      speakDiscovery(nonLetterDiscovery(level, target, level.guide && matched > 0));
     }
 
     function handleSubmit() {
