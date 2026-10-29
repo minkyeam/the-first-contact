@@ -1646,6 +1646,133 @@ ________________
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
 
+      // 퍼블릭 도메인 멜로디. 브라우저 안에서만 만들고, 파일은 쓰지 않아요.
+      const HAPPY_NOTES = [
+        [60, 0.5], [60, 0.5], [62, 1], [60, 1], [65, 1], [64, 2], null,
+        [60, 0.5], [60, 0.5], [62, 1], [60, 1], [67, 1], [65, 2], null,
+        [60, 0.5], [60, 0.5], [72, 1], [69, 1], [65, 1], [64, 1], [62, 2], null,
+        [70, 0.5], [70, 0.5], [69, 1], [65, 1], [67, 1], [65, 2]
+      ];
+      const NOTE_NAME = { 60: 'C4', 62: 'D4', 64: 'E4', 65: 'F4', 67: 'G4', 69: 'A4', 70: 'Bb4', 72: 'C5' };
+      const BEAT_SEC = 0.48;
+      const REST_SEC = 0.32;
+      let audioCtx = null;
+      let audioOut = null;
+      let songNodes = [];
+
+      function ensureAudio() {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return null;
+        try {
+          if (!audioCtx || audioCtx.state === 'closed') {
+            audioCtx = new AudioCtx();
+            audioOut = null;
+          }
+          if (audioCtx.state === 'suspended') void audioCtx.resume();
+          return audioCtx;
+        } catch (_error) {
+          return null;
+        }
+      }
+
+      function audioDestination(ctx) {
+        if (audioOut && audioOut.context === ctx) return audioOut;
+        const gain = ctx.createGain();
+        gain.gain.value = 0.14;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 1800;
+        gain.connect(filter);
+        filter.connect(ctx.destination);
+        audioOut = gain;
+        return audioOut;
+      }
+
+      function midiFreq(midi) {
+        return 440 * Math.pow(2, (midi - 69) / 12);
+      }
+
+      function scheduleTone(ctx, when, midi, dur, type, peak) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const dest = audioDestination(ctx);
+        osc.type = type;
+        osc.frequency.value = midiFreq(midi);
+        osc.frequency.setValueAtTime(midiFreq(midi), when);
+        const attack = Math.min(0.02, dur * 0.3);
+        gain.gain.setValueAtTime(0.0001, when);
+        gain.gain.exponentialRampToValueAtTime(peak, when + attack);
+        gain.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+        osc.connect(gain);
+        gain.connect(dest);
+        osc.start(when);
+        osc.stop(when + dur + 0.03);
+        songNodes.push(osc);
+      }
+
+      function stopSong() {
+        songNodes.forEach((node) => {
+          try { node.stop(); } catch (_error) { /* already finished */ }
+          try { node.disconnect(); } catch (_error) { /* already disconnected */ }
+        });
+        songNodes = [];
+      }
+
+      function playCandlePop() {
+        const ctx = ensureAudio();
+        if (!ctx) return;
+        try {
+          const when = ctx.currentTime + 0.01;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.value = 540;
+          osc.frequency.setValueAtTime(540, when);
+          osc.frequency.exponentialRampToValueAtTime(200, when + 0.08);
+          gain.gain.setValueAtTime(0.0001, when);
+          gain.gain.exponentialRampToValueAtTime(0.045, when + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.09);
+          osc.connect(gain);
+          gain.connect(audioDestination(ctx));
+          osc.start(when);
+          osc.stop(when + 0.11);
+          console.info('birthday-pop');
+        } catch (_error) { /* 소리가 없어도 놀이는 계속 */ }
+      }
+
+      function playHappyBirthday() {
+        const ctx = ensureAudio();
+        if (!ctx) {
+          console.info('birthday-song-skipped');
+          return 2600;
+        }
+        try {
+          stopSong();
+          const names = [];
+          let cursor = ctx.currentTime + 0.05;
+          const start = cursor;
+          HAPPY_NOTES.forEach((note) => {
+            if (!note) {
+              cursor += REST_SEC;
+              return;
+            }
+            const [midi, beats] = note;
+            const dur = beats * BEAT_SEC * 0.9;
+            scheduleTone(ctx, cursor, midi, dur, 'square', 0.55);
+            if (beats >= 1) scheduleTone(ctx, cursor, midi - 12, dur * 0.85, 'triangle', 0.32);
+            names.push(NOTE_NAME[midi] || String(midi));
+            console.info('birthday-note', NOTE_NAME[midi] || midi, Number((cursor - start).toFixed(2)));
+            cursor += beats * BEAT_SEC;
+          });
+          const seconds = cursor - start;
+          console.info('birthday-song', names.join(' '), Number(seconds.toFixed(2)));
+          return Math.round(seconds * 1000) + 180;
+        } catch (_error) {
+          console.info('birthday-song-skipped');
+          return 2600;
+        }
+      }
+
       async function celebrateChoco() {
         const token = birthdayToken;
         birthdayState = 'party';
@@ -1660,15 +1787,21 @@ ________________
           command: 'birthday-choco',
           frames: [0, 1, 2].map(chocoPartyFrame)
         });
-        await Promise.all([
-          speak(`초코가 노래해! 생일 축하해 재윤아, 생일 축하해. 사랑하는 재윤아, 생일 축하해! 이제 모험 하러 가자.`, {
-            rate: 0.9,
-            pitch: 1.06,
-            timeoutMs: 12000
-          }),
-          sleep(2600)
-        ]);
+        await speak('초코가 노래해! 생일 축하해 재윤아!', {
+          rate: 0.9,
+          pitch: 1.05,
+          timeoutMs: 7000
+        });
+        stopSpeaking();
+        console.info('birthday-tts-done');
         if (token !== playToken || birthdayState !== 'party') return;
+        const songMs = playHappyBirthday();
+        await sleep(songMs);
+        if (token !== playToken || birthdayState !== 'party') {
+          stopSong();
+          return;
+        }
+        stopSong();
         const next = pendingBirthdayChapter;
         birthdayState = null;
         pendingBirthdayChapter = null;
@@ -1681,7 +1814,9 @@ ________________
         const now = performance.now();
         if (now - lastBlowAt < 240) return;
         lastBlowAt = now;
+        ensureAudio();
         candlesLit -= 1;
+        playCandlePop();
         speak('후!', {
           rate: 1.05,
           pitch: 1.08 + (candleTotal - candlesLit) * 0.05,
@@ -1752,6 +1887,8 @@ ________________
         if (birthdayState !== 'candles' && birthdayState !== 'party') return;
         birthdayState = null;
         pendingBirthdayChapter = null;
+        stopSong();
+        stopSpeaking();
       }
 
       ui.menuBtn.addEventListener('click', leaveBirthday, true);
@@ -1760,10 +1897,8 @@ ________________
       ui.commandInput.addEventListener('keydown', (event) => {
         if (birthdayState !== 'candles' && birthdayState !== 'party') return;
         if (birthdayState === 'party') {
-          if (event.key === 'Enter') {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-          }
+          event.preventDefault();
+          event.stopImmediatePropagation();
           return;
         }
         if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
@@ -1800,10 +1935,8 @@ ________________
         if (birthdayState !== 'candles' && birthdayState !== 'party') return;
         event.preventDefault();
         event.stopImmediatePropagation();
-        const line = birthdayState === 'party'
-          ? '초코가 노래해! 생일 축하해 재윤아!'
-          : `${greetLine} 키를 눌러 초를 꺼 봐.`;
-        speak(line, { rate: 0.86, pitch: 1.05, timeoutMs: 14000 });
+        if (birthdayState === 'party') return;
+        speak(`${greetLine} 키를 눌러 초를 꺼 봐.`, { rate: 0.86, pitch: 1.05, timeoutMs: 14000 });
       }, true);
     }
 
