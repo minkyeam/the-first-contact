@@ -1712,6 +1712,7 @@ ________________
     let letterSoundBaseline = '';
     let speechToken = 0;
     let resolveActiveSpeech = null;
+    let synthCancelledAt = 0;
     let sceneAnimationTimer = null;
     let isStageTransitioning = false;
     let playToken = 0;
@@ -2131,9 +2132,321 @@ ________________
         || null;
     }
 
+    // Pre-generated SunHi clips (audio/tts/manifest.json). Missing clips use speakSynth.
+    let ttsManifest = null;
+    let ttsManifestSettled = false;
+    const ttsStats = { mp3: 0, fallback: 0, ended: 0 };
+    const ttsLog = [];
+    const decodedBuffers = new Map();
+    const bufferLoads = new Map();
+    let preloadWait = [];
+    let audioCtx = null;
+    let audioUnlocked = false;
+    let clipQueue = [];
+    let clipActive = null;
+    let clipEpoch = 0;
+    let clipPumping = false;
+    let clipStop = null;
+
+    function normalizeSpeech(text) {
+      return String(text == null ? '' : text).normalize('NFC').replace(/\s+/g, ' ').trim();
+    }
+
+    function ttsBusy() {
+      return clipPumping || clipQueue.length > 0 || !!clipActive;
+    }
+
+    function ttsTrace(type, text) {
+      const entry = { t: performance.now(), type, text: text || '' };
+      ttsLog.push(entry);
+      if (type === 'mp3') {
+        ttsStats.mp3 += 1;
+        window.__lhqLastPlay = entry;
+        console.info('[lhq-tts] mp3 ' + (text || ''));
+      } else if (type === 'end') {
+        ttsStats.ended += 1;
+        console.info('[lhq-tts] end ' + (text || ''));
+      } else if (type === 'fallback') {
+        ttsStats.fallback += 1;
+        window.__lhqLastPlay = entry;
+        console.info('[lhq-tts] fallback ' + (text || ''));
+      } else if (type === 'cancel') {
+        console.info('[lhq-tts] cancel');
+      }
+    }
+
+    function ensureAudioCtx() {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      if (!audioCtx) audioCtx = new AudioCtx();
+      return audioCtx;
+    }
+
+    function resolveClip(rel) {
+      return new URL(rel, document.baseURI).href;
+    }
+
+    function loadDecoded(url) {
+      if (decodedBuffers.has(url)) return Promise.resolve(decodedBuffers.get(url));
+      if (bufferLoads.has(url)) return bufferLoads.get(url);
+      const job = (async () => {
+        const ctx = ensureAudioCtx();
+        if (!ctx) throw new Error('no audio context');
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('missing clip');
+        const bytes = await response.arrayBuffer();
+        const audio = await ctx.decodeAudioData(bytes.slice(0));
+        decodedBuffers.set(url, audio);
+        return audio;
+      })();
+      bufferLoads.set(url, job);
+      job.catch(() => {
+        if (bufferLoads.get(url) === job) bufferLoads.delete(url);
+      });
+      return job;
+    }
+
+    function preloadNorms(list) {
+      if (!ttsManifest || !ttsManifest.clips || !list) return;
+      list.forEach(text => {
+        const rel = ttsManifest.clips[text];
+        if (!rel) return;
+        const job = loadDecoded(resolveClip(rel)).catch(() => {});
+        preloadWait.push(job);
+      });
+    }
+
+    function unlockAudio() {
+      const ctx = ensureAudioCtx();
+      if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+      if (audioUnlocked) return;
+      audioUnlocked = true;
+      if (ctx) {
+        try {
+          const silence = ctx.createBuffer(1, 1, ctx.sampleRate || 22050);
+          const source = ctx.createBufferSource();
+          source.buffer = silence;
+          source.connect(ctx.destination);
+          source.start(0);
+        } catch (_error) { /* ignore */ }
+      }
+      try {
+        const beep = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+        const played = beep.play();
+        if (played && typeof played.then === 'function') played.then(() => beep.pause()).catch(() => {});
+      } catch (_error) { /* ignore */ }
+      if (ttsManifest) preloadNorms(ttsManifest.preload);
+    }
+
+    ['pointerdown', 'touchstart', 'keydown', 'click'].forEach(type => {
+      window.addEventListener(type, unlockAudio, true);
+    });
+
+    const ttsManifestReady = fetch(new URL('audio/tts/manifest.json', document.baseURI).href)
+      .then(response => (response.ok ? response.json() : null))
+      .then(data => {
+        ttsManifest = data && data.clips ? data : null;
+      })
+      .catch(() => {
+        ttsManifest = null;
+      })
+      .then(() => {
+        ttsManifestSettled = true;
+        window.__lhqTtsReady = true;
+        if (ttsManifest) {
+          preloadNorms(ttsManifest.preload);
+          preloadNorms(ttsManifest.prime);
+        }
+      });
+
+    function cancelClipQueue() {
+      const hadAudio = !!(clipActive || clipQueue.length || clipStop);
+      clipEpoch += 1;
+      const stop = clipStop;
+      clipStop = null;
+      const dropped = [];
+      if (clipActive) dropped.push(clipActive);
+      dropped.push(...clipQueue);
+      clipQueue = [];
+      clipActive = null;
+      if (stop) {
+        try { stop(); } catch (_error) { /* ignore */ }
+      }
+      dropped.forEach(item => item.finish(false));
+      synthCancelledAt = performance.now();
+      speechToken += 1;
+      if (resolveActiveSpeech) {
+        const resolvePrev = resolveActiveSpeech;
+        resolveActiveSpeech = null;
+        resolvePrev(false);
+      }
+      if (hasTTS()) {
+        try { window.speechSynthesis.cancel(); } catch (_error) { /* ignore */ }
+      }
+      if (hadAudio) ttsTrace('cancel', '');
+    }
+
+    function stopSpeaking() {
+      cancelClipQueue();
+    }
+
+    async function runSynthFallback(item, norm) {
+      ttsTrace('fallback', norm);
+      await new Promise(resolve => {
+        let done = false;
+        const stop = () => {
+          if (done) return;
+          done = true;
+          resolve();
+        };
+        clipStop = stop;
+        speakSynth(item.text, Object.assign({}, item.options, { interrupt: true })).then(
+          ok => {
+            stop();
+            if (!item.settled) item.finish(!!ok);
+          },
+          () => {
+            stop();
+            if (!item.settled) item.finish(false);
+          }
+        );
+      });
+    }
+
+    async function playClipItem(item) {
+      const myEpoch = clipEpoch;
+      const norm = normalizeSpeech(item.text);
+      const rel = ttsManifest && ttsManifest.clips ? ttsManifest.clips[norm] : '';
+      if (!rel) {
+        await runSynthFallback(item, norm);
+        return;
+      }
+      let buffer = decodedBuffers.get(resolveClip(rel)) || null;
+      if (!buffer) {
+        try {
+          buffer = await loadDecoded(resolveClip(rel));
+        } catch (_error) {
+          buffer = null;
+        }
+      }
+      if (clipEpoch !== myEpoch || item.settled) return;
+      const ctx = ensureAudioCtx();
+      if (!buffer || !ctx) {
+        await runSynthFallback(item, norm);
+        return;
+      }
+      if (ctx.state === 'suspended') {
+        try { await ctx.resume(); } catch (_error) { /* ignore */ }
+      }
+      if (clipEpoch !== myEpoch || item.settled) return;
+
+      const playedThrough = await new Promise(resolve => {
+        let halted = false;
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(ctx.destination);
+        try {
+          const forced = Number(window.__lhqTtsRate);
+          if (forced > 1 && forced <= 16) source.playbackRate.value = forced;
+        } catch (_error) { /* keep natural speed */ }
+        const halt = () => {
+          if (halted) return;
+          halted = true;
+          if (clipStop === halt) clipStop = null;
+          try { source.stop(); } catch (_error) { /* ignore */ }
+          resolve(false);
+        };
+        clipStop = halt;
+        source.onended = () => {
+          if (halted) return;
+          halted = true;
+          if (clipStop === halt) clipStop = null;
+          ttsTrace('end', norm);
+          item.finish(true);
+          resolve(true);
+        };
+        try {
+          source.start(0);
+        } catch (_error) {
+          halted = true;
+          if (clipStop === halt) clipStop = null;
+          resolve(false);
+          return;
+        }
+        ttsTrace('mp3', norm);
+        const followers = ttsManifest.next && ttsManifest.next[norm];
+        if (followers) preloadNorms(followers);
+      });
+
+      if (!playedThrough && clipEpoch === myEpoch && !item.settled) {
+        await runSynthFallback(item, norm);
+      }
+    }
+
+    async function pumpClipQueue() {
+      if (clipPumping) return;
+      clipPumping = true;
+      try {
+        while (clipQueue.length) {
+          const item = clipQueue.shift();
+          if (!item || item.settled) continue;
+          clipActive = item;
+          await playClipItem(item);
+          if (clipActive === item) clipActive = null;
+        }
+      } finally {
+        clipPumping = false;
+      }
+      if (clipQueue.length) void pumpClipQueue();
+    }
+
+    function enqueueClip(text, options) {
+      const interrupt = options.interrupt ?? true;
+      return new Promise(resolve => {
+        const item = {
+          text,
+          options,
+          settled: false,
+          finish(ok) {
+            if (this.settled) return;
+            this.settled = true;
+            resolve(ok);
+          }
+        };
+        if (interrupt) cancelClipQueue();
+        clipQueue.push(item);
+        // Clips are often longer than the old speechSynthesis cap. onended still
+        // resolves early; this only keeps a late clip from being cut off.
+        const timeoutMs = Math.max(options.timeoutMs ?? 15000, 45000);
+        window.setTimeout(() => {
+          if (item.settled) return;
+          item.finish(false);
+          if (clipActive === item && clipStop) {
+            try { clipStop(); } catch (_error) { /* ignore */ }
+          }
+        }, timeoutMs);
+        void pumpClipQueue();
+      });
+    }
+
     function speak(text, options = {}) {
+      if (!gameStarted || !text) return Promise.resolve(false);
+      if (!ttsManifestSettled) return ttsManifestReady.then(() => speak(text, options));
+      const norm = normalizeSpeech(text);
+      if (!norm) return Promise.resolve(false);
+      const rel = ttsManifest && ttsManifest.clips ? ttsManifest.clips[norm] : '';
+      if (rel) return enqueueClip(text, options);
+      const interrupt = options.interrupt ?? true;
+      if (interrupt) cancelClipQueue();
+      ttsTrace('fallback', norm);
+      return speakSynth(text, options);
+    }
+
+    // speechSynthesis is only the fallback. Retry once if cancel() drops the next speak().
+    function speakSynth(text, options = {}) {
       if (!gameStarted || !hasTTS() || !text) return Promise.resolve(false);
       const synth = window.speechSynthesis;
+      const interrupt = options.interrupt !== false;
       const token = ++speechToken;
       if (resolveActiveSpeech) {
         const resolvePrev = resolveActiveSpeech;
@@ -2141,9 +2454,11 @@ ________________
         resolvePrev(false);
       }
 
-      // Chrome/Safari drop speak() called in the same turn as cancel().
-      const needsGap = !!(synth.speaking || synth.pending);
-      if (needsGap) {
+      const cancelledRecently = performance.now() - synthCancelledAt < 120;
+      const alreadySpeaking = !!(synth.speaking || synth.pending);
+      const needsGap = cancelledRecently || (interrupt && alreadySpeaking);
+      if (interrupt && alreadySpeaking) {
+        synthCancelledAt = performance.now();
         try { synth.cancel(); } catch (_error) { /* ignore */ }
       }
       if (synth.paused) {
@@ -2237,9 +2552,10 @@ ________________
             if (!dropped) return;
             if (attempts < 2) {
               retrying = true;
+              synthCancelledAt = performance.now();
               try { synth.cancel(); } catch (_error) { /* ignore */ }
               retrying = false;
-              launch();
+              setTimeout(launch, 50);
               return;
             }
             finish(false);
@@ -2253,17 +2569,15 @@ ________________
       });
     }
 
-    function stopSpeaking() {
-      speechToken += 1;
-      if (resolveActiveSpeech) {
-        const resolvePrev = resolveActiveSpeech;
-        resolveActiveSpeech = null;
-        resolvePrev(false);
-      }
-      if (hasTTS()) {
-        try { window.speechSynthesis.cancel(); } catch (_error) { /* ignore */ }
-      }
-    }
+    window.__lhqTtsStats = ttsStats;
+    window.__lhqTtsLog = ttsLog;
+    window.__lhqTtsBusy = ttsBusy;
+    window.__lhqNormalize = normalizeSpeech;
+    window.__lhqUnlockAudio = unlockAudio;
+    window.__lhqLastPlay = null;
+    window.__lhqTtsReady = false;
+    window.__lhqDecodedCount = () => decodedBuffers.size;
+    window.__lhqPreloadDone = () => Promise.all(preloadWait);
 
     function setStatus(text, type = '') {
       ui.status.textContent = text;
@@ -2572,6 +2886,12 @@ ________________
 
     function repeatVoice() {
       if (!gameStarted || ui.gameScreen.classList.contains('hidden') || ui.repeatBtn.disabled) return;
+      if (window.__lhqBirthdayState === 'party') return;
+      if (window.__lhqBirthdayState === 'candles' && window.__lhqBirthdayRepeatLine) {
+        trackEvent('hint_repeat_click', { chapter_id: 'birthday', level_index: 0 });
+        speak(window.__lhqBirthdayRepeatLine, { rate: 0.86, pitch: 1.05, timeoutMs: 14000 });
+        return;
+      }
       const chapter = chapters[currentChapter];
       const level = chapter && chapter.levels[currentLevel];
       if (!level) return;
@@ -2651,14 +2971,464 @@ ________________
       pickKoreanVoice();
       trackEvent('tts_available');
     } else {
-      setStatus('WARN> TTS NOT AVAILABLE. TEXT MODE ENABLED.', 'err');
-      trackEvent('tts_unavailable');
+      ttsManifestReady.then(() => {
+        if (ttsManifest && ttsManifest.clips) {
+          trackEvent('tts_available');
+          return;
+        }
+        setStatus('WARN> TTS NOT AVAILABLE. TEXT MODE ENABLED.', 'err');
+        trackEvent('tts_unavailable');
+      });
     }
 
     trackEvent('app_boot', {
       inapp_kakao: isKakaoInApp,
       tts_supported: hasTTS()
     });
+
+    // 재윤이 생일(매년 10월 31일, 브라우저 현지 날짜)에만 켜지는 축하.
+    // 평소에는 installBirthdayCelebration()을 호출하지 않아 화면과 저장이 그대로입니다.
+    // 미리보기: ?birthday=1  나이는 2022-10-31 기준. 클리어 기록은 건드리지 않습니다.
+    function isBirthdayOverride() {
+      try {
+        return new URLSearchParams(window.location.search).get('birthday') === '1';
+      } catch (_error) {
+        return false;
+      }
+    }
+
+    function isBirthdayToday() {
+      const now = new Date();
+      if (now.getMonth() === 9 && now.getDate() === 31) return true;
+      return isBirthdayOverride();
+    }
+
+    function birthdayAge() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+      const celebrating = (month === 10 && day === 31) || isBirthdayOverride();
+      let age = year - 2022;
+      if (!celebrating && (month < 10 || (month === 10 && day < 31))) age -= 1;
+      return Math.max(1, age);
+    }
+
+    function agePhrase(age) {
+      const words = ['', '한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열', '열한', '열두', '열세', '열네', '열다섯', '열여섯', '열일곱', '열여덟', '열아홉', '스무'];
+      if (age >= 1 && age <= 20) return `${words[age]} 살`;
+      return `${age}살`;
+    }
+
+    function installBirthdayCelebration() {
+      const age = birthdayAge();
+      const phrase = agePhrase(age);
+      const candleTotal = Math.min(5, age);
+      const greetLine = `생일 축하해 재윤아! 오늘 재윤이 ${phrase} 됐네!`;
+      window.__lhqBirthdayRepeatLine = `${greetLine} 키를 눌러 초를 꺼 봐.`;
+      let candlesLit = candleTotal;
+      let birthdayState = null;
+      function publishBirthday(state) {
+        birthdayState = state;
+        window.__lhqBirthdayState = state || '';
+      }
+      let birthdayPlayedThisLoad = false;
+      let pendingBirthdayChapter = 0;
+      let birthdayToken = 0;
+      let lastBlowAt = 0;
+      let candleFromKey = false;
+      const bootPre = document.querySelector('#startScreen pre.boot');
+
+      function padCenter(text, width) {
+        if (text.length >= width) return text;
+        const left = Math.floor((width - text.length) / 2);
+        return ' '.repeat(left) + text + ' '.repeat(width - text.length - left);
+      }
+
+      function cakeArt(lit, total, tick) {
+        const flame = tick % 2 === 0 ? '*' : '+';
+        let flames = '';
+        let wicks = '';
+        for (let i = 0; i < total; i += 1) {
+          const on = i < lit;
+          flames += on ? ` ${flame} ` : '   ';
+          wicks += on ? ' | ' : ' . ';
+        }
+        const outer = 21;
+        const inner = outer - 2;
+        const rule = '-'.repeat(inner);
+        const line = (content) => `|${padCenter(content, inner)}|`;
+        return [
+          colorize(padCenter(flames, outer), tick % 2 === 0 ? 'YELLOW' : 'RED'),
+          padCenter(wicks, outer),
+          `.${rule}.`,
+          colorize(line('HAPPY BIRTHDAY'), 'YELLOW'),
+          line(`JAEYUN ${age}`),
+          colorize(line('####  ####  ####'), 'RED'),
+          colorize(line('~~~~  ~~~~  ~~~~'), 'YELLOW'),
+          `'${rule}'`
+        ].join('\n');
+      }
+
+      const confetti = [
+        ' [YELLOW]*[/YELLOW]   [RED]o[/RED]    [AQUA]+[/AQUA]   [FUCHSIA]*[/FUCHSIA]    [LIME]o[/LIME]   [YELLOW]+[/YELLOW]',
+        '   [RED]+[/RED]   [YELLOW]*[/YELLOW]    [LIME]o[/LIME]   [AQUA]*[/AQUA]    [FUCHSIA]+[/FUCHSIA]   [RED]o[/RED]'
+      ];
+
+      function chocoPartyFrame(step) {
+        const face = step % 2 === 0 ? '^' : 'o';
+        const body = dog(face, '|^^|', true).replace(/^\n/, '').replace(/\n$/, '');
+        const hat = step % 2 === 0
+          ? '     [YELLOW]^[/YELLOW]\n    [RED]/#\\[/RED]\n   [YELLOW]/___\\[/YELLOW]'
+          : '     [RED]^[/RED]\n    [YELLOW]/#\\[/YELLOW]\n   [FUCHSIA]/___\\[/FUCHSIA]';
+        const note = ['   [YELLOW]~ la ~[/YELLOW]', '  [FUCHSIA]~ la la ~[/FUCHSIA]', '    [RED]<3 <3[/RED]'][step % 3];
+        return [confetti[step % 2], hat, body, note].join('\n');
+      }
+
+      function candleCommand(lit, total) {
+        const marks = [];
+        for (let i = 0; i < total; i += 1) marks.push(i < lit ? '*' : '.');
+        return marks.join(' ');
+      }
+
+      function drawBoot(tick) {
+        if (!bootPre) return;
+        bootPre.classList.add('scene-art');
+        const header = escapeHtml([
+          "BOOT: LITTLE HACKER'S QUEST (VOICE)",
+          'STATUS: HAPPY BIRTHDAY JAEYUN',
+          'AUDIO: KO-KR TTS CONNECTED',
+          ''
+        ].join('\n'));
+        const footer = escapeHtml([
+          '',
+          greetLine,
+          'COMMAND: PRESS START OR PICK A CHAPTER'
+        ].join('\n'));
+        bootPre.innerHTML = `${header}\n${renderColoredArt(cakeArt(candleTotal, candleTotal, tick))}\n${footer}`;
+      }
+
+      let bootTick = 0;
+      drawBoot(0);
+      setInterval(() => {
+        bootTick += 1;
+        drawBoot(bootTick);
+      }, 260);
+      trackEvent('birthday_boot', { age: age, preview: isBirthdayOverride() ? 1 : 0 });
+
+      function showCandles() {
+        stopSceneAnimation();
+        applyTheme('#ffd43b');
+        ui.levelTitle.textContent = `HAPPY BIRTHDAY · 재윤 · ${age}살`;
+        ui.sceneDesc.textContent = `${greetLine} 남은 초 ${candlesLit}개.`;
+        ui.commandText.textContent = candleCommand(candlesLit, candleTotal);
+        ui.spellingText.textContent = '아무 키나 눌러요. 후!';
+        setStatus(`SYS> BLOW THE CANDLES. ${candlesLit} LEFT.`);
+        startResultAnimation({
+          command: 'birthday',
+          frames: [cakeArt(candlesLit, candleTotal, 0), cakeArt(candlesLit, candleTotal, 1)]
+        });
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      // 퍼블릭 도메인 멜로디. 브라우저 안에서만 만들고, 파일은 쓰지 않아요.
+      const HAPPY_NOTES = [
+        [60, 0.5], [60, 0.5], [62, 1], [60, 1], [65, 1], [64, 2], null,
+        [60, 0.5], [60, 0.5], [62, 1], [60, 1], [67, 1], [65, 2], null,
+        [60, 0.5], [60, 0.5], [72, 1], [69, 1], [65, 1], [64, 1], [62, 2], null,
+        [70, 0.5], [70, 0.5], [69, 1], [65, 1], [67, 1], [65, 2]
+      ];
+      const NOTE_NAME = { 60: 'C4', 62: 'D4', 64: 'E4', 65: 'F4', 67: 'G4', 69: 'A4', 70: 'Bb4', 72: 'C5' };
+      const BEAT_SEC = 0.48;
+      const REST_SEC = 0.32;
+      let audioCtx = null;
+      let audioOut = null;
+      let songNodes = [];
+
+      function ensureAudio() {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return null;
+        try {
+          if (!audioCtx || audioCtx.state === 'closed') {
+            audioCtx = new AudioCtx();
+            audioOut = null;
+          }
+          if (audioCtx.state === 'suspended') void audioCtx.resume();
+          return audioCtx;
+        } catch (_error) {
+          return null;
+        }
+      }
+
+      function audioDestination(ctx) {
+        if (audioOut && audioOut.context === ctx) return audioOut;
+        const gain = ctx.createGain();
+        gain.gain.value = 0.14;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 1800;
+        gain.connect(filter);
+        filter.connect(ctx.destination);
+        audioOut = gain;
+        return audioOut;
+      }
+
+      function midiFreq(midi) {
+        return 440 * Math.pow(2, (midi - 69) / 12);
+      }
+
+      function scheduleTone(ctx, when, midi, dur, type, peak) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const dest = audioDestination(ctx);
+        osc.type = type;
+        osc.frequency.value = midiFreq(midi);
+        osc.frequency.setValueAtTime(midiFreq(midi), when);
+        const attack = Math.min(0.02, dur * 0.3);
+        gain.gain.setValueAtTime(0.0001, when);
+        gain.gain.exponentialRampToValueAtTime(peak, when + attack);
+        gain.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+        osc.connect(gain);
+        gain.connect(dest);
+        osc.start(when);
+        osc.stop(when + dur + 0.03);
+        songNodes.push(osc);
+      }
+
+      function stopSong() {
+        songNodes.forEach((node) => {
+          try { node.stop(); } catch (_error) { /* already finished */ }
+          try { node.disconnect(); } catch (_error) { /* already disconnected */ }
+        });
+        songNodes = [];
+      }
+
+      function playCandlePop() {
+        const ctx = ensureAudio();
+        if (!ctx) return;
+        try {
+          const when = ctx.currentTime + 0.01;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.value = 540;
+          osc.frequency.setValueAtTime(540, when);
+          osc.frequency.exponentialRampToValueAtTime(200, when + 0.08);
+          gain.gain.setValueAtTime(0.0001, when);
+          gain.gain.exponentialRampToValueAtTime(0.045, when + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.09);
+          osc.connect(gain);
+          gain.connect(audioDestination(ctx));
+          osc.start(when);
+          osc.stop(when + 0.11);
+          console.info('birthday-pop');
+        } catch (_error) { /* 소리가 없어도 놀이는 계속 */ }
+      }
+
+      function playHappyBirthday() {
+        const ctx = ensureAudio();
+        if (!ctx) {
+          console.info('birthday-song-skipped');
+          return 2600;
+        }
+        try {
+          stopSong();
+          const names = [];
+          let cursor = ctx.currentTime + 0.05;
+          const start = cursor;
+          HAPPY_NOTES.forEach((note) => {
+            if (!note) {
+              cursor += REST_SEC;
+              return;
+            }
+            const [midi, beats] = note;
+            const dur = beats * BEAT_SEC * 0.9;
+            scheduleTone(ctx, cursor, midi, dur, 'square', 0.55);
+            if (beats >= 1) scheduleTone(ctx, cursor, midi - 12, dur * 0.85, 'triangle', 0.32);
+            names.push(NOTE_NAME[midi] || String(midi));
+            console.info('birthday-note', NOTE_NAME[midi] || midi, Number((cursor - start).toFixed(2)));
+            cursor += beats * BEAT_SEC;
+          });
+          const seconds = cursor - start;
+          console.info('birthday-song', names.join(' '), Number(seconds.toFixed(2)));
+          return Math.round(seconds * 1000) + 180;
+        } catch (_error) {
+          console.info('birthday-song-skipped');
+          return 2600;
+        }
+      }
+
+      async function celebrateChoco() {
+        const token = birthdayToken;
+        publishBirthday('party');
+        stopSceneAnimation();
+        applyTheme('#ff4fa3');
+        ui.levelTitle.textContent = `HAPPY BIRTHDAY · 초코 · ${age}살`;
+        ui.sceneDesc.textContent = '초코가 파티 모자를 쓰고 생일 축하 노래를 해요!';
+        ui.commandText.textContent = 'YAY';
+        ui.spellingText.textContent = greetLine;
+        setStatus('OK> CHOCO IS SINGING.', 'ok');
+        startResultAnimation({
+          command: 'birthday-choco',
+          frames: [0, 1, 2].map(chocoPartyFrame)
+        });
+        await speak('초코가 노래해! 생일 축하해 재윤아!', {
+          rate: 0.9,
+          pitch: 1.05,
+          timeoutMs: 7000
+        });
+        stopSpeaking();
+        console.info('birthday-tts-done');
+        if (token !== playToken || birthdayState !== 'party') return;
+        const songMs = playHappyBirthday();
+        await sleep(songMs);
+        if (token !== playToken || birthdayState !== 'party') {
+          stopSong();
+          return;
+        }
+        stopSong();
+        const next = pendingBirthdayChapter;
+        publishBirthday(null);
+        pendingBirthdayChapter = null;
+        isStageTransitioning = false;
+        originalStartChapter(next);
+      }
+
+      function blowOneCandle() {
+        if (birthdayState !== 'candles' || candlesLit <= 0) return;
+        const now = performance.now();
+        if (now - lastBlowAt < 240) return;
+        lastBlowAt = now;
+        ensureAudio();
+        candlesLit -= 1;
+        playCandlePop();
+        speak('후!', {
+          rate: 1.05,
+          pitch: 1.08 + (candleTotal - candlesLit) * 0.05,
+          interrupt: true,
+          timeoutMs: 1600
+        });
+        if (candlesLit > 0) {
+          showCandles();
+          return;
+        }
+        ui.commandText.textContent = candleCommand(0, candleTotal);
+        ui.sceneDesc.textContent = '와! 초가 다 꺼졌어!';
+        setStatus('OK> CANDLES OUT.', 'ok');
+        void celebrateChoco();
+      }
+
+      function beginBirthday(index) {
+        const firstStart = !gameStarted;
+        gameStarted = true;
+        if (firstStart) {
+          if (hasTTS()) pickKoreanVoice();
+          trackEvent('game_start');
+        }
+        playToken += 1;
+        birthdayToken = playToken;
+        isStageTransitioning = true;
+        publishBirthday('candles');
+        pendingBirthdayChapter = index;
+        candlesLit = candleTotal;
+        ui.startScreen.classList.add('hidden');
+        ui.gameScreen.classList.remove('hidden');
+        ui.doneBox.classList.add('hidden');
+        setInputEnabled(true);
+        resetTheme();
+        ui.commandInput.value = '';
+        showCandles();
+        ui.commandInput.focus();
+        speak(`${greetLine} 케이크 초를 꺼 보자. 키를 눌러 후!`, {
+          rate: 0.86,
+          pitch: 1.05,
+          timeoutMs: 18000
+        });
+        trackEvent('birthday_mission_start', { age: age });
+      }
+
+      const originalStartChapter = startChapter;
+      startChapter = function (index) {
+        if (isKakaoInApp && !allowKakaoInAppPlay) return originalStartChapter(index);
+        if (birthdayState === 'candles' || birthdayState === 'party') return;
+        if (birthdayPlayedThisLoad) return originalStartChapter(index);
+        birthdayPlayedThisLoad = true;
+        beginBirthday(index);
+      };
+
+      const originalStartResultAnimation = startResultAnimation;
+      startResultAnimation = function (level) {
+        if (!level || birthdayState) return originalStartResultAnimation(level);
+        const frames = level.frames && level.frames.length ? level.frames : [level.artBefore];
+        if (!frames || !frames.length) return originalStartResultAnimation(level);
+        const decorated = [];
+        frames.forEach((frame) => {
+          confetti.forEach((line) => decorated.push(`${line}\n${frame}`));
+        });
+        return originalStartResultAnimation({ ...level, frames: decorated });
+      };
+
+      function leaveBirthday() {
+        if (birthdayState !== 'candles' && birthdayState !== 'party') return;
+        publishBirthday(null);
+        pendingBirthdayChapter = null;
+        stopSong();
+        stopSpeaking();
+      }
+
+      ui.menuBtn.addEventListener('click', leaveBirthday, true);
+      ui.backToMenuBtn.addEventListener('click', leaveBirthday, true);
+
+      ui.commandInput.addEventListener('keydown', (event) => {
+        if (birthdayState !== 'candles' && birthdayState !== 'party') return;
+        if (birthdayState === 'party') {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
+        if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
+        const skip = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab', 'Escape', 'F1'];
+        const blow = !skip.includes(event.key) && (event.key.length === 1 || event.key === 'Enter' || event.key === 'Backspace');
+        if (!blow) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        candleFromKey = true;
+        ui.commandInput.value = '';
+        blowOneCandle();
+        setTimeout(() => {
+          candleFromKey = false;
+        }, 0);
+      }, true);
+
+      ui.commandInput.addEventListener('input', () => {
+        if (birthdayState !== 'candles') return;
+        const typed = ui.commandInput.value;
+        if (!typed) return;
+        ui.commandInput.value = '';
+        if (candleFromKey) return;
+        blowOneCandle();
+      });
+
+      ui.submitBtn.addEventListener('click', (event) => {
+        if (birthdayState !== 'candles' && birthdayState !== 'party') return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (birthdayState === 'candles') blowOneCandle();
+      }, true);
+
+      ui.repeatBtn.addEventListener('click', (event) => {
+        if (birthdayState !== 'candles' && birthdayState !== 'party') return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (birthdayState === 'party') return;
+        speak(`${greetLine} 키를 눌러 초를 꺼 봐.`, { rate: 0.86, pitch: 1.05, timeoutMs: 14000 });
+      }, true);
+    }
+
+    if (isBirthdayToday()) installBirthdayCelebration();
   </script>
 </body>
 </html>
