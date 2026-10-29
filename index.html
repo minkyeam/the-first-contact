@@ -1502,6 +1502,312 @@ ________________
       inapp_kakao: isKakaoInApp,
       tts_supported: hasTTS()
     });
+
+    // 재윤이 생일(매년 10월 31일, 브라우저 현지 날짜)에만 켜지는 축하.
+    // 평소에는 installBirthdayCelebration()을 호출하지 않아 화면과 저장이 그대로입니다.
+    // 미리보기: ?birthday=1  나이는 2022-10-31 기준. 클리어 기록은 건드리지 않습니다.
+    function isBirthdayOverride() {
+      try {
+        return new URLSearchParams(window.location.search).get('birthday') === '1';
+      } catch (_error) {
+        return false;
+      }
+    }
+
+    function isBirthdayToday() {
+      const now = new Date();
+      if (now.getMonth() === 9 && now.getDate() === 31) return true;
+      return isBirthdayOverride();
+    }
+
+    function birthdayAge() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+      const celebrating = (month === 10 && day === 31) || isBirthdayOverride();
+      let age = year - 2022;
+      if (!celebrating && (month < 10 || (month === 10 && day < 31))) age -= 1;
+      return Math.max(1, age);
+    }
+
+    function agePhrase(age) {
+      const words = ['', '한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열', '열한', '열두', '열세', '열네', '열다섯', '열여섯', '열일곱', '열여덟', '열아홉', '스무'];
+      if (age >= 1 && age <= 20) return `${words[age]} 살`;
+      return `${age}살`;
+    }
+
+    function installBirthdayCelebration() {
+      const age = birthdayAge();
+      const phrase = agePhrase(age);
+      const candleTotal = Math.min(5, age);
+      const greetLine = `생일 축하해 재윤아! 오늘 재윤이 ${phrase} 됐네!`;
+      let candlesLit = candleTotal;
+      let birthdayState = null;
+      let birthdayPlayedThisLoad = false;
+      let pendingBirthdayChapter = 0;
+      let birthdayToken = 0;
+      let lastBlowAt = 0;
+      let candleFromKey = false;
+      const bootPre = document.querySelector('#startScreen pre.boot');
+
+      function padCenter(text, width) {
+        if (text.length >= width) return text;
+        const left = Math.floor((width - text.length) / 2);
+        return ' '.repeat(left) + text + ' '.repeat(width - text.length - left);
+      }
+
+      function cakeArt(lit, total, tick) {
+        const flame = tick % 2 === 0 ? '*' : '+';
+        let flames = '';
+        let wicks = '';
+        for (let i = 0; i < total; i += 1) {
+          const on = i < lit;
+          flames += on ? ` ${flame} ` : '   ';
+          wicks += on ? ' | ' : ' . ';
+        }
+        const outer = 21;
+        const inner = outer - 2;
+        const rule = '-'.repeat(inner);
+        const line = (content) => `|${padCenter(content, inner)}|`;
+        return [
+          colorize(padCenter(flames, outer), tick % 2 === 0 ? 'YELLOW' : 'RED'),
+          padCenter(wicks, outer),
+          `.${rule}.`,
+          colorize(line('HAPPY BIRTHDAY'), 'YELLOW'),
+          line(`JAEYUN ${age}`),
+          colorize(line('####  ####  ####'), 'RED'),
+          colorize(line('~~~~  ~~~~  ~~~~'), 'YELLOW'),
+          `'${rule}'`
+        ].join('\n');
+      }
+
+      const confetti = [
+        ' [YELLOW]*[/YELLOW]   [RED]o[/RED]    [AQUA]+[/AQUA]   [FUCHSIA]*[/FUCHSIA]    [LIME]o[/LIME]   [YELLOW]+[/YELLOW]',
+        '   [RED]+[/RED]   [YELLOW]*[/YELLOW]    [LIME]o[/LIME]   [AQUA]*[/AQUA]    [FUCHSIA]+[/FUCHSIA]   [RED]o[/RED]'
+      ];
+
+      function chocoPartyFrame(step) {
+        const face = step % 2 === 0 ? '^' : 'o';
+        const body = dog(face, '|^^|', true).replace(/^\n/, '').replace(/\n$/, '');
+        const hat = step % 2 === 0
+          ? '     [YELLOW]^[/YELLOW]\n    [RED]/#\\[/RED]\n   [YELLOW]/___\\[/YELLOW]'
+          : '     [RED]^[/RED]\n    [YELLOW]/#\\[/YELLOW]\n   [FUCHSIA]/___\\[/FUCHSIA]';
+        const note = ['   [YELLOW]~ la ~[/YELLOW]', '  [FUCHSIA]~ la la ~[/FUCHSIA]', '    [RED]<3 <3[/RED]'][step % 3];
+        return [confetti[step % 2], hat, body, note].join('\n');
+      }
+
+      function candleCommand(lit, total) {
+        const marks = [];
+        for (let i = 0; i < total; i += 1) marks.push(i < lit ? '*' : '.');
+        return marks.join(' ');
+      }
+
+      function drawBoot(tick) {
+        if (!bootPre) return;
+        bootPre.classList.add('scene-art');
+        const header = escapeHtml([
+          "BOOT: LITTLE HACKER'S QUEST (VOICE)",
+          'STATUS: HAPPY BIRTHDAY JAEYUN',
+          'AUDIO: KO-KR TTS CONNECTED',
+          ''
+        ].join('\n'));
+        const footer = escapeHtml([
+          '',
+          greetLine,
+          'COMMAND: PRESS START OR PICK A CHAPTER'
+        ].join('\n'));
+        bootPre.innerHTML = `${header}\n${renderColoredArt(cakeArt(candleTotal, candleTotal, tick))}\n${footer}`;
+      }
+
+      let bootTick = 0;
+      drawBoot(0);
+      setInterval(() => {
+        bootTick += 1;
+        drawBoot(bootTick);
+      }, 260);
+      trackEvent('birthday_boot', { age: age, preview: isBirthdayOverride() ? 1 : 0 });
+
+      function showCandles() {
+        stopSceneAnimation();
+        applyTheme('#ffd43b');
+        ui.levelTitle.textContent = `HAPPY BIRTHDAY · 재윤 · ${age}살`;
+        ui.sceneDesc.textContent = `${greetLine} 남은 초 ${candlesLit}개.`;
+        ui.commandText.textContent = candleCommand(candlesLit, candleTotal);
+        ui.spellingText.textContent = '아무 키나 눌러요. 후!';
+        setStatus(`SYS> BLOW THE CANDLES. ${candlesLit} LEFT.`);
+        startResultAnimation({
+          command: 'birthday',
+          frames: [cakeArt(candlesLit, candleTotal, 0), cakeArt(candlesLit, candleTotal, 1)]
+        });
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      async function celebrateChoco() {
+        const token = birthdayToken;
+        birthdayState = 'party';
+        stopSceneAnimation();
+        applyTheme('#ff4fa3');
+        ui.levelTitle.textContent = `HAPPY BIRTHDAY · 초코 · ${age}살`;
+        ui.sceneDesc.textContent = '초코가 파티 모자를 쓰고 생일 축하 노래를 해요!';
+        ui.commandText.textContent = 'YAY';
+        ui.spellingText.textContent = greetLine;
+        setStatus('OK> CHOCO IS SINGING.', 'ok');
+        startResultAnimation({
+          command: 'birthday-choco',
+          frames: [0, 1, 2].map(chocoPartyFrame)
+        });
+        await Promise.all([
+          speak(`초코가 노래해! 생일 축하해 재윤아, 생일 축하해. 사랑하는 재윤아, 생일 축하해! 이제 모험 하러 가자.`, {
+            rate: 0.9,
+            pitch: 1.06,
+            timeoutMs: 12000
+          }),
+          sleep(2600)
+        ]);
+        if (token !== playToken || birthdayState !== 'party') return;
+        const next = pendingBirthdayChapter;
+        birthdayState = null;
+        pendingBirthdayChapter = null;
+        isStageTransitioning = false;
+        originalStartChapter(next);
+      }
+
+      function blowOneCandle() {
+        if (birthdayState !== 'candles' || candlesLit <= 0) return;
+        const now = performance.now();
+        if (now - lastBlowAt < 240) return;
+        lastBlowAt = now;
+        candlesLit -= 1;
+        speak('후!', {
+          rate: 1.05,
+          pitch: 1.08 + (candleTotal - candlesLit) * 0.05,
+          interrupt: true,
+          timeoutMs: 1600
+        });
+        if (candlesLit > 0) {
+          showCandles();
+          return;
+        }
+        ui.commandText.textContent = candleCommand(0, candleTotal);
+        ui.sceneDesc.textContent = '와! 초가 다 꺼졌어!';
+        setStatus('OK> CANDLES OUT.', 'ok');
+        void celebrateChoco();
+      }
+
+      function beginBirthday(index) {
+        const firstStart = !gameStarted;
+        gameStarted = true;
+        if (firstStart) {
+          if (hasTTS()) pickKoreanVoice();
+          trackEvent('game_start');
+        }
+        playToken += 1;
+        birthdayToken = playToken;
+        isStageTransitioning = true;
+        birthdayState = 'candles';
+        pendingBirthdayChapter = index;
+        candlesLit = candleTotal;
+        ui.startScreen.classList.add('hidden');
+        ui.gameScreen.classList.remove('hidden');
+        ui.doneBox.classList.add('hidden');
+        setInputEnabled(true);
+        resetTheme();
+        ui.commandInput.value = '';
+        showCandles();
+        ui.commandInput.focus();
+        speak(`${greetLine} 케이크 초를 꺼 보자. 키를 눌러 후!`, {
+          rate: 0.86,
+          pitch: 1.05,
+          timeoutMs: 18000
+        });
+        trackEvent('birthday_mission_start', { age: age });
+      }
+
+      const originalStartChapter = startChapter;
+      startChapter = function (index) {
+        if (isKakaoInApp) return originalStartChapter(index);
+        if (birthdayState === 'candles' || birthdayState === 'party') return;
+        if (birthdayPlayedThisLoad) return originalStartChapter(index);
+        birthdayPlayedThisLoad = true;
+        beginBirthday(index);
+      };
+
+      const originalStartResultAnimation = startResultAnimation;
+      startResultAnimation = function (level) {
+        if (!level || birthdayState) return originalStartResultAnimation(level);
+        const frames = level.frames && level.frames.length ? level.frames : [level.artBefore];
+        if (!frames || !frames.length) return originalStartResultAnimation(level);
+        const decorated = [];
+        frames.forEach((frame) => {
+          confetti.forEach((line) => decorated.push(`${line}\n${frame}`));
+        });
+        return originalStartResultAnimation({ ...level, frames: decorated });
+      };
+
+      function leaveBirthday() {
+        if (birthdayState !== 'candles' && birthdayState !== 'party') return;
+        birthdayState = null;
+        pendingBirthdayChapter = null;
+      }
+
+      ui.menuBtn.addEventListener('click', leaveBirthday, true);
+      ui.backToMenuBtn.addEventListener('click', leaveBirthday, true);
+
+      ui.commandInput.addEventListener('keydown', (event) => {
+        if (birthdayState !== 'candles' && birthdayState !== 'party') return;
+        if (birthdayState === 'party') {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+          return;
+        }
+        if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
+        const skip = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab', 'Escape', 'F1'];
+        const blow = !skip.includes(event.key) && (event.key.length === 1 || event.key === 'Enter' || event.key === 'Backspace');
+        if (!blow) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        candleFromKey = true;
+        ui.commandInput.value = '';
+        blowOneCandle();
+        setTimeout(() => {
+          candleFromKey = false;
+        }, 0);
+      }, true);
+
+      ui.commandInput.addEventListener('input', () => {
+        if (birthdayState !== 'candles') return;
+        const typed = ui.commandInput.value;
+        if (!typed) return;
+        ui.commandInput.value = '';
+        if (candleFromKey) return;
+        blowOneCandle();
+      });
+
+      ui.submitBtn.addEventListener('click', (event) => {
+        if (birthdayState !== 'candles' && birthdayState !== 'party') return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (birthdayState === 'candles') blowOneCandle();
+      }, true);
+
+      ui.repeatBtn.addEventListener('click', (event) => {
+        if (birthdayState !== 'candles' && birthdayState !== 'party') return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const line = birthdayState === 'party'
+          ? '초코가 노래해! 생일 축하해 재윤아!'
+          : `${greetLine} 키를 눌러 초를 꺼 봐.`;
+        speak(line, { rate: 0.86, pitch: 1.05, timeoutMs: 14000 });
+      }, true);
+    }
+
+    if (isBirthdayToday()) installBirthdayCelebration();
   </script>
 </body>
 </html>
