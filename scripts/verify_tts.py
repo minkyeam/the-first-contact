@@ -361,6 +361,120 @@ def fallback_reward(browser, port: int, reward_text: str) -> None:
         restore(path, backup)
 
 
+def date_mock_script(iso: str) -> str:
+    return f"""
+    (() => {{
+      const fixedMs = Date.parse('{iso}');
+      const NativeDate = Date;
+      class FakeDate extends NativeDate {{
+        constructor(...args) {{
+          if (args.length === 0) super(fixedMs);
+          else super(...args);
+        }}
+        static now() {{ return fixedMs; }}
+        static parse(value) {{ return NativeDate.parse(value); }}
+        static UTC(...args) {{ return NativeDate.UTC(...args); }}
+      }}
+      window.Date = FakeDate;
+    }})();
+    """
+
+
+def blow_candle(page) -> None:
+    page.locator("#commandInput").focus()
+    page.evaluate(
+        """() => {
+          const input = document.querySelector('#commandInput');
+          input.dispatchEvent(new KeyboardEvent('keydown', {
+            key: 'a', bubbles: true, cancelable: true
+          }));
+        }"""
+    )
+
+
+def play_birthday(browser, port: int, path: str, date_iso: str | None, expect_phrase: str) -> None:
+    context = browser.new_context(viewport={"width": 1280, "height": 900})
+    if date_iso:
+        context.add_init_script(date_mock_script(date_iso))
+    context.add_init_script(INIT)
+    page = context.new_page()
+    notes: list[str] = []
+    page.on("console", lambda msg: notes.append(msg.text))
+    page.goto(f"http://127.0.0.1:{port}{path}", wait_until="domcontentloaded")
+    page.wait_for_function("() => window.__lhqTtsReady === true")
+    page.evaluate("() => window.__lhqPreloadDone()")
+    boot = page.locator("#startScreen pre.boot").inner_text()
+    if expect_phrase not in boot:
+        context.close()
+        raise SystemExit(f"birthday boot missing {expect_phrase!r}: {boot[:180]}")
+    page.locator("#chapterGrid button").nth(0).click()
+    page.wait_for_selector("#gameScreen:not(.hidden)")
+    page.wait_for_function(
+        """(phrase) => window.__lhqTtsLog.some(event => event.type === 'mp3' && event.text.includes(phrase))""",
+        arg=expect_phrase,
+        timeout=15000,
+    )
+    candles = page.evaluate(
+        """() => (document.querySelector('#commandText').textContent || '').split('').filter(ch => ch === '*').length"""
+    )
+    if candles < 1:
+        context.close()
+        raise SystemExit("birthday screen did not show candles")
+    for _ in range(candles):
+        blow_candle(page)
+        page.wait_for_timeout(300)
+    deadline_pops = 0
+    while deadline_pops < 20:
+        pops = sum(1 for line in notes if line.startswith("birthday-pop"))
+        if pops >= candles:
+            break
+        page.wait_for_timeout(100)
+        deadline_pops += 1
+    pops = sum(1 for line in notes if line.startswith("birthday-pop"))
+    if pops < candles:
+        context.close()
+        raise SystemExit(f"expected {candles} candle pops, saw {pops}")
+    page.wait_for_function(
+        """() => window.__lhqTtsLog.some(event => event.type === 'end' && event.text.indexOf('초코가 노래해') === 0)""",
+        timeout=20000,
+    )
+    for _ in range(250):
+        if any(line.startswith("birthday-tts-done") for line in notes) and any(
+            line.startswith("birthday-song ") for line in notes
+        ):
+            break
+        page.wait_for_timeout(100)
+    else:
+        context.close()
+        raise SystemExit("birthday song did not start: " + " | ".join(notes[-8:]))
+    song_at = next(i for i, line in enumerate(notes) if line.startswith("birthday-song "))
+    done_at = next(i for i, line in enumerate(notes) if line.startswith("birthday-tts-done"))
+    end_at = next(i for i, line in enumerate(notes) if line.startswith("[lhq-tts] end 초코가 노래해"))
+    if not (end_at < done_at < song_at):
+        context.close()
+        raise SystemExit(f"song started before the spoken line ended: end={end_at} done={done_at} song={song_at}")
+    page.wait_for_function(
+        """() => {
+          const title = document.querySelector('#levelTitle')?.textContent || '';
+          return title.includes('CH1') || title.includes('알파벳');
+        }""",
+        timeout=25000,
+    )
+    page.wait_for_function(
+        """() => window.__lhqTtsLog.some(event => event.type === 'mp3' && event.text.includes('알파벳 놀이를 해요'))""",
+        timeout=15000,
+    )
+    stats = page.evaluate("() => window.__lhqTtsStats")
+    if stats["fallback"] != 0:
+        fallbacks = page.evaluate(
+            """() => window.__lhqTtsLog.filter(event => event.type === 'fallback').map(event => event.text)"""
+        )
+        context.close()
+        raise SystemExit(f"birthday fallbacks: {fallbacks}")
+    print(f"birthday {expect_phrase} candles={candles} pops={pops} mp3={stats['mp3']} fallback=0 song-after-tts")
+    context.close()
+
+
 def cancel_and_restart(page) -> None:
     page.locator("#chapterGrid button").nth(0).click()
     page.wait_for_function("() => window.__lhqTtsStats.mp3 >= 1", timeout=10000)
@@ -382,6 +496,10 @@ def main() -> None:
     try:
         with sync_playwright() as playwright:
             browser = launch(playwright)
+            play_birthday(browser, port, "/index.html", "2026-10-31T12:00:00", "네 살")
+            play_birthday(browser, port, "/index.html", "2027-10-31T12:00:00", "다섯 살")
+            play_birthday(browser, port, "/index.html?birthday=1", None, "네 살")
+
             page, _errors = new_page(browser, port)
             cancel_and_restart(page)
             page.context.close()

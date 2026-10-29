@@ -404,12 +404,20 @@ def collect_birthday(browser, port: int, collector: Collector) -> None:
             context.close()
             raise SystemExit(f"birthday date mock failed: expected {year}, got {got_year}")
         page.locator("#chapterGrid button").nth(0).click()
-        page.wait_for_timeout(80)
+        page.wait_for_selector("#gameScreen:not(.hidden)")
         page.click("#repeatBtn")
         for _ in range(6):
-            page.keyboard.press("a")
-            page.wait_for_timeout(270)
-        page.wait_for_timeout(120)
+            page.locator("#commandInput").focus()
+            page.evaluate(
+                """() => {
+                  const input = document.querySelector('#commandInput');
+                  input.dispatchEvent(new KeyboardEvent('keydown', {
+                    key: 'a', bubbles: true, cancelable: true
+                  }));
+                }"""
+            )
+            page.wait_for_timeout(280)
+        page.wait_for_timeout(150)
         drain(page, collector)
         context.close()
         print(f"birthday age {age}", flush=True)
@@ -521,6 +529,17 @@ def collect_lines() -> dict:
     if level_total and len(unique) < level_total * 2:
         raise SystemExit(f"only collected {len(unique)} lines for {level_total} levels")
     source = INDEX.read_text(encoding="utf-8")
+    if "function agePhrase" in source:
+        age_words = [
+            "한", "두", "세", "네", "다섯", "여섯", "일곱", "여덟", "아홉", "열",
+            "열한", "열두", "열세", "열네", "열다섯", "열여섯", "열일곱", "열여덟", "열아홉", "스무",
+        ]
+        missing_ages = [word for word in age_words if not any(f"{word} 살" in line for line in unique)]
+        if missing_ages:
+            raise SystemExit(f"missing birthday ages: {missing_ages}")
+        for required in ("후!", "초코가 노래해! 생일 축하해 재윤아!"):
+            if required not in unique:
+                raise SystemExit(f"missing birthday line: {required}")
     if "괜찮아, 다시 해보자" in source:
         errors_found = [line for line in unique if line.startswith("괜찮아")]
         if len(errors_found) < level_total:
