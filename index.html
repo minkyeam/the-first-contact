@@ -1202,7 +1202,309 @@ ________________
         || null;
     }
 
+    // Pre-generated SunHi clips (audio/tts/manifest.json). Missing clips use speakSynth.
+    let ttsManifest = null;
+    let ttsManifestSettled = false;
+    const ttsStats = { mp3: 0, fallback: 0, ended: 0 };
+    const ttsLog = [];
+    const decodedBuffers = new Map();
+    const bufferLoads = new Map();
+    let preloadWait = [];
+    let audioCtx = null;
+    let audioUnlocked = false;
+    let clipQueue = [];
+    let clipActive = null;
+    let clipEpoch = 0;
+    let clipPumping = false;
+    let clipStop = null;
+
+    function normalizeSpeech(text) {
+      return String(text == null ? '' : text).normalize('NFC').replace(/\s+/g, ' ').trim();
+    }
+
+    function ttsBusy() {
+      return clipPumping || clipQueue.length > 0 || !!clipActive;
+    }
+
+    function ttsTrace(type, text) {
+      const entry = { t: performance.now(), type, text: text || '' };
+      ttsLog.push(entry);
+      if (type === 'mp3') {
+        ttsStats.mp3 += 1;
+        window.__lhqLastPlay = entry;
+        console.info('[lhq-tts] mp3 ' + (text || ''));
+      } else if (type === 'end') {
+        ttsStats.ended += 1;
+        console.info('[lhq-tts] end ' + (text || ''));
+      } else if (type === 'fallback') {
+        ttsStats.fallback += 1;
+        window.__lhqLastPlay = entry;
+        console.info('[lhq-tts] fallback ' + (text || ''));
+      } else if (type === 'cancel') {
+        console.info('[lhq-tts] cancel');
+      }
+    }
+
+    function ensureAudioCtx() {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      if (!audioCtx) audioCtx = new AudioCtx();
+      return audioCtx;
+    }
+
+    function resolveClip(rel) {
+      return new URL(rel, document.baseURI).href;
+    }
+
+    function loadDecoded(url) {
+      if (decodedBuffers.has(url)) return Promise.resolve(decodedBuffers.get(url));
+      if (bufferLoads.has(url)) return bufferLoads.get(url);
+      const job = (async () => {
+        const ctx = ensureAudioCtx();
+        if (!ctx) throw new Error('no audio context');
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('missing clip');
+        const bytes = await response.arrayBuffer();
+        const audio = await ctx.decodeAudioData(bytes.slice(0));
+        decodedBuffers.set(url, audio);
+        return audio;
+      })();
+      bufferLoads.set(url, job);
+      job.catch(() => {
+        if (bufferLoads.get(url) === job) bufferLoads.delete(url);
+      });
+      return job;
+    }
+
+    function preloadNorms(list) {
+      if (!ttsManifest || !ttsManifest.clips || !list) return;
+      list.forEach(text => {
+        const rel = ttsManifest.clips[text];
+        if (!rel) return;
+        const job = loadDecoded(resolveClip(rel)).catch(() => {});
+        preloadWait.push(job);
+      });
+    }
+
+    function unlockAudio() {
+      const ctx = ensureAudioCtx();
+      if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+      if (audioUnlocked) return;
+      audioUnlocked = true;
+      if (ctx) {
+        try {
+          const silence = ctx.createBuffer(1, 1, ctx.sampleRate || 22050);
+          const source = ctx.createBufferSource();
+          source.buffer = silence;
+          source.connect(ctx.destination);
+          source.start(0);
+        } catch (_error) { /* ignore */ }
+      }
+      try {
+        const beep = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+        const played = beep.play();
+        if (played && typeof played.then === 'function') played.then(() => beep.pause()).catch(() => {});
+      } catch (_error) { /* ignore */ }
+      if (ttsManifest) preloadNorms(ttsManifest.preload);
+    }
+
+    ['pointerdown', 'touchstart', 'keydown', 'click'].forEach(type => {
+      window.addEventListener(type, unlockAudio, true);
+    });
+
+    const ttsManifestReady = fetch(new URL('audio/tts/manifest.json', document.baseURI).href)
+      .then(response => (response.ok ? response.json() : null))
+      .then(data => {
+        ttsManifest = data && data.clips ? data : null;
+      })
+      .catch(() => {
+        ttsManifest = null;
+      })
+      .then(() => {
+        ttsManifestSettled = true;
+        window.__lhqTtsReady = true;
+        if (ttsManifest) {
+          preloadNorms(ttsManifest.preload);
+          preloadNorms(ttsManifest.prime);
+        }
+      });
+
+    function cancelClipQueue() {
+      const hadAudio = !!(clipActive || clipQueue.length || clipStop);
+      clipEpoch += 1;
+      const stop = clipStop;
+      clipStop = null;
+      const dropped = [];
+      if (clipActive) dropped.push(clipActive);
+      dropped.push(...clipQueue);
+      clipQueue = [];
+      clipActive = null;
+      if (stop) {
+        try { stop(); } catch (_error) { /* ignore */ }
+      }
+      dropped.forEach(item => item.finish(false));
+      if (hasTTS()) {
+        try { window.speechSynthesis.cancel(); } catch (_error) { /* ignore */ }
+      }
+      if (hadAudio) ttsTrace('cancel', '');
+    }
+
+    function stopSpeaking() {
+      cancelClipQueue();
+    }
+
+    async function runSynthFallback(item, norm) {
+      ttsTrace('fallback', norm);
+      await new Promise(resolve => {
+        let done = false;
+        const stop = () => {
+          if (done) return;
+          done = true;
+          resolve();
+        };
+        clipStop = stop;
+        speakSynth(item.text, Object.assign({}, item.options, { interrupt: true })).then(
+          ok => {
+            stop();
+            if (!item.settled) item.finish(!!ok);
+          },
+          () => {
+            stop();
+            if (!item.settled) item.finish(false);
+          }
+        );
+      });
+    }
+
+    async function playClipItem(item) {
+      const myEpoch = clipEpoch;
+      const norm = normalizeSpeech(item.text);
+      const rel = ttsManifest && ttsManifest.clips ? ttsManifest.clips[norm] : '';
+      if (!rel) {
+        await runSynthFallback(item, norm);
+        return;
+      }
+      let buffer = decodedBuffers.get(resolveClip(rel)) || null;
+      if (!buffer) {
+        try {
+          buffer = await loadDecoded(resolveClip(rel));
+        } catch (_error) {
+          buffer = null;
+        }
+      }
+      if (clipEpoch !== myEpoch || item.settled) return;
+      const ctx = ensureAudioCtx();
+      if (!buffer || !ctx) {
+        await runSynthFallback(item, norm);
+        return;
+      }
+      if (ctx.state === 'suspended') {
+        try { await ctx.resume(); } catch (_error) { /* ignore */ }
+      }
+      if (clipEpoch !== myEpoch || item.settled) return;
+
+      const playedThrough = await new Promise(resolve => {
+        let halted = false;
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(ctx.destination);
+        try {
+          const forced = Number(window.__lhqTtsRate);
+          if (forced > 1 && forced <= 16) source.playbackRate.value = forced;
+        } catch (_error) { /* keep natural speed */ }
+        const halt = () => {
+          if (halted) return;
+          halted = true;
+          if (clipStop === halt) clipStop = null;
+          try { source.stop(); } catch (_error) { /* ignore */ }
+          resolve(false);
+        };
+        clipStop = halt;
+        source.onended = () => {
+          if (halted) return;
+          halted = true;
+          if (clipStop === halt) clipStop = null;
+          ttsTrace('end', norm);
+          item.finish(true);
+          resolve(true);
+        };
+        try {
+          source.start(0);
+        } catch (_error) {
+          halted = true;
+          if (clipStop === halt) clipStop = null;
+          resolve(false);
+          return;
+        }
+        ttsTrace('mp3', norm);
+        const followers = ttsManifest.next && ttsManifest.next[norm];
+        if (followers) preloadNorms(followers);
+      });
+
+      if (!playedThrough && clipEpoch === myEpoch && !item.settled) {
+        await runSynthFallback(item, norm);
+      }
+    }
+
+    async function pumpClipQueue() {
+      if (clipPumping) return;
+      clipPumping = true;
+      try {
+        while (clipQueue.length) {
+          const item = clipQueue.shift();
+          if (!item || item.settled) continue;
+          clipActive = item;
+          await playClipItem(item);
+          if (clipActive === item) clipActive = null;
+        }
+      } finally {
+        clipPumping = false;
+      }
+      if (clipQueue.length) void pumpClipQueue();
+    }
+
+    function enqueueClip(text, options) {
+      const interrupt = options.interrupt ?? true;
+      return new Promise(resolve => {
+        const item = {
+          text,
+          options,
+          settled: false,
+          finish(ok) {
+            if (this.settled) return;
+            this.settled = true;
+            resolve(ok);
+          }
+        };
+        if (interrupt) cancelClipQueue();
+        clipQueue.push(item);
+        // Clips are often longer than the old speechSynthesis cap. onended still
+        // resolves early; this only keeps a late clip from being cut off.
+        const timeoutMs = Math.max(options.timeoutMs ?? 15000, 45000);
+        window.setTimeout(() => {
+          if (item.settled) return;
+          item.finish(false);
+          if (clipActive === item && clipStop) {
+            try { clipStop(); } catch (_error) { /* ignore */ }
+          }
+        }, timeoutMs);
+        void pumpClipQueue();
+      });
+    }
+
     function speak(text, options = {}) {
+      if (!gameStarted) return Promise.resolve(false);
+      if (!ttsManifestSettled) return ttsManifestReady.then(() => speak(text, options));
+      const norm = normalizeSpeech(text);
+      const rel = norm && ttsManifest && ttsManifest.clips ? ttsManifest.clips[norm] : '';
+      if (rel) return enqueueClip(text, options);
+      const interrupt = options.interrupt ?? true;
+      if (interrupt) cancelClipQueue();
+      ttsTrace('fallback', norm);
+      return speakSynth(text, options);
+    }
+
+    function speakSynth(text, options = {}) {
       if (!gameStarted || !hasTTS()) return Promise.resolve(false);
       const synth = window.speechSynthesis;
       const interrupt = options.interrupt ?? true;
@@ -1222,16 +1524,26 @@ ________________
         if (koreanVoice) utter.voice = koreanVoice;
         utter.onend = () => finish(true);
         utter.onerror = () => finish(false);
-        synth.speak(utter);
+        try {
+          synth.speak(utter);
+        } catch (_error) {
+          finish(false);
+        }
 
         const timeoutMs = options.timeoutMs ?? 15000;
         setTimeout(() => finish(false), timeoutMs);
       });
     }
 
-    function stopSpeaking() {
-      if (hasTTS()) window.speechSynthesis.cancel();
-    }
+    window.__lhqTtsStats = ttsStats;
+    window.__lhqTtsLog = ttsLog;
+    window.__lhqTtsBusy = ttsBusy;
+    window.__lhqNormalize = normalizeSpeech;
+    window.__lhqUnlockAudio = unlockAudio;
+    window.__lhqLastPlay = null;
+    window.__lhqTtsReady = false;
+    window.__lhqDecodedCount = () => decodedBuffers.size;
+    window.__lhqPreloadDone = () => Promise.all(preloadWait);
 
     function setStatus(text, type = '') {
       ui.status.textContent = text;
@@ -1494,8 +1806,14 @@ ________________
       pickKoreanVoice();
       trackEvent('tts_available');
     } else {
-      setStatus('WARN> TTS NOT AVAILABLE. TEXT MODE ENABLED.', 'err');
-      trackEvent('tts_unavailable');
+      ttsManifestReady.then(() => {
+        if (ttsManifest && ttsManifest.clips) {
+          trackEvent('tts_available');
+          return;
+        }
+        setStatus('WARN> TTS NOT AVAILABLE. TEXT MODE ENABLED.', 'err');
+        trackEvent('tts_unavailable');
+      });
     }
 
     trackEvent('app_boot', {
