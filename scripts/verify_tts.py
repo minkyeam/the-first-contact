@@ -105,8 +105,30 @@ def launch(playwright):
     )
 
 
+# Full play, fallbacks, and saved-progress checks are the non-birthday game.
+# Pin the clock off October 31 so a machine dated on the birthday does not
+# turn that playthrough into the candle flow. Birthday itself is play_birthday().
+NORMAL_DATE = """
+(() => {
+  const fixedMs = Date.parse('2026-06-15T12:00:00');
+  const NativeDate = Date;
+  class FakeDate extends NativeDate {
+    constructor(...args) {
+      if (args.length === 0) super(fixedMs);
+      else super(...args);
+    }
+    static now() { return fixedMs; }
+    static parse(value) { return NativeDate.parse(value); }
+    static UTC(...args) { return NativeDate.UTC(...args); }
+  }
+  window.Date = FakeDate;
+})();
+"""
+
+
 def new_page(browser, port: int):
     context = browser.new_context(viewport={"width": 1280, "height": 900})
+    context.add_init_script(NORMAL_DATE)
     context.add_init_script(INIT)
     page = context.new_page()
     errors: list[str] = []
@@ -327,14 +349,17 @@ def restore(path: Path, backup: Path) -> None:
 
 
 def expect_fallback(page, text: str) -> None:
+    # A missing clip is logged as fallback, then speak() may wait ~50ms after
+    # cancel() before speechSynthesis.speak. Wait for both.
     page.wait_for_function(
-        """(text) => window.__lhqTtsLog.some(event => event.type === 'fallback' && event.text === text)""",
+        """(text) => {
+          const logged = window.__lhqTtsLog.some(event => event.type === 'fallback' && event.text === text);
+          const spoken = (window.__synthCalls || []).indexOf(text) !== -1;
+          return logged && spoken;
+        }""",
         arg=text,
         timeout=20000,
     )
-    calls = page.evaluate("() => window.__synthCalls.slice()")
-    if text not in calls:
-        raise SystemExit(f"speechSynthesis was not used for {text!r}; calls={calls[:4]}")
 
 
 def fallback_letter(browser, port: int, letter_text: str, letter_key: str) -> None:

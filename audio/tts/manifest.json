@@ -5,151 +5,126 @@
   "channels": 1,
   "sampleRate": 24000,
   "clips": {
-    "2층버스 놀이! 글자 누르고 엔터. 2층버스가 재윤이 정류장에 왔어! 제이 눌러줄래?": "audio/tts/2bcf99795b4e7579.mp3",
+    "2층버스 놀이! 글자 누르고 엔터. 2층버스가 재윤이 정류장에 왔어! 재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이 눌러줄래?": "audio/tts/11d1928105ad1b44.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 문은 J를 기다려.": "audio/tts/d0a20b6d581e8807.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 문은 J를 기다려.": "audio/tts/c8cab2dedcfc8cd5.mp3",
     "어, 그건 C이네! C는 Choco~ 초코. 문은 J를 기다려.": "audio/tts/f9845904c70e068a.mp3",
     "어, 그건 D이네! D는 Dog~ 강아지. 문은 J를 기다려.": "audio/tts/7454db85fedfbc8e.mp3",
     "어, 그건 E이네! E는 Egg~ 달걀. 문은 J를 기다려.": "audio/tts/fa43241dcbb1baea.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 문은 J를 기다려.": "audio/tts/bda8ce47cbd1f9b8.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 문은 J를 기다려.": "audio/tts/825006838ab7fddf.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 문은 J를 기다려.": "audio/tts/c92545dfa57befe9.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 문은 J를 기다려.": "audio/tts/5fd95b14081f7b89.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 문은 J를 기다려.": "audio/tts/081a09fd12c4930b.mp3",
     "제이": "audio/tts/542abe61bdc58122.mp3",
     "J만 누르고 엔터 해 줘.": "audio/tts/f22cbb17487e9505.mp3",
-    "2층버스가 재윤이 정류장에 왔어! 제이 눌러줄래?": "audio/tts/d8c851b6f699dec0.mp3",
+    "2층버스가 재윤이 정류장에 왔어! 재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이 눌러줄래?": "audio/tts/41822e4990b1f1fc.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 문은 J를 기다려.": "audio/tts/f480905f0a232373.mp3",
     "좋아. 이제 엔터!": "audio/tts/d7c9098b4adc2828.mp3",
-    "치익~ 문이 열렸어! 재윤이가 탔어.": "audio/tts/116042aec1f0feb1.mp3",
-    "초코도 타고 싶대! 씨 눌러줄래?": "audio/tts/bc3d976e0b5074f4.mp3",
+    "치익~ 문이 열렸어! 재윤이가 탔어. 재는 제이야!": "audio/tts/ffde264b64019fd2.mp3",
+    "초코도 타고 싶대! 초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨 눌러줄래?": "audio/tts/8bcd8691ed107144.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 C를 기다려.": "audio/tts/5d8b65070d1bcf78.mp3",
-    "씨": "audio/tts/c90eea3c6347f1e0.mp3",
-    "멍멍! 초코가 재윤이 옆에 탔어.": "audio/tts/d2ed915a509254da.mp3",
-    "비는 버스야! 비 누르면 2층버스가 가.": "audio/tts/53ac8b1d3516d9e4.mp3",
+    "멍멍! 초코가 재윤이 옆에 탔어. 초코는 씨야!": "audio/tts/d8deb479c012eeb2.mp3",
+    "이제 버스가 가! 버스는 영어로 버스! 버스는 비로 시작해. 그래서 비야! 비 눌러줄래?": "audio/tts/26be18f168e9ca94.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 버스는 B를 기다려.": "audio/tts/be49169ec1a4f3c7.mp3",
-    "비": "audio/tts/5e0d62698b44a434.mp3",
-    "부릉! 2층버스가 달렸어.": "audio/tts/c1a1dcc9b727e719.mp3",
+    "부릉! 2층버스가 달렸어. 버스는 비야!": "audio/tts/932833b2f895b150.mp3",
     "버스 재미있었지? 초코가 꼬리를 흔들며 고마워해. 멍멍! 다음도 해 볼까?": "audio/tts/f1f1c3e774909d35.mp3",
-    "신호등 놀이! 빨간 불이야! 알은 멈춰. 알 눌러줄래?": "audio/tts/f15b3abaf5287e37.mp3",
-    "빨간 불이야! 알은 멈춰. 알 눌러줄래?": "audio/tts/d86390d871925d81.mp3",
+    "신호등 놀이! 빨간 불이야! 빨강은 영어로 레드! 레드는 알로 시작해. 그래서 알이야! 알 눌러줄래?": "audio/tts/e43af6714bb5a190.mp3",
+    "빨간 불이야! 빨강은 영어로 레드! 레드는 알로 시작해. 그래서 알이야! 알 눌러줄래?": "audio/tts/b939706b8c7e65d9.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 신호등은 R을 기다려.": "audio/tts/2d5353e53630df0d.mp3",
-    "알": "audio/tts/63251c05b0dbf37f.mp3",
-    "빨간 불! 차가 멈췄어.": "audio/tts/25cafe8ba53822b6.mp3",
-    "노란 불이야. 와이는 천천히. 와이 눌러줄래?": "audio/tts/95845cb9c9e8fbfd.mp3",
+    "빨간 불! 차가 멈췄어. 레드는 알이야!": "audio/tts/af0dd983156dfd3d.mp3",
+    "노란 불이야! 노랑은 영어로 옐로! 옐로는 와이로 시작해. 그래서 와이야! 와이 눌러줄래?": "audio/tts/742ba468ac26be6b.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 신호등은 Y를 기다려.": "audio/tts/fddd292d7f3f28bc.mp3",
-    "와이": "audio/tts/66e4d5d7b9164c52.mp3",
-    "노란 불! 차가 천천히 가.": "audio/tts/a5ceb25720d3db22.mp3",
-    "초록 불이야! 지는 가. 지 눌러줄래?": "audio/tts/bf0ac4cacfdcc11c.mp3",
+    "노란 불! 차가 천천히 가. 옐로는 와이야!": "audio/tts/6f3f100a1ab5f433.mp3",
+    "초록 불이야! 초록은 영어로 그린! 그린은 지로 시작해. 그래서 지야! 지 눌러줄래?": "audio/tts/d74ccca450eba8a7.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 신호등은 G를 기다려.": "audio/tts/bca743ceab5117ba.mp3",
-    "지": "audio/tts/32e608b594bece7a.mp3",
-    "초록 불! 부릉, 차가 달려.": "audio/tts/8a1463af633cfcdc.mp3",
+    "초록 불! 부릉, 차가 달려. 그린은 지야!": "audio/tts/c14c06b3a684c4da.mp3",
     "신호를 잘 봤어. 초코가 안전해서 고마워해! 다음도 해 볼까?": "audio/tts/4b26b579203cedd0.mp3",
-    "초코에게 밥 주기! 초코가 사과 먹고 싶대! 에이 눌러줄래?": "audio/tts/c17811d8a1c83679.mp3",
-    "초코가 사과 먹고 싶대! 에이 눌러줄래?": "audio/tts/c983827024cabfc4.mp3",
+    "초코에게 밥 주기! 초코가 사과 먹고 싶대! 사과는 영어로 애플! 애플은 에이로 시작해. 그래서 에이야! 에이 눌러줄래?": "audio/tts/916de553487462a0.mp3",
+    "초코가 사과 먹고 싶대! 사과는 영어로 애플! 애플은 에이로 시작해. 그래서 에이야! 에이 눌러줄래?": "audio/tts/18243316c501f472.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 A를 기다려.": "audio/tts/5aef640c2300fffc.mp3",
-    "에이": "audio/tts/e756c665f973bc6d.mp3",
-    "냠냠! 멍멍!": "audio/tts/00a6a75607b1889c.mp3",
-    "달걀도 줄래? 이는 에그야. 이 눌러줄래?": "audio/tts/cb0a96e154b0fa5d.mp3",
+    "냠냠! 멍멍! 애플은 에이야!": "audio/tts/75aff954faa2ef61.mp3",
+    "달걀도 줄래? 달걀은 영어로 에그! 에그는 이로 시작해. 그래서 이야! 이 눌러줄래?": "audio/tts/71ff302884826275.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 E를 기다려.": "audio/tts/42fe30af3d8281ec.mp3",
-    "이": "audio/tts/8bafb6b7d17ead49.mp3",
-    "냠냠! 달걀도 먹었어.": "audio/tts/d22be4be1fdf2fbb.mp3",
-    "오렌지는 오야. 오 눌러줄래?": "audio/tts/0283e7977c6aea4d.mp3",
+    "냠냠! 달걀도 먹었어. 에그는 이야!": "audio/tts/b8037e72d8e6f64f.mp3",
+    "오렌지도 있어! 오렌지는 영어로 오렌지! 오렌지는 오로 시작해. 그래서 오야! 오 눌러줄래?": "audio/tts/ef6bc9133f8a687e.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 O를 기다려.": "audio/tts/81cf1ce29435f612.mp3",
-    "오": "audio/tts/c0ccf82e09f1e873.mp3",
-    "냠냠! 오렌지 맛있어.": "audio/tts/3bd1173a292367cd.mp3",
-    "물고기는 피쉬, 에프야. 에프 눌러줄래?": "audio/tts/f995daa2d98885ad.mp3",
+    "냠냠! 오렌지 맛있어. 오렌지는 오야!": "audio/tts/f3a02a1e7794c063.mp3",
+    "물고기도 줄래? 물고기는 영어로 피쉬! 피쉬는 에프로 시작해. 그래서 에프야! 에프 눌러줄래?": "audio/tts/86aebcce35eb178c.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 F를 기다려.": "audio/tts/6cb8342b2b601ad0.mp3",
-    "에프": "audio/tts/4f9d8100123ab005.mp3",
-    "냠냠! 물고기 먹었어. 멍멍!": "audio/tts/fea960bcdfcccde1.mp3",
+    "냠냠! 물고기 먹었어. 멍멍! 피쉬는 에프야!": "audio/tts/9b3c08ad023aa8ae.mp3",
     "배부른 초코가 핥짝. 재윤아 고마워! 다음도 해 볼까?": "audio/tts/c3e60ef0893dd6e9.mp3",
-    "이름 부르기! 재윤이 이름을 쓰자! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.": "audio/tts/d9270c40935ec1c0.mp3",
-    "재윤이 이름을 쓰자! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.": "audio/tts/c38109f8919ea8aa.mp3",
+    "이름 부르기! 재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.": "audio/tts/386aaa6be59a0b52.mp3",
+    "재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.": "audio/tts/7b5809cd8c2becd2.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 이름은 J를 기다려.": "audio/tts/e55f5f3865f821d0.mp3",
     "제이! 다음은 에이.": "audio/tts/94f3002cb07c41e8.mp3",
     "에이! 다음은 이.": "audio/tts/95f0da91dfeb1c31.mp3",
     "이! 됐어, 엔터!": "audio/tts/3b435be3260391b7.mp3",
-    "재윤이 이름 완성!": "audio/tts/c46aa05f2ff63d12.mp3",
-    "모자는 햇이야. 에이치 누르면 초코가 모자를 써.": "audio/tts/eb46480d0f1409d3.mp3",
+    "재윤이 이름 완성! 재는 제이야!": "audio/tts/19384e1a47b787f0.mp3",
+    "초코에게 모자를 씌우자! 모자는 영어로 햇! 햇은 에이치로 시작해. 그래서 에이치야! 에이치 눌러줄래?": "audio/tts/511001fdbc5306fe.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 모자는 H를 기다려.": "audio/tts/79793073abe7431f.mp3",
-    "에이치": "audio/tts/cfa54b80dacc482f.mp3",
-    "초코가 모자를 썼어! 멋져.": "audio/tts/f84449352c29660c.mp3",
-    "초코를 불러 보자! 먼저 씨. 다 쓰면 엔터.": "audio/tts/ec384a2cdcb925a3.mp3",
+    "초코가 모자를 썼어! 멋져. 햇은 에이치야!": "audio/tts/f41258bb9a671354.mp3",
+    "초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨, 에이치, 오, 씨, 오. 먼저 씨. 다 쓰면 엔터.": "audio/tts/9850d9b1f71e795b.mp3",
     "씨! 다음은 에이치.": "audio/tts/1190518ee52fd957.mp3",
     "에이치! 다음은 오.": "audio/tts/6d59595583079d27.mp3",
     "오! 다음은 씨.": "audio/tts/d7efca35817c4c29.mp3",
     "씨! 다음은 오.": "audio/tts/9c1243b33be9ce0a.mp3",
     "오! 됐어, 엔터!": "audio/tts/282a7319ecc8d18f.mp3",
-    "초코가 재윤이 부르는 소리를 듣고 뛰어왔어!": "audio/tts/245b66dc56f8e531.mp3",
+    "초코가 재윤이 부르는 소리를 듣고 뛰어왔어! 초코는 씨야!": "audio/tts/05e1002267c9e8c8.mp3",
     "이름을 불러 줘서 초코가 폴짝. 고마워! 다음도 해 볼까?": "audio/tts/ae4618d3612fe386.mp3",
-    "초코랑 놀자! 디는 독, 강아지야. 디 눌러줄래?": "audio/tts/01cd89e7b68fd4bd.mp3",
-    "디는 독, 강아지야. 디 눌러줄래?": "audio/tts/83ac07696e626099.mp3",
+    "초코랑 놀자! 강아지 초코가 뛰고 싶대! 강아지는 영어로 독! 독은 디로 시작해. 그래서 디야! 디 눌러줄래?": "audio/tts/6c96ff760cb533cf.mp3",
+    "강아지 초코가 뛰고 싶대! 강아지는 영어로 독! 독은 디로 시작해. 그래서 디야! 디 눌러줄래?": "audio/tts/1a1a640644bf4253.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 D를 기다려.": "audio/tts/89d9dc3caced6554.mp3",
-    "디": "audio/tts/b7029d28f76ff106.mp3",
-    "멍멍! 초코가 폴짝 뛰었어.": "audio/tts/98e839ecb59223e3.mp3",
-    "아이스크림은 아이야. 아이 눌러줄래?": "audio/tts/5e66fee14a8d8f47.mp3",
+    "멍멍! 초코가 폴짝 뛰었어. 독은 디야!": "audio/tts/5a3b60cf7bf6f740.mp3",
+    "아이스크림 줄까? 아이스크림은 영어로 아이스크림! 아이스크림은 아이로 시작해. 그래서 아이야! 아이 눌러줄래?": "audio/tts/0f089fae71aac142.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 I를 기다려.": "audio/tts/1a8c918bd8442ae5.mp3",
-    "아이": "audio/tts/c3d655375e7f3d04.mp3",
-    "냠냠! 시원해. 멍멍!": "audio/tts/153809dc8d24db0d.mp3",
-    "연은 카이트, 케이야. 케이 눌러줄래?": "audio/tts/f8f596e2de94dc87.mp3",
+    "냠냠! 시원해. 멍멍! 아이스크림은 아이야!": "audio/tts/d67494ff89c5d699.mp3",
+    "연을 날려 보자! 연은 영어로 카이트! 카이트는 케이로 시작해. 그래서 케이야! 케이 눌러줄래?": "audio/tts/a214347afe1e3e92.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 연은 K를 기다려.": "audio/tts/12863d3d57cfc5d6.mp3",
-    "케이": "audio/tts/1e1de6b4264f4ce1.mp3",
-    "연이 하늘로 올라갔어!": "audio/tts/5cb565219374e60a.mp3",
-    "코는 노즈, 엔이야. 엔 눌러줄래?": "audio/tts/9c39cd1b9906e1ca.mp3",
+    "연이 하늘로 올라갔어! 카이트는 케이야!": "audio/tts/fa52a87ca0e38750.mp3",
+    "초코 코가 간지러워! 코는 영어로 노즈! 노즈는 엔으로 시작해. 그래서 엔이야! 엔 눌러줄래?": "audio/tts/7eaf46ab1bcf2abe.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 N을 기다려.": "audio/tts/6a7fe8ca050d8c72.mp3",
-    "엔": "audio/tts/de3780853b587ea5.mp3",
-    "에취! 초코 코가 간지러워.": "audio/tts/9347451eeb973f90.mp3",
+    "에취! 초코 코가 간지러워. 노즈는 엔이야!": "audio/tts/7e844e84ff6eab62.mp3",
     "같이 놀아 줘서 초코가 고마워해. 멍멍! 다음도 해 볼까?": "audio/tts/221f4cb25c139119.mp3",
-    "밤하늘 놀이! 별은 스타, 에스야. 에스 눌러줄래?": "audio/tts/9ca6419235967a57.mp3",
-    "별은 스타, 에스야. 에스 눌러줄래?": "audio/tts/fb13dec1750bee18.mp3",
+    "밤하늘 놀이! 별을 켜 볼까? 별은 영어로 스타! 스타는 에스로 시작해. 그래서 에스야! 에스 눌러줄래?": "audio/tts/ee241c5a9e520764.mp3",
+    "별을 켜 볼까? 별은 영어로 스타! 스타는 에스로 시작해. 그래서 에스야! 에스 눌러줄래?": "audio/tts/525e54103f145270.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 별은 S를 기다려.": "audio/tts/1ff756d1798c3ac9.mp3",
-    "에스": "audio/tts/cfd60e2798e72fe8.mp3",
-    "별이 반짝 켜졌어!": "audio/tts/f2e5b67b55d35b3a.mp3",
-    "달은 문, 엠이야. 엠 눌러줄래?": "audio/tts/46a1ff04ea9bad75.mp3",
+    "별이 반짝 켜졌어! 스타는 에스야!": "audio/tts/20808fc28a03f77e.mp3",
+    "달을 띄워 볼까? 달은 영어로 문! 문은 엠으로 시작해. 그래서 엠이야! 엠 눌러줄래?": "audio/tts/175f59f2ff6b08cc.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 달은 M을 기다려.": "audio/tts/97a5764940be53e0.mp3",
-    "엠": "audio/tts/87ab4d1c28a51c3e.mp3",
-    "달이 동그랗게 떴어.": "audio/tts/6f326cdbb860ba8e.mp3",
-    "비가 와. 우산은 유야. 유 눌러줄래?": "audio/tts/731761555006656e.mp3",
+    "달이 동그랗게 떴어. 문은 엠이야!": "audio/tts/ba6bc729085e634c.mp3",
+    "비가 와! 우산은 영어로 엄브렐라! 엄브렐라는 유로 시작해. 그래서 유야! 유 눌러줄래?": "audio/tts/e083514162a508a0.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 우산은 U를 기다려.": "audio/tts/a1ca3a0b70a55542.mp3",
-    "유": "audio/tts/0a8fef4b99a88b47.mp3",
-    "우산 아래 초코가 폭신해.": "audio/tts/a164360ba7d27c0d.mp3",
-    "왕관은 퀸, 큐야. 큐 눌러줄래?": "audio/tts/04c420d297fb565a.mp3",
+    "우산 아래 초코가 폭신해. 엄브렐라는 유야!": "audio/tts/5f2966c198fc2d7b.mp3",
+    "여왕 초코가 왕관을 쓰고 싶대! 여왕은 영어로 퀸! 퀸은 큐로 시작해. 그래서 큐야! 큐 눌러줄래?": "audio/tts/b7bafcb305c1175c.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 왕관은 Q를 기다려.": "audio/tts/0b9353aa52528c63.mp3",
-    "큐": "audio/tts/8111e1df095cf31b.mp3",
-    "초코가 왕이 됐어!": "audio/tts/9894cec433a7eed2.mp3",
+    "초코가 왕이 됐어! 퀸은 큐야!": "audio/tts/d11b69ac2b3651ce.mp3",
     "밤하늘을 보여 줘서 초코가 고마워해. 다음도 해 볼까?": "audio/tts/b9bfabedf91211fd.mp3",
-    "자동차 놀이! 트럭은 티야. 티 눌러줄래?": "audio/tts/7e4d0b9fb23b80a1.mp3",
-    "트럭은 티야. 티 눌러줄래?": "audio/tts/7fc287e7d682d0ad.mp3",
+    "자동차 놀이! 트럭이 출발해! 트럭은 영어로 트럭! 트럭은 티로 시작해. 그래서 티야! 티 눌러줄래?": "audio/tts/db4d314873e0b6c4.mp3",
+    "트럭이 출발해! 트럭은 영어로 트럭! 트럭은 티로 시작해. 그래서 티야! 티 눌러줄래?": "audio/tts/4db17eaf295d3618.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 트럭은 T를 기다려.": "audio/tts/011df7c9d998eab4.mp3",
-    "티": "audio/tts/ce4ea7d5e6eff9bd.mp3",
-    "부릉! 트럭이 가.": "audio/tts/49f279b131c1449f.mp3",
-    "바퀴는 휠, 더블유야. 더블유 눌러줄래?": "audio/tts/b5f1e99293b6684e.mp3",
+    "부릉! 트럭이 가. 트럭은 티야!": "audio/tts/f8e0ee97bbbbf922.mp3",
+    "바퀴가 굴러가! 바퀴는 영어로 휠! 휠은 더블유로 시작해. 그래서 더블유야! 더블유 눌러줄래?": "audio/tts/dfb50b226c229706.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 바퀴는 W를 기다려.": "audio/tts/98fa1a61a51e9138.mp3",
-    "더블유": "audio/tts/992ecade143148d0.mp3",
-    "바퀴가 데굴데굴 굴러.": "audio/tts/7d47d84b050e8ea5.mp3",
-    "밴은 브이야. 브이 눌러줄래?": "audio/tts/75061f1b849340b4.mp3",
+    "바퀴가 데굴데굴 굴러. 휠은 더블유야!": "audio/tts/cae9ca1413ed4fed.mp3",
+    "밴이 지나가! 밴은 영어로 밴! 밴은 브이로 시작해. 그래서 브이야! 브이 눌러줄래?": "audio/tts/fbf6b4a337562e75.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 밴은 V를 기다려.": "audio/tts/6035f8a8254b3499.mp3",
-    "브이": "audio/tts/2a1f4fcc183d7150.mp3",
-    "붕붕! 밴이 지나갔어.": "audio/tts/2c2dc852a717fb5b.mp3",
+    "붕붕! 밴이 지나갔어. 밴은 브이야!": "audio/tts/1db421f33dfb5dcf.mp3",
     "차를 보여 줘서 초코가 신났어. 고마워! 다음도 해 볼까?": "audio/tts/4e30aa41e92bc338.mp3",
-    "동물 친구 놀이! 돼지는 피그, 피야. 피 눌러줄래?": "audio/tts/2231311c9bc5d0f9.mp3",
-    "돼지는 피그, 피야. 피 눌러줄래?": "audio/tts/338df1e027cdd323.mp3",
+    "동물 친구 놀이! 돼지 친구가 오고 싶대! 돼지는 영어로 피그! 피그는 피로 시작해. 그래서 피야! 피 눌러줄래?": "audio/tts/2ee23fba9c888823.mp3",
+    "돼지 친구가 오고 싶대! 돼지는 영어로 피그! 피그는 피로 시작해. 그래서 피야! 피 눌러줄래?": "audio/tts/5f654df1eb3757cb.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 돼지는 P를 기다려.": "audio/tts/28eb3d548a8d4c16.mp3",
-    "피": "audio/tts/9c6661386be05570.mp3",
-    "꿀꿀! 돼지 친구가 왔어.": "audio/tts/b5a6b8c47385c352.mp3",
-    "사자는 라이언, 엘이야. 엘 눌러줄래?": "audio/tts/6169805e71d8d6cb.mp3",
+    "꿀꿀! 돼지 친구가 왔어. 피그는 피야!": "audio/tts/cc5946b1a0b3e0d6.mp3",
+    "사자가 나타났어! 사자는 영어로 라이언! 라이언은 엘로 시작해. 그래서 엘이야! 엘 눌러줄래?": "audio/tts/b96fb55875296205.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 사자는 L을 기다려.": "audio/tts/e5a9f6dcb0a5d5b0.mp3",
-    "엘": "audio/tts/0262f01b34a07436.mp3",
-    "어흥! 사자가 나타났어.": "audio/tts/6351c1818da049dc.mp3",
-    "얼룩말은 지브라, 제트야. 제트 눌러줄래?": "audio/tts/4387d6bc33127efc.mp3",
+    "어흥! 사자가 나타났어. 라이언은 엘이야!": "audio/tts/125d751ac9d0c4bf.mp3",
+    "얼룩말이 달려와! 얼룩말은 영어로 지브라! 지브라는 제트로 시작해. 그래서 제트야! 제트 눌러줄래?": "audio/tts/17bee44381f9381e.mp3",
     "Z만 누르고 엔터 해 줘.": "audio/tts/776fc0c69186949b.mp3",
-    "얼룩말이 달려왔어!": "audio/tts/1c2c2dd99d7ecaad.mp3",
-    "실로폰은 엑스야. 엑스 눌러줄래?": "audio/tts/2deb2e76a8050bb7.mp3",
-    "엑스": "audio/tts/45e250c9b8fe514f.mp3",
-    "띵동! 초코가 꼬리를 흔들어.": "audio/tts/443c192aeb07255a.mp3",
+    "얼룩말이 달려왔어! 지브라는 제트야!": "audio/tts/aae57158875e2bfd.mp3",
+    "실로폰을 쳐 볼까? 실로폰은 영어로 자일로폰! 자일로폰은 엑스로 시작해. 그래서 엑스야! 엑스 눌러줄래?": "audio/tts/43f76c8ff4fcea2b.mp3",
+    "띵동! 초코가 꼬리를 흔들어. 자일로폰은 엑스야!": "audio/tts/bb1e1e113ac27db4.mp3",
     "친구들을 불러 줘서 초코가 고마워해. 멍멍! 다음도 해 볼까?": "audio/tts/cd7b4e1248ddbac6.mp3",
     "글자 놀이는 여기까지! 이제 짧은 명령을 내려 보자. 글자를 차례로 누르고 엔터. 방이 너무 어두워요. 불을 켜 볼까요? 차례대로, 오, 엔.": "audio/tts/9f4bb44131ae52af.mp3",
     "방이 너무 어두워요. 불을 켜 볼까요? 차례대로, 오, 엔.": "audio/tts/eafe9b4956f76016.mp3",
-    "제트": "audio/tts/ca146f54640364b6.mp3",
     "괜찮아, 다시 해보자. 오, 엔.": "audio/tts/c438a63627c82d7a.mp3",
     "우와, 성공이야! 방이 환해졌어. 아주 잘했어!": "audio/tts/b2e68911fbada39b.mp3",
     "로봇이 자고 있어요. 안녕 하고 인사해 볼까요? 차례대로, 에이치, 아이.": "audio/tts/94b6062a54229e74.mp3",
@@ -250,15 +225,40 @@
     "커다란 풍선을 크게 터뜨려 볼까요? 팝 다음에 띄어쓰고, 대시 두 개, 그리고 빅. 차례대로, 피, 오, 피, 띄어쓰기, 대시, 대시, 비, 아이, 지.": "audio/tts/ba6f5ab8cbfd50e7.mp3",
     "괜찮아, 다시 해보자. 피, 오, 피, 띄어쓰기, 대시, 대시, 비, 아이, 지.": "audio/tts/c849771d7708884c.mp3",
     "모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!": "audio/tts/2d82d1f8fe93417a.mp3",
+    "제트": "audio/tts/ca146f54640364b6.mp3",
     "대시 두 개 -- 성공! 정말 잘했어요.": "audio/tts/840f0c31f24a4464.mp3",
     "버스 재미있었지? 초코가 꼬리를 흔들며 고마워해. 멍멍! 모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!": "audio/tts/ad565fd957bdc559.mp3",
+    "알": "audio/tts/63251c05b0dbf37f.mp3",
     "신호를 잘 봤어. 초코가 안전해서 고마워해! 모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!": "audio/tts/81d6c82b460d1dbf.mp3",
+    "에이": "audio/tts/e756c665f973bc6d.mp3",
     "배부른 초코가 핥짝. 재윤아 고마워! 모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!": "audio/tts/90db9edf2934e715.mp3",
+    "에이치": "audio/tts/cfa54b80dacc482f.mp3",
     "이름을 불러 줘서 초코가 폴짝. 고마워! 모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!": "audio/tts/df4c07795d3e8b3e.mp3",
+    "디": "audio/tts/b7029d28f76ff106.mp3",
     "같이 놀아 줘서 초코가 고마워해. 멍멍! 모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!": "audio/tts/e56b31d22dfc9b3f.mp3",
+    "에스": "audio/tts/cfd60e2798e72fe8.mp3",
     "밤하늘을 보여 줘서 초코가 고마워해. 모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!": "audio/tts/a8400b96959aee35.mp3",
+    "티": "audio/tts/ce4ea7d5e6eff9bd.mp3",
     "차를 보여 줘서 초코가 신났어. 고마워! 모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!": "audio/tts/e88612d984fbecbf.mp3",
+    "피": "audio/tts/9c6661386be05570.mp3",
     "친구들을 불러 줘서 초코가 고마워해. 멍멍! 모든 챕터를 다 해냈어요. 오늘의 꼬마 해커로 임명!": "audio/tts/5d0aeac9d1b14699.mp3",
+    "비": "audio/tts/5e0d62698b44a434.mp3",
+    "씨": "audio/tts/c90eea3c6347f1e0.mp3",
+    "이": "audio/tts/8bafb6b7d17ead49.mp3",
+    "에프": "audio/tts/4f9d8100123ab005.mp3",
+    "지": "audio/tts/32e608b594bece7a.mp3",
+    "아이": "audio/tts/c3d655375e7f3d04.mp3",
+    "케이": "audio/tts/1e1de6b4264f4ce1.mp3",
+    "엘": "audio/tts/0262f01b34a07436.mp3",
+    "엠": "audio/tts/87ab4d1c28a51c3e.mp3",
+    "엔": "audio/tts/de3780853b587ea5.mp3",
+    "오": "audio/tts/c0ccf82e09f1e873.mp3",
+    "큐": "audio/tts/8111e1df095cf31b.mp3",
+    "유": "audio/tts/0a8fef4b99a88b47.mp3",
+    "브이": "audio/tts/2a1f4fcc183d7150.mp3",
+    "더블유": "audio/tts/992ecade143148d0.mp3",
+    "엑스": "audio/tts/45e250c9b8fe514f.mp3",
+    "와이": "audio/tts/66e4d5d7b9164c52.mp3",
     "대시": "audio/tts/81d2314c2589997d.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 제이.": "audio/tts/cd322acfd9e188fe.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 다음은 제이.": "audio/tts/7f0389e57d947d19.mp3",
@@ -266,7 +266,7 @@
     "어, 그건 D이네! D는 Dog~ 강아지. 다음은 제이.": "audio/tts/8ec7417e7df2609f.mp3",
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 제이.": "audio/tts/7bbfe63c18f4915c.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 제이.": "audio/tts/4edfa3ff3e180fb1.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 제이.": "audio/tts/8967088857c13751.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 제이.": "audio/tts/c733295466f6e2ac.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 제이.": "audio/tts/aa70724a71fc24d7.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 다음은 제이.": "audio/tts/656a5b27b36464a5.mp3",
     "어, 그건 J이네! J는 Jae~ 재윤. 문은 J를 기다려.": "audio/tts/803465db9581e6a0.mp3",
@@ -304,7 +304,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 제이.": "audio/tts/d4db59bccc754ee3.mp3",
     "어, 글자가 아니야. 다음은 제이.": "audio/tts/b819942a2d72bec2.mp3",
     "어, 글자가 아니야. 문은 J를 기다려.": "audio/tts/728a82e65cee7b62.mp3",
-    "2층버스 놀이! 글자 누르고 엔터. 초코도 타고 싶대! 씨 눌러줄래?": "audio/tts/3b5f28ad8565d992.mp3",
+    "2층버스 놀이! 글자 누르고 엔터. 초코도 타고 싶대! 초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨 눌러줄래?": "audio/tts/f86214d3283bacee.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 초코는 C를 기다려.": "audio/tts/fe75b3ed50feef5c.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 씨.": "audio/tts/6510194bb93b864b.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 초코는 C를 기다려.": "audio/tts/de14e6d960a4609d.mp3",
@@ -317,8 +317,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 씨.": "audio/tts/1bdfd0b767d41eb7.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 초코는 C를 기다려.": "audio/tts/aed5f953d2888d5c.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 씨.": "audio/tts/9ab6a4f1cd688d9e.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 초코는 C를 기다려.": "audio/tts/279bf19a15070310.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 씨.": "audio/tts/0c5c97524b6bf4da.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 초코는 C를 기다려.": "audio/tts/b58454df5d435053.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 씨.": "audio/tts/074e66c0640d89e8.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 초코는 C를 기다려.": "audio/tts/5772e6fe33b30ab3.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 씨.": "audio/tts/f5f42ce8769480d9.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 초코는 C를 기다려.": "audio/tts/ef6a6426bc2b9ef4.mp3",
@@ -358,7 +358,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 씨.": "audio/tts/aa79a418a936a4ac.mp3",
     "어, 글자가 아니야. 다음은 씨.": "audio/tts/af6555c81b7d0560.mp3",
     "어, 글자가 아니야. 초코는 C를 기다려.": "audio/tts/f3439846d115a563.mp3",
-    "2층버스 놀이! 글자 누르고 엔터. 비는 버스야! 비 누르면 2층버스가 가.": "audio/tts/3d0470d8aa4f4b23.mp3",
+    "2층버스 놀이! 글자 누르고 엔터. 이제 버스가 가! 버스는 영어로 버스! 버스는 비로 시작해. 그래서 비야! 비 눌러줄래?": "audio/tts/e3d3b547dd90091f.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 버스는 B를 기다려.": "audio/tts/d8388ec5b950ce51.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 비.": "audio/tts/37ffac9f96c1886e.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 버스는 B를 기다려.": "audio/tts/cbad9e21c6b09b28.mp3",
@@ -371,8 +371,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 비.": "audio/tts/f2e8571362ff90c2.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 버스는 B를 기다려.": "audio/tts/25a714d69eea08ea.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 비.": "audio/tts/81caec83950acc85.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 버스는 B를 기다려.": "audio/tts/7a34f226e8e14bbb.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 비.": "audio/tts/d0a82124d9ea5a27.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 버스는 B를 기다려.": "audio/tts/62acad0c8a5708a9.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 비.": "audio/tts/3256624b68bf279c.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 버스는 B를 기다려.": "audio/tts/3c057548691271df.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 비.": "audio/tts/db7468163270a1cf.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 버스는 B를 기다려.": "audio/tts/6f0f019cd439c9b3.mp3",
@@ -424,8 +424,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 알.": "audio/tts/1e4c63fdf4cd7d91.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 신호등은 R을 기다려.": "audio/tts/20aa242c01aad915.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 알.": "audio/tts/b5978cf4d499a80f.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 신호등은 R을 기다려.": "audio/tts/2503c515e434095a.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 알.": "audio/tts/318272da90e1a7d3.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 신호등은 R을 기다려.": "audio/tts/93627fac4b5c3f45.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 알.": "audio/tts/10b9750e9f1b5e25.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 신호등은 R을 기다려.": "audio/tts/e764533dde38b730.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 알.": "audio/tts/7391d9bdb7f618ef.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 신호등은 R을 기다려.": "audio/tts/e1e9fd9ca22f843d.mp3",
@@ -465,7 +465,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 알.": "audio/tts/142dcc150f1b975d.mp3",
     "어, 글자가 아니야. 다음은 알.": "audio/tts/b9aad37673a71de5.mp3",
     "어, 글자가 아니야. 신호등은 R을 기다려.": "audio/tts/7c89050fe877dce6.mp3",
-    "신호등 놀이! 노란 불이야. 와이는 천천히. 와이 눌러줄래?": "audio/tts/d5c5b39bbdda8441.mp3",
+    "신호등 놀이! 노란 불이야! 노랑은 영어로 옐로! 옐로는 와이로 시작해. 그래서 와이야! 와이 눌러줄래?": "audio/tts/23ff50af30ab1670.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 신호등은 Y를 기다려.": "audio/tts/5a520c45246867d5.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 와이.": "audio/tts/dd3c0f7b5d275611.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 신호등은 Y를 기다려.": "audio/tts/0ab8eda9f9a38a18.mp3",
@@ -478,8 +478,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 와이.": "audio/tts/567fc69df25650ff.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 신호등은 Y를 기다려.": "audio/tts/12c8edc254fdcf29.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 와이.": "audio/tts/6cdc381cbeede616.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 신호등은 Y를 기다려.": "audio/tts/81284b4dc19ad677.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 와이.": "audio/tts/84ceff0e1baeb078.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 신호등은 Y를 기다려.": "audio/tts/ccf0be76d4cc69d7.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 와이.": "audio/tts/528ceddb1bee429a.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 신호등은 Y를 기다려.": "audio/tts/aa319dbb69533e5c.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 와이.": "audio/tts/4daa1c6a75e97a47.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 신호등은 Y를 기다려.": "audio/tts/e544b8a57605d305.mp3",
@@ -519,7 +519,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 와이.": "audio/tts/d426484170aa3e1a.mp3",
     "어, 글자가 아니야. 다음은 와이.": "audio/tts/6494e1e66fab9623.mp3",
     "어, 글자가 아니야. 신호등은 Y를 기다려.": "audio/tts/f4ad50df612565f3.mp3",
-    "신호등 놀이! 초록 불이야! 지는 가. 지 눌러줄래?": "audio/tts/095d8336af339e16.mp3",
+    "신호등 놀이! 초록 불이야! 초록은 영어로 그린! 그린은 지로 시작해. 그래서 지야! 지 눌러줄래?": "audio/tts/ca4ab59c41d3bfc9.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 신호등은 G를 기다려.": "audio/tts/a01a83119e00dee3.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 지.": "audio/tts/c88320bf217ceb83.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 신호등은 G를 기다려.": "audio/tts/86485075efb44690.mp3",
@@ -532,8 +532,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 지.": "audio/tts/38b2b0e6cdc993cb.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 신호등은 G를 기다려.": "audio/tts/c13865aa3bcb42f7.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 지.": "audio/tts/2a44823f1255177b.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 신호등은 G를 기다려.": "audio/tts/b92033565d2e1b48.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 지.": "audio/tts/6dec9b2127bcebc4.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 신호등은 G를 기다려.": "audio/tts/295416aa7b4cc786.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 지.": "audio/tts/69342892e6fd1f86.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 신호등은 G를 기다려.": "audio/tts/cae2d0522646b6a5.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 지.": "audio/tts/4740e0712890fac2.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 신호등은 G를 기다려.": "audio/tts/942f617916cc858e.mp3",
@@ -585,8 +585,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 에이.": "audio/tts/eb75fb6679468c1d.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 초코는 A를 기다려.": "audio/tts/96e3a7f449af2d93.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 에이.": "audio/tts/d0a99309782f01fa.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 초코는 A를 기다려.": "audio/tts/3b07c67b30479ce8.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 에이.": "audio/tts/23e5867238708b77.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 초코는 A를 기다려.": "audio/tts/34083e70e72c14d1.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 에이.": "audio/tts/4bbf92623bddc46a.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 초코는 A를 기다려.": "audio/tts/ba424913aa834bff.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 에이.": "audio/tts/fab1ef0eaa8701d6.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 초코는 A를 기다려.": "audio/tts/9aa705cf2435be22.mp3",
@@ -626,7 +626,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 에이.": "audio/tts/788aa474a17439e3.mp3",
     "어, 글자가 아니야. 다음은 에이.": "audio/tts/30f1e42e36c81945.mp3",
     "어, 글자가 아니야. 초코는 A를 기다려.": "audio/tts/d9a4fa1b75006638.mp3",
-    "초코에게 밥 주기! 달걀도 줄래? 이는 에그야. 이 눌러줄래?": "audio/tts/b5a0e444c1f0580d.mp3",
+    "초코에게 밥 주기! 달걀도 줄래? 달걀은 영어로 에그! 에그는 이로 시작해. 그래서 이야! 이 눌러줄래?": "audio/tts/14e3b88d98305bfd.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 초코는 E를 기다려.": "audio/tts/e1616ada1d3929c3.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 이.": "audio/tts/5112514ce7f5c61f.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 초코는 E를 기다려.": "audio/tts/c5a6522e3879e014.mp3",
@@ -639,8 +639,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 이.": "audio/tts/d580580fc6372101.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 초코는 E를 기다려.": "audio/tts/7f1aa1794cd3fc28.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 이.": "audio/tts/815eab1b7e7bbd98.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 초코는 E를 기다려.": "audio/tts/41023a60641248ef.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 이.": "audio/tts/4f849b44b0b2f990.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 초코는 E를 기다려.": "audio/tts/ff523268ae436418.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 이.": "audio/tts/f0e4570a42cf9682.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 초코는 E를 기다려.": "audio/tts/205b489780338fd2.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 이.": "audio/tts/c23c7aac2f1171ea.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 초코는 E를 기다려.": "audio/tts/3c38ae5d46957cba.mp3",
@@ -680,7 +680,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 이.": "audio/tts/5d14481b5e280270.mp3",
     "어, 글자가 아니야. 다음은 이.": "audio/tts/1b4adb36a36f9105.mp3",
     "어, 글자가 아니야. 초코는 E를 기다려.": "audio/tts/2f4f8c08a9e3fb1c.mp3",
-    "초코에게 밥 주기! 오렌지는 오야. 오 눌러줄래?": "audio/tts/e1a79dae30836f76.mp3",
+    "초코에게 밥 주기! 오렌지도 있어! 오렌지는 영어로 오렌지! 오렌지는 오로 시작해. 그래서 오야! 오 눌러줄래?": "audio/tts/924dda8e35553100.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 초코는 O를 기다려.": "audio/tts/a1d778c478bc8f85.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 오.": "audio/tts/4d7920c1ed3da72b.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 초코는 O를 기다려.": "audio/tts/80ae7ba3cf2e1d40.mp3",
@@ -693,8 +693,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 오.": "audio/tts/c2671510b23b156c.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 초코는 O를 기다려.": "audio/tts/b574737ea8535dcd.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 오.": "audio/tts/c4fbc7919b086c5a.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 초코는 O를 기다려.": "audio/tts/7f4ca48b2ce1b00a.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 오.": "audio/tts/2e49563913788ff1.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 초코는 O를 기다려.": "audio/tts/c3af9f04dd62affb.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 오.": "audio/tts/f3cc0eff05f98869.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 초코는 O를 기다려.": "audio/tts/e23b6654b1de436e.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 오.": "audio/tts/0fa43bfce52f5035.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 초코는 O를 기다려.": "audio/tts/5293ffd5854a7495.mp3",
@@ -734,7 +734,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 오.": "audio/tts/1dd95a5985fab4df.mp3",
     "어, 글자가 아니야. 다음은 오.": "audio/tts/266e07c0dd49ff98.mp3",
     "어, 글자가 아니야. 초코는 O를 기다려.": "audio/tts/0d4565fcdaa87993.mp3",
-    "초코에게 밥 주기! 물고기는 피쉬, 에프야. 에프 눌러줄래?": "audio/tts/c63ffbedfd327404.mp3",
+    "초코에게 밥 주기! 물고기도 줄래? 물고기는 영어로 피쉬! 피쉬는 에프로 시작해. 그래서 에프야! 에프 눌러줄래?": "audio/tts/3466cf811549c877.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 초코는 F를 기다려.": "audio/tts/bc6c808a9d6d9437.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 에프.": "audio/tts/63c9fb757c2ec5b8.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 초코는 F를 기다려.": "audio/tts/3a53c6ce7a216a7b.mp3",
@@ -747,8 +747,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 에프.": "audio/tts/d89491c50fece1af.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 초코는 F를 기다려.": "audio/tts/95798ba3e61bb811.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 에프.": "audio/tts/30b6c440ca70b445.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 초코는 F를 기다려.": "audio/tts/dd61626079e2fd4d.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 에프.": "audio/tts/c846e71e704051f1.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 초코는 F를 기다려.": "audio/tts/e9327f74e7cf3568.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 에프.": "audio/tts/43d7a0556d7ecf33.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 초코는 F를 기다려.": "audio/tts/484509523282c8e1.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 에프.": "audio/tts/0973450f4e97c274.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 초코는 F를 기다려.": "audio/tts/666c5d2649ad78d4.mp3",
@@ -794,7 +794,7 @@
     "어, 그건 D이네! D는 Dog~ 강아지. 이름은 J를 기다려.": "audio/tts/7bb75bb4062f9e7e.mp3",
     "어, 그건 E이네! E는 Egg~ 달걀. 이름은 J를 기다려.": "audio/tts/9c50cd4be8b80d0b.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 이름은 J를 기다려.": "audio/tts/153e27c73f1f94ff.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 이름은 J를 기다려.": "audio/tts/a9dbfcd2d03853db.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 이름은 J를 기다려.": "audio/tts/cffb4f79ca166b95.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 이름은 J를 기다려.": "audio/tts/e29f32d751e3f1df.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 이름은 J를 기다려.": "audio/tts/30e282d84ff67898.mp3",
     "어, 그건 J이네! J는 Jae~ 재윤. 이름은 J를 기다려.": "audio/tts/7cf7d39b042756d0.mp3",
@@ -820,7 +820,7 @@
     "어, 그건 D이네! D는 Dog~ 강아지. 이름은 A를 기다려.": "audio/tts/f0c9d7e0d0006bf5.mp3",
     "어, 그건 E이네! E는 Egg~ 달걀. 이름은 A를 기다려.": "audio/tts/dc53988c801ee654.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 이름은 A를 기다려.": "audio/tts/66a6f71d0c4042f5.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 이름은 A를 기다려.": "audio/tts/86787439b5cf5dc2.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 이름은 A를 기다려.": "audio/tts/22409174faddb886.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 이름은 A를 기다려.": "audio/tts/cdf7542de4698d04.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 이름은 A를 기다려.": "audio/tts/b08820a106aeabb5.mp3",
     "어, 그건 J이네! J는 Jae~ 재윤. 이름은 A를 기다려.": "audio/tts/91dc9f44ab6ac592.mp3",
@@ -847,7 +847,7 @@
     "어, 그건 D이네! D는 Dog~ 강아지. 이름은 E를 기다려.": "audio/tts/3fb8c5cb16e12e09.mp3",
     "어, 그건 E이네! E는 Egg~ 달걀. 이름은 E를 기다려.": "audio/tts/572348ba7f647f77.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 이름은 E를 기다려.": "audio/tts/686065f09a197774.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 이름은 E를 기다려.": "audio/tts/fd3d3472d443544a.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 이름은 E를 기다려.": "audio/tts/4865c25b839e4d7e.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 이름은 E를 기다려.": "audio/tts/5f97536692f03e7d.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 이름은 E를 기다려.": "audio/tts/030c41ffcc3ee35d.mp3",
     "어, 그건 J이네! J는 Jae~ 재윤. 이름은 E를 기다려.": "audio/tts/016ffda9191a08ff.mp3",
@@ -868,7 +868,7 @@
     "어, 그건 Y이네! Y는 Yellow~ 노랑. 이름은 E를 기다려.": "audio/tts/84ced7776e5d16cf.mp3",
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 이름은 E를 기다려.": "audio/tts/9fc5e1a4c3bcbee9.mp3",
     "어, 글자가 아니야. 이름은 E를 기다려.": "audio/tts/4bf933d9f3143127.mp3",
-    "이름 부르기! 모자는 햇이야. 에이치 누르면 초코가 모자를 써.": "audio/tts/0925283fa4735c9a.mp3",
+    "이름 부르기! 초코에게 모자를 씌우자! 모자는 영어로 햇! 햇은 에이치로 시작해. 그래서 에이치야! 에이치 눌러줄래?": "audio/tts/abdd7acd3b648c47.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 모자는 H를 기다려.": "audio/tts/1af087784be715fd.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 에이치.": "audio/tts/20bdc24406072765.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 모자는 H를 기다려.": "audio/tts/eea9d394676eaeb6.mp3",
@@ -881,8 +881,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 에이치.": "audio/tts/bcc6701c07ace8ef.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 모자는 H를 기다려.": "audio/tts/75648521a5825873.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 에이치.": "audio/tts/348575149a6889d8.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 모자는 H를 기다려.": "audio/tts/f36cd611558f606c.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 에이치.": "audio/tts/5cf42172445d69e0.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 모자는 H를 기다려.": "audio/tts/15a5e5e3a00ed586.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 에이치.": "audio/tts/94a731276d37a4cc.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 모자는 H를 기다려.": "audio/tts/7470c822fff6b8f3.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 에이치.": "audio/tts/8ff69dbcf1c6d1e9.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 모자는 H를 기다려.": "audio/tts/1481227bd07ff278.mp3",
@@ -922,14 +922,14 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 에이치.": "audio/tts/6863c52bff7b6644.mp3",
     "어, 글자가 아니야. 다음은 에이치.": "audio/tts/2c3dadb1a3f3c8a1.mp3",
     "어, 글자가 아니야. 모자는 H를 기다려.": "audio/tts/07ef97752651d0f3.mp3",
-    "이름 부르기! 초코를 불러 보자! 먼저 씨. 다 쓰면 엔터.": "audio/tts/d2dc5bd3a73f6a96.mp3",
+    "이름 부르기! 초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨, 에이치, 오, 씨, 오. 먼저 씨. 다 쓰면 엔터.": "audio/tts/4d48bfe8d049bd96.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 초코는 H를 기다려.": "audio/tts/113392f5beca418b.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 초코는 H를 기다려.": "audio/tts/13c74e255e9e7b36.mp3",
     "어, 그건 C이네! C는 Choco~ 초코. 초코는 H를 기다려.": "audio/tts/9a23fdedcce0a6e2.mp3",
     "어, 그건 D이네! D는 Dog~ 강아지. 초코는 H를 기다려.": "audio/tts/09bc663468a41c68.mp3",
     "어, 그건 E이네! E는 Egg~ 달걀. 초코는 H를 기다려.": "audio/tts/88befb33c6a09f10.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 초코는 H를 기다려.": "audio/tts/a09caa05d5cefc10.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 초코는 H를 기다려.": "audio/tts/2db5c4c2cbc915e7.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 초코는 H를 기다려.": "audio/tts/1ab178b02b1227db.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 초코는 H를 기다려.": "audio/tts/15e32afd282b4b9c.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 초코는 H를 기다려.": "audio/tts/26529a3d9c20641b.mp3",
     "어, 그건 J이네! J는 Jae~ 재윤. 초코는 H를 기다려.": "audio/tts/a65be1f2592edddb.mp3",
@@ -962,8 +962,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 디.": "audio/tts/0af89f1694cd0e53.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 초코는 D를 기다려.": "audio/tts/1e6b173ab561860d.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 디.": "audio/tts/f6c4b35e16267b27.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 초코는 D를 기다려.": "audio/tts/04ac5824b846b600.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 디.": "audio/tts/4fc5f1748c730a41.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 초코는 D를 기다려.": "audio/tts/83cb57a3d539f9f8.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 디.": "audio/tts/5379300fb1622e52.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 초코는 D를 기다려.": "audio/tts/93667e5beb585abd.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 디.": "audio/tts/584132f0520a85b4.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 초코는 D를 기다려.": "audio/tts/220855626f43adf2.mp3",
@@ -1003,7 +1003,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 디.": "audio/tts/ec2bf4361ff720ba.mp3",
     "어, 글자가 아니야. 다음은 디.": "audio/tts/e4edb97f06ffd7e3.mp3",
     "어, 글자가 아니야. 초코는 D를 기다려.": "audio/tts/9daaf27dfefbf63d.mp3",
-    "초코랑 놀자! 아이스크림은 아이야. 아이 눌러줄래?": "audio/tts/83881136e7dad782.mp3",
+    "초코랑 놀자! 아이스크림 줄까? 아이스크림은 영어로 아이스크림! 아이스크림은 아이로 시작해. 그래서 아이야! 아이 눌러줄래?": "audio/tts/235a8f716bf80952.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 초코는 I를 기다려.": "audio/tts/d4011b88e2358529.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 아이.": "audio/tts/b1e06a1398af1d2b.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 초코는 I를 기다려.": "audio/tts/67fac178b69a7fbd.mp3",
@@ -1016,8 +1016,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 아이.": "audio/tts/acae22cef060aaba.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 초코는 I를 기다려.": "audio/tts/9be2c3cddda18e7b.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 아이.": "audio/tts/fafa362a8f57f584.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 초코는 I를 기다려.": "audio/tts/255f42fd8f74157b.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 아이.": "audio/tts/662a40e8f889d90f.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 초코는 I를 기다려.": "audio/tts/6b98145b5bc2f724.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 아이.": "audio/tts/d26d98bdb1b84093.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 초코는 I를 기다려.": "audio/tts/28ea501645754dc1.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 아이.": "audio/tts/0f630dcccc403963.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 초코는 I를 기다려.": "audio/tts/6614a2eef65a8bb4.mp3",
@@ -1057,7 +1057,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 아이.": "audio/tts/91379501368afad1.mp3",
     "어, 글자가 아니야. 다음은 아이.": "audio/tts/e1bc53280a0a19cd.mp3",
     "어, 글자가 아니야. 초코는 I를 기다려.": "audio/tts/2431f72035529f21.mp3",
-    "초코랑 놀자! 연은 카이트, 케이야. 케이 눌러줄래?": "audio/tts/e7be56179f11eced.mp3",
+    "초코랑 놀자! 연을 날려 보자! 연은 영어로 카이트! 카이트는 케이로 시작해. 그래서 케이야! 케이 눌러줄래?": "audio/tts/eab756af40b4f2ae.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 연은 K를 기다려.": "audio/tts/a505d58baeff2fe5.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 케이.": "audio/tts/5c3c1a6a7ced5705.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 연은 K를 기다려.": "audio/tts/b20d30b866dbc603.mp3",
@@ -1070,8 +1070,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 케이.": "audio/tts/ce560124e2e42970.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 연은 K를 기다려.": "audio/tts/4c8cd4714b2c8e55.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 케이.": "audio/tts/e385666246ad876a.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 연은 K를 기다려.": "audio/tts/aed24d3a52405dc7.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 케이.": "audio/tts/cd2b43306965d0c6.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 연은 K를 기다려.": "audio/tts/c66e114db9b72eb1.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 케이.": "audio/tts/60095b4d05a2126d.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 연은 K를 기다려.": "audio/tts/190794876e41fe70.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 케이.": "audio/tts/923cd32c9989fbc2.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 연은 K를 기다려.": "audio/tts/a9b87a23a1fae4f7.mp3",
@@ -1111,7 +1111,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 케이.": "audio/tts/ceb9d69b13e29ea1.mp3",
     "어, 글자가 아니야. 다음은 케이.": "audio/tts/280a5d03d197750d.mp3",
     "어, 글자가 아니야. 연은 K를 기다려.": "audio/tts/db2e48521bda009b.mp3",
-    "초코랑 놀자! 코는 노즈, 엔이야. 엔 눌러줄래?": "audio/tts/e37a88787483f7b4.mp3",
+    "초코랑 놀자! 초코 코가 간지러워! 코는 영어로 노즈! 노즈는 엔으로 시작해. 그래서 엔이야! 엔 눌러줄래?": "audio/tts/1bc285c80df77a18.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 초코는 N을 기다려.": "audio/tts/eed0a42ef7bc6be5.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 엔.": "audio/tts/f26ffbde10736216.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 초코는 N을 기다려.": "audio/tts/57393220232d59b2.mp3",
@@ -1124,8 +1124,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 엔.": "audio/tts/512210c5b8638f3c.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 초코는 N을 기다려.": "audio/tts/6e7e2a3120ae9445.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 엔.": "audio/tts/67ed6e532b534962.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 초코는 N을 기다려.": "audio/tts/8e3ecc9fd1f9df27.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 엔.": "audio/tts/fd0632592f734264.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 초코는 N을 기다려.": "audio/tts/b76091ebb9aac596.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 엔.": "audio/tts/bacbe1ee77060197.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 초코는 N을 기다려.": "audio/tts/8c9d7e8c508f5f34.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 엔.": "audio/tts/6ed260319c7ba062.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 초코는 N을 기다려.": "audio/tts/4aeb569213118900.mp3",
@@ -1177,8 +1177,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 에스.": "audio/tts/30da1d3af32e7006.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 별은 S를 기다려.": "audio/tts/d9251365b695ec2e.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 에스.": "audio/tts/00d770994a0fc44c.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 별은 S를 기다려.": "audio/tts/c87dc868e7e67a79.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 에스.": "audio/tts/ec328fa9b77f91d7.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 별은 S를 기다려.": "audio/tts/2d9c05f7a2afa0fd.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 에스.": "audio/tts/47888c3a60bcf95f.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 별은 S를 기다려.": "audio/tts/df086bc03e921742.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 에스.": "audio/tts/004ba71faf1dac87.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 별은 S를 기다려.": "audio/tts/8edb5b561eceae53.mp3",
@@ -1218,7 +1218,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 에스.": "audio/tts/8b9bb909ea92b282.mp3",
     "어, 글자가 아니야. 다음은 에스.": "audio/tts/d68a227d83b8621e.mp3",
     "어, 글자가 아니야. 별은 S를 기다려.": "audio/tts/82356e5d016559b4.mp3",
-    "밤하늘 놀이! 달은 문, 엠이야. 엠 눌러줄래?": "audio/tts/17b7797db344842e.mp3",
+    "밤하늘 놀이! 달을 띄워 볼까? 달은 영어로 문! 문은 엠으로 시작해. 그래서 엠이야! 엠 눌러줄래?": "audio/tts/753ad43087c98b76.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 달은 M을 기다려.": "audio/tts/d29b7962d14c1dcc.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 엠.": "audio/tts/7255dd187fc5f75f.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 달은 M을 기다려.": "audio/tts/8dbad24bc046f512.mp3",
@@ -1231,8 +1231,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 엠.": "audio/tts/f968d9c593a1b0f3.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 달은 M을 기다려.": "audio/tts/85cea3dfecf66430.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 엠.": "audio/tts/cea5cb5c1f743a5b.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 달은 M을 기다려.": "audio/tts/f3aef9e67233437c.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 엠.": "audio/tts/ed30da196939a794.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 달은 M을 기다려.": "audio/tts/0a8692fdd8bb63ef.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 엠.": "audio/tts/2175cd9db049e6df.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 달은 M을 기다려.": "audio/tts/bc42d4bba8024516.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 엠.": "audio/tts/f8205322f1b31ea1.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 달은 M을 기다려.": "audio/tts/77eda7e7ca6bca4c.mp3",
@@ -1272,7 +1272,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 엠.": "audio/tts/80e6112752b7c07d.mp3",
     "어, 글자가 아니야. 다음은 엠.": "audio/tts/785b04b42cb8abd6.mp3",
     "어, 글자가 아니야. 달은 M을 기다려.": "audio/tts/9ad74e4974695878.mp3",
-    "밤하늘 놀이! 비가 와. 우산은 유야. 유 눌러줄래?": "audio/tts/1a178e0d5a02c46b.mp3",
+    "밤하늘 놀이! 비가 와! 우산은 영어로 엄브렐라! 엄브렐라는 유로 시작해. 그래서 유야! 유 눌러줄래?": "audio/tts/5ee042e47bc25a41.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 우산은 U를 기다려.": "audio/tts/998b056a333f9ca9.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 유.": "audio/tts/2b70b6b5066bb6f5.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 우산은 U를 기다려.": "audio/tts/cf7db08a80b3f1b3.mp3",
@@ -1285,8 +1285,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 유.": "audio/tts/26f718bc08eb2991.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 우산은 U를 기다려.": "audio/tts/e8c76639c7eb82d0.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 유.": "audio/tts/fcd0d41ac7919d17.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 우산은 U를 기다려.": "audio/tts/dc8bad0ff4b31290.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 유.": "audio/tts/7a178b5304ea1ec4.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 우산은 U를 기다려.": "audio/tts/e264f3f8b2f09de8.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 유.": "audio/tts/769cf536f4d60bc1.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 우산은 U를 기다려.": "audio/tts/ce44f46451b6294f.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 유.": "audio/tts/30ea45e9b32d961d.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 우산은 U를 기다려.": "audio/tts/51066c7b9c43ab0d.mp3",
@@ -1326,7 +1326,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 유.": "audio/tts/9668b7811a298418.mp3",
     "어, 글자가 아니야. 다음은 유.": "audio/tts/e7837c141bef243c.mp3",
     "어, 글자가 아니야. 우산은 U를 기다려.": "audio/tts/c8e95b2ff15cdc8d.mp3",
-    "밤하늘 놀이! 왕관은 퀸, 큐야. 큐 눌러줄래?": "audio/tts/ca13d52c096edff3.mp3",
+    "밤하늘 놀이! 여왕 초코가 왕관을 쓰고 싶대! 여왕은 영어로 퀸! 퀸은 큐로 시작해. 그래서 큐야! 큐 눌러줄래?": "audio/tts/57ad879737bdc1a6.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 왕관은 Q를 기다려.": "audio/tts/3d663e078d796af6.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 큐.": "audio/tts/ef0ba14de57b5b90.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 왕관은 Q를 기다려.": "audio/tts/6ce922419e576516.mp3",
@@ -1339,8 +1339,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 큐.": "audio/tts/789cf57cb391f077.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 왕관은 Q를 기다려.": "audio/tts/39031529e225454c.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 큐.": "audio/tts/27c897c57a211042.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 왕관은 Q를 기다려.": "audio/tts/159139eca67e5efc.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 큐.": "audio/tts/17e2fb71195f6f52.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 왕관은 Q를 기다려.": "audio/tts/e85bc2c048160ece.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 큐.": "audio/tts/07514c7d435fdda9.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 왕관은 Q를 기다려.": "audio/tts/4bc8dcda8fa224c1.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 큐.": "audio/tts/2be23be6c586e6d8.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 왕관은 Q를 기다려.": "audio/tts/4bdc638246dc492f.mp3",
@@ -1392,8 +1392,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 티.": "audio/tts/1c3d7b1995fd8804.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 트럭은 T를 기다려.": "audio/tts/f00c3cddee303156.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 티.": "audio/tts/781c29ded30384fb.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 트럭은 T를 기다려.": "audio/tts/91b26ce02b127cdb.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 티.": "audio/tts/34c38ce0c5d08533.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 트럭은 T를 기다려.": "audio/tts/51a915bf0f8f0bc8.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 티.": "audio/tts/17d3f8af092173b3.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 트럭은 T를 기다려.": "audio/tts/b74d8b1524e70f52.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 티.": "audio/tts/7dac1d361c18a113.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 트럭은 T를 기다려.": "audio/tts/48c90fa3d3141032.mp3",
@@ -1433,7 +1433,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 티.": "audio/tts/fafc22bb6e06b039.mp3",
     "어, 글자가 아니야. 다음은 티.": "audio/tts/4a477327c654fc05.mp3",
     "어, 글자가 아니야. 트럭은 T를 기다려.": "audio/tts/75f9fe6cfab58b03.mp3",
-    "자동차 놀이! 바퀴는 휠, 더블유야. 더블유 눌러줄래?": "audio/tts/f1a4d4d964e173a0.mp3",
+    "자동차 놀이! 바퀴가 굴러가! 바퀴는 영어로 휠! 휠은 더블유로 시작해. 그래서 더블유야! 더블유 눌러줄래?": "audio/tts/b4ded075e2082906.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 바퀴는 W를 기다려.": "audio/tts/5d33d59b0bc97032.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 더블유.": "audio/tts/7a85df7eff62fabf.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 바퀴는 W를 기다려.": "audio/tts/b5fbcaf09a3d479a.mp3",
@@ -1446,8 +1446,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 더블유.": "audio/tts/e80826a60c2b7b95.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 바퀴는 W를 기다려.": "audio/tts/b220e20d321f6bf6.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 더블유.": "audio/tts/a504cc071fcf0084.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 바퀴는 W를 기다려.": "audio/tts/329226dedc24db2f.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 더블유.": "audio/tts/e3fe77a9a7e7005a.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 바퀴는 W를 기다려.": "audio/tts/bd43a80bbf26cada.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 더블유.": "audio/tts/2c817492f372d152.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 바퀴는 W를 기다려.": "audio/tts/a5bc6ebd2eb7831e.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 더블유.": "audio/tts/df52c61fe67eeb55.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 바퀴는 W를 기다려.": "audio/tts/f22e0c11ff7a6285.mp3",
@@ -1487,7 +1487,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 더블유.": "audio/tts/3580f66a0a1df30d.mp3",
     "어, 글자가 아니야. 다음은 더블유.": "audio/tts/e17ef9b962bee9d4.mp3",
     "어, 글자가 아니야. 바퀴는 W를 기다려.": "audio/tts/ac3d13533a8b36ac.mp3",
-    "자동차 놀이! 밴은 브이야. 브이 눌러줄래?": "audio/tts/c1e2bec54a0bd02d.mp3",
+    "자동차 놀이! 밴이 지나가! 밴은 영어로 밴! 밴은 브이로 시작해. 그래서 브이야! 브이 눌러줄래?": "audio/tts/c4a58f6de3941607.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 밴은 V를 기다려.": "audio/tts/a320f2148ae2d2a9.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 브이.": "audio/tts/25ed2e45891b62a2.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 밴은 V를 기다려.": "audio/tts/47609c04e9c49417.mp3",
@@ -1500,8 +1500,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 브이.": "audio/tts/7622f728df7c7b6a.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 밴은 V를 기다려.": "audio/tts/fe094eb9f32e171e.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 브이.": "audio/tts/c52b39afa353b6d5.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 밴은 V를 기다려.": "audio/tts/f48e21ff1e71b5db.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 브이.": "audio/tts/fbd2d12ad8095080.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 밴은 V를 기다려.": "audio/tts/ab252a7a34508486.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 브이.": "audio/tts/7d4e96a0bb49f8ff.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 밴은 V를 기다려.": "audio/tts/78538698e611cb00.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 브이.": "audio/tts/e00280d0fd2d71a3.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 밴은 V를 기다려.": "audio/tts/4f636ea291490203.mp3",
@@ -1553,8 +1553,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 피.": "audio/tts/4690ec104f0f1f42.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 돼지는 P를 기다려.": "audio/tts/4868105f173958f5.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 피.": "audio/tts/82d79e1651b2f719.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 돼지는 P를 기다려.": "audio/tts/77b7bca441948b42.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 피.": "audio/tts/9f782166f3afecf3.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 돼지는 P를 기다려.": "audio/tts/8f929f2cf6de56a3.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 피.": "audio/tts/4ad189a98118cafb.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 돼지는 P를 기다려.": "audio/tts/d6616dc1291cc338.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 피.": "audio/tts/1acdf77fe0385186.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 돼지는 P를 기다려.": "audio/tts/5c5e9baa7bbc95d2.mp3",
@@ -1594,7 +1594,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 피.": "audio/tts/6f0e9dd649443f51.mp3",
     "어, 글자가 아니야. 다음은 피.": "audio/tts/ac5b2d3e21784935.mp3",
     "어, 글자가 아니야. 돼지는 P를 기다려.": "audio/tts/df5089e832c68281.mp3",
-    "동물 친구 놀이! 사자는 라이언, 엘이야. 엘 눌러줄래?": "audio/tts/bf3b63559e8ecd51.mp3",
+    "동물 친구 놀이! 사자가 나타났어! 사자는 영어로 라이언! 라이언은 엘로 시작해. 그래서 엘이야! 엘 눌러줄래?": "audio/tts/e462bb59aa060915.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 사자는 L을 기다려.": "audio/tts/acbcf32b65063743.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 엘.": "audio/tts/f456e5095516097c.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 사자는 L을 기다려.": "audio/tts/e394bfe57f9ce971.mp3",
@@ -1607,8 +1607,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 엘.": "audio/tts/1b0444979753ba6a.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 사자는 L을 기다려.": "audio/tts/2a6b4f1a14b3e372.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 엘.": "audio/tts/064454bbb784473c.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 사자는 L을 기다려.": "audio/tts/c9e7a1015656895b.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 엘.": "audio/tts/a700a58bae9d3a66.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 사자는 L을 기다려.": "audio/tts/10a90bc605c4f979.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 엘.": "audio/tts/89598582751a9da0.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 사자는 L을 기다려.": "audio/tts/1c4c05713e5aa9b0.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 엘.": "audio/tts/44664d6851405ffa.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 사자는 L을 기다려.": "audio/tts/04f6d2471901301e.mp3",
@@ -1648,7 +1648,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 엘.": "audio/tts/0ca4b3e0e59012f4.mp3",
     "어, 글자가 아니야. 다음은 엘.": "audio/tts/e1c3a790f5e90f02.mp3",
     "어, 글자가 아니야. 사자는 L을 기다려.": "audio/tts/65535511aeb94343.mp3",
-    "동물 친구 놀이! 얼룩말은 지브라, 제트야. 제트 눌러줄래?": "audio/tts/a124e07593c42c1e.mp3",
+    "동물 친구 놀이! 얼룩말이 달려와! 얼룩말은 영어로 지브라! 지브라는 제트로 시작해. 그래서 제트야! 제트 눌러줄래?": "audio/tts/acad924d849708ae.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 얼룩말은 Z를 기다려.": "audio/tts/d73da62c3594f257.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 제트.": "audio/tts/b9b6d96491beda05.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 얼룩말은 Z를 기다려.": "audio/tts/5da446bf1465ade9.mp3",
@@ -1661,8 +1661,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 제트.": "audio/tts/3a58963ee5f99e64.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 얼룩말은 Z를 기다려.": "audio/tts/8281c9a3f5810fa3.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 제트.": "audio/tts/a35c9631c0428842.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 얼룩말은 Z를 기다려.": "audio/tts/568582ab85cb2015.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 제트.": "audio/tts/a7983a28e695f9a9.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 얼룩말은 Z를 기다려.": "audio/tts/7c62f4b936602ada.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 제트.": "audio/tts/0dd8fe7040a2dbd5.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 얼룩말은 Z를 기다려.": "audio/tts/387d07c0b6d4873c.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 제트.": "audio/tts/2713c946fe447a62.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 얼룩말은 Z를 기다려.": "audio/tts/630d6783d8d18540.mp3",
@@ -1703,7 +1703,7 @@
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 다음은 제트.": "audio/tts/f51402672ffd33d1.mp3",
     "어, 글자가 아니야. 다음은 제트.": "audio/tts/81d47d69a9f7e2c9.mp3",
     "어, 글자가 아니야. 얼룩말은 Z를 기다려.": "audio/tts/3bf686160da60ef9.mp3",
-    "동물 친구 놀이! 실로폰은 엑스야. 엑스 눌러줄래?": "audio/tts/84acfcf76e895c1f.mp3",
+    "동물 친구 놀이! 실로폰을 쳐 볼까? 실로폰은 영어로 자일로폰! 자일로폰은 엑스로 시작해. 그래서 엑스야! 엑스 눌러줄래?": "audio/tts/18d2471e232eeb7d.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 실로폰은 X를 기다려.": "audio/tts/674567968c982f1b.mp3",
     "어, 그건 A이네! A는 Apple~ 사과. 다음은 엑스.": "audio/tts/2d9df9d76bca453f.mp3",
     "어, 그건 B이네! B는 Bus~ 버스. 실로폰은 X를 기다려.": "audio/tts/39db811dc5215a9c.mp3",
@@ -1716,8 +1716,8 @@
     "어, 그건 E이네! E는 Egg~ 달걀. 다음은 엑스.": "audio/tts/b9add3f5b53b8af2.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 실로폰은 X를 기다려.": "audio/tts/1d03ff01f7de128d.mp3",
     "어, 그건 F이네! F는 Fish~ 물고기. 다음은 엑스.": "audio/tts/79647489a9ad30d7.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 실로폰은 X를 기다려.": "audio/tts/a5c49dfacc6ef757.mp3",
-    "어, 그건 G이네! G는 Go~ 출발. 다음은 엑스.": "audio/tts/f19de0cacb9abb1d.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 실로폰은 X를 기다려.": "audio/tts/adf9a87eaa177fa5.mp3",
+    "어, 그건 G이네! G는 Green~ 초록. 다음은 엑스.": "audio/tts/32ff7391e3a24688.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 실로폰은 X를 기다려.": "audio/tts/17369e805db8d8ab.mp3",
     "어, 그건 H이네! H는 Hat~ 모자. 다음은 엑스.": "audio/tts/c83e1e9e1441f771.mp3",
     "어, 그건 I이네! I는 Ice~ 아이스크림. 실로폰은 X를 기다려.": "audio/tts/c92126b24cac5a94.mp3",
@@ -1814,6 +1814,12 @@
     "X는 맨 아랫줄, 왼쪽에서 두 번째에 있어": "audio/tts/b02013fee708f499.mp3",
     "Y는 맨 윗줄, 왼쪽에서 여섯 번째에 있어": "audio/tts/6bfaa76a1067fd9a.mp3",
     "Z는 맨 아랫줄, 왼쪽에서 첫 번째에 있어": "audio/tts/7baf4c87482a90a7.mp3",
+    "다음 챕터로 갈게!": "audio/tts/5e32fba1869dedf6.mp3",
+    "이전 챕터로 갈게!": "audio/tts/94a8179fd82c42f2.mp3",
+    "그 챕터로 갈게!": "audio/tts/09ef3293d405280e.mp3",
+    "여기가 마지막 챕터야.": "audio/tts/6fd56a16805c6b04.mp3",
+    "여기가 첫 챕터야.": "audio/tts/a9177a04e888e7f9.mp3",
+    "그 챕터는 없어.": "audio/tts/3bc75b6fec1e2a82.mp3",
     "생일 축하해 재윤아! 오늘 재윤이 한 살 됐네! 케이크 초를 꺼 보자. 키를 눌러 후!": "audio/tts/7dc00635edd53ccf.mp3",
     "생일 축하해 재윤아! 오늘 재윤이 한 살 됐네! 키를 눌러 초를 꺼 봐.": "audio/tts/93dbec97b74af0d1.mp3",
     "후!": "audio/tts/a3230b1f091a79c3.mp3",
@@ -1888,412 +1894,412 @@
     "후!"
   ],
   "prime": [
-    "2층버스 놀이! 글자 누르고 엔터. 2층버스가 재윤이 정류장에 왔어! 제이 눌러줄래?",
-    "신호등 놀이! 빨간 불이야! 알은 멈춰. 알 눌러줄래?",
-    "초코에게 밥 주기! 초코가 사과 먹고 싶대! 에이 눌러줄래?",
-    "이름 부르기! 재윤이 이름을 쓰자! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.",
-    "초코랑 놀자! 디는 독, 강아지야. 디 눌러줄래?",
-    "밤하늘 놀이! 별은 스타, 에스야. 에스 눌러줄래?",
-    "자동차 놀이! 트럭은 티야. 티 눌러줄래?",
-    "동물 친구 놀이! 돼지는 피그, 피야. 피 눌러줄래?",
+    "2층버스 놀이! 글자 누르고 엔터. 2층버스가 재윤이 정류장에 왔어! 재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이 눌러줄래?",
+    "신호등 놀이! 빨간 불이야! 빨강은 영어로 레드! 레드는 알로 시작해. 그래서 알이야! 알 눌러줄래?",
+    "초코에게 밥 주기! 초코가 사과 먹고 싶대! 사과는 영어로 애플! 애플은 에이로 시작해. 그래서 에이야! 에이 눌러줄래?",
+    "이름 부르기! 재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.",
+    "초코랑 놀자! 강아지 초코가 뛰고 싶대! 강아지는 영어로 독! 독은 디로 시작해. 그래서 디야! 디 눌러줄래?",
+    "밤하늘 놀이! 별을 켜 볼까? 별은 영어로 스타! 스타는 에스로 시작해. 그래서 에스야! 에스 눌러줄래?",
+    "자동차 놀이! 트럭이 출발해! 트럭은 영어로 트럭! 트럭은 티로 시작해. 그래서 티야! 티 눌러줄래?",
+    "동물 친구 놀이! 돼지 친구가 오고 싶대! 돼지는 영어로 피그! 피그는 피로 시작해. 그래서 피야! 피 눌러줄래?",
     "글자 놀이는 여기까지! 이제 짧은 명령을 내려 보자. 글자를 차례로 누르고 엔터. 방이 너무 어두워요. 불을 켜 볼까요? 차례대로, 오, 엔.",
     "아는 글자로 세 글자 단어를 만들어 보자! 고양이, 영어로 캣! 캣 만들어 볼까요? 차례대로, 씨, 에이, 티.",
     "신호등에서 R은 빨강, 멈추기였지? 이제 명령 뒤에 대시 하나랑 글자를 붙여 보자. 대시는 숫자 0 옆에 있는 짧은 막대야. 신호등 R, 빨강이랑 같아. 방에 빨간 불을 켜 볼까요? 온 다음에 띄어쓰고, 대시 하나, 그리고 알. 알는 레드의 첫 글자예요. 차례대로, 오, 엔, 띄어쓰기, 대시, 알.",
     "대시 두 개는 단어를 통째로 쓰는 거야. 대시 R이랑 대시 두 개 red는 같은 빨강이야. 대시를 두 번 쓰면 한 글자 대신 단어를 통째로 써. 빨강은 red야. 방에 빨간 불을 켜 볼까요? 온 다음에 띄어쓰고, 대시 두 개, 그리고 레드. 차례대로, 오, 엔, 띄어쓰기, 대시, 대시, 알, 이, 디."
   ],
   "next": {
-    "2층버스 놀이! 글자 누르고 엔터. 2층버스가 재윤이 정류장에 왔어! 제이 눌러줄래?": [
+    "2층버스 놀이! 글자 누르고 엔터. 2층버스가 재윤이 정류장에 왔어! 재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이 눌러줄래?": [
       "어, 그건 A이네! A는 Apple~ 사과. 문은 J를 기다려.",
       "어, 그건 B이네! B는 Bus~ 버스. 문은 J를 기다려.",
       "어, 그건 C이네! C는 Choco~ 초코. 문은 J를 기다려.",
       "어, 그건 D이네! D는 Dog~ 강아지. 문은 J를 기다려.",
       "어, 그건 E이네! E는 Egg~ 달걀. 문은 J를 기다려.",
       "어, 그건 F이네! F는 Fish~ 물고기. 문은 J를 기다려.",
-      "어, 그건 G이네! G는 Go~ 출발. 문은 J를 기다려.",
+      "어, 그건 G이네! G는 Green~ 초록. 문은 J를 기다려.",
       "어, 그건 H이네! H는 Hat~ 모자. 문은 J를 기다려."
     ],
-    "2층버스가 재윤이 정류장에 왔어! 제이 눌러줄래?": [
+    "2층버스가 재윤이 정류장에 왔어! 재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 문은 J를 기다려.",
-      "치익~ 문이 열렸어! 재윤이가 탔어.",
-      "초코도 타고 싶대! 씨 눌러줄래?"
+      "치익~ 문이 열렸어! 재윤이가 탔어. 재는 제이야!",
+      "초코도 타고 싶대! 초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 문은 J를 기다려.": [
-      "치익~ 문이 열렸어! 재윤이가 탔어.",
-      "초코도 타고 싶대! 씨 눌러줄래?"
+      "치익~ 문이 열렸어! 재윤이가 탔어. 재는 제이야!",
+      "초코도 타고 싶대! 초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨 눌러줄래?"
     ],
-    "치익~ 문이 열렸어! 재윤이가 탔어.": [
-      "초코도 타고 싶대! 씨 눌러줄래?"
+    "치익~ 문이 열렸어! 재윤이가 탔어. 재는 제이야!": [
+      "초코도 타고 싶대! 초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨 눌러줄래?"
     ],
-    "초코도 타고 싶대! 씨 눌러줄래?": [
+    "초코도 타고 싶대! 초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 C를 기다려.",
-      "멍멍! 초코가 재윤이 옆에 탔어.",
-      "비는 버스야! 비 누르면 2층버스가 가."
+      "멍멍! 초코가 재윤이 옆에 탔어. 초코는 씨야!",
+      "이제 버스가 가! 버스는 영어로 버스! 버스는 비로 시작해. 그래서 비야! 비 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 C를 기다려.": [
-      "멍멍! 초코가 재윤이 옆에 탔어.",
-      "비는 버스야! 비 누르면 2층버스가 가.",
-      "초코가 재윤이 부르는 소리를 듣고 뛰어왔어!",
+      "멍멍! 초코가 재윤이 옆에 탔어. 초코는 씨야!",
+      "이제 버스가 가! 버스는 영어로 버스! 버스는 비로 시작해. 그래서 비야! 비 눌러줄래?",
+      "초코가 재윤이 부르는 소리를 듣고 뛰어왔어! 초코는 씨야!",
       "이름을 불러 줘서 초코가 폴짝. 고마워! 다음도 해 볼까?"
     ],
-    "멍멍! 초코가 재윤이 옆에 탔어.": [
-      "비는 버스야! 비 누르면 2층버스가 가."
+    "멍멍! 초코가 재윤이 옆에 탔어. 초코는 씨야!": [
+      "이제 버스가 가! 버스는 영어로 버스! 버스는 비로 시작해. 그래서 비야! 비 눌러줄래?"
     ],
-    "비는 버스야! 비 누르면 2층버스가 가.": [
+    "이제 버스가 가! 버스는 영어로 버스! 버스는 비로 시작해. 그래서 비야! 비 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 버스는 B를 기다려.",
-      "부릉! 2층버스가 달렸어.",
+      "부릉! 2층버스가 달렸어. 버스는 비야!",
       "버스 재미있었지? 초코가 꼬리를 흔들며 고마워해. 멍멍! 다음도 해 볼까?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 버스는 B를 기다려.": [
-      "부릉! 2층버스가 달렸어.",
+      "부릉! 2층버스가 달렸어. 버스는 비야!",
       "버스 재미있었지? 초코가 꼬리를 흔들며 고마워해. 멍멍! 다음도 해 볼까?"
     ],
-    "부릉! 2층버스가 달렸어.": [
+    "부릉! 2층버스가 달렸어. 버스는 비야!": [
       "버스 재미있었지? 초코가 꼬리를 흔들며 고마워해. 멍멍! 다음도 해 볼까?"
     ],
-    "신호등 놀이! 빨간 불이야! 알은 멈춰. 알 눌러줄래?": [
-      "빨간 불이야! 알은 멈춰. 알 눌러줄래?",
+    "신호등 놀이! 빨간 불이야! 빨강은 영어로 레드! 레드는 알로 시작해. 그래서 알이야! 알 눌러줄래?": [
+      "빨간 불이야! 빨강은 영어로 레드! 레드는 알로 시작해. 그래서 알이야! 알 눌러줄래?",
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 신호등은 R을 기다려.",
       "좋아. 이제 엔터!",
-      "빨간 불! 차가 멈췄어.",
-      "노란 불이야. 와이는 천천히. 와이 눌러줄래?"
+      "빨간 불! 차가 멈췄어. 레드는 알이야!",
+      "노란 불이야! 노랑은 영어로 옐로! 옐로는 와이로 시작해. 그래서 와이야! 와이 눌러줄래?"
     ],
-    "빨간 불이야! 알은 멈춰. 알 눌러줄래?": [
+    "빨간 불이야! 빨강은 영어로 레드! 레드는 알로 시작해. 그래서 알이야! 알 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 신호등은 R을 기다려.",
-      "빨간 불! 차가 멈췄어.",
-      "노란 불이야. 와이는 천천히. 와이 눌러줄래?"
+      "빨간 불! 차가 멈췄어. 레드는 알이야!",
+      "노란 불이야! 노랑은 영어로 옐로! 옐로는 와이로 시작해. 그래서 와이야! 와이 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 신호등은 R을 기다려.": [
-      "빨간 불! 차가 멈췄어.",
-      "노란 불이야. 와이는 천천히. 와이 눌러줄래?"
+      "빨간 불! 차가 멈췄어. 레드는 알이야!",
+      "노란 불이야! 노랑은 영어로 옐로! 옐로는 와이로 시작해. 그래서 와이야! 와이 눌러줄래?"
     ],
-    "빨간 불! 차가 멈췄어.": [
-      "노란 불이야. 와이는 천천히. 와이 눌러줄래?"
+    "빨간 불! 차가 멈췄어. 레드는 알이야!": [
+      "노란 불이야! 노랑은 영어로 옐로! 옐로는 와이로 시작해. 그래서 와이야! 와이 눌러줄래?"
     ],
-    "노란 불이야. 와이는 천천히. 와이 눌러줄래?": [
+    "노란 불이야! 노랑은 영어로 옐로! 옐로는 와이로 시작해. 그래서 와이야! 와이 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 신호등은 Y를 기다려.",
-      "노란 불! 차가 천천히 가.",
-      "초록 불이야! 지는 가. 지 눌러줄래?"
+      "노란 불! 차가 천천히 가. 옐로는 와이야!",
+      "초록 불이야! 초록은 영어로 그린! 그린은 지로 시작해. 그래서 지야! 지 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 신호등은 Y를 기다려.": [
-      "노란 불! 차가 천천히 가.",
-      "초록 불이야! 지는 가. 지 눌러줄래?"
+      "노란 불! 차가 천천히 가. 옐로는 와이야!",
+      "초록 불이야! 초록은 영어로 그린! 그린은 지로 시작해. 그래서 지야! 지 눌러줄래?"
     ],
-    "노란 불! 차가 천천히 가.": [
-      "초록 불이야! 지는 가. 지 눌러줄래?"
+    "노란 불! 차가 천천히 가. 옐로는 와이야!": [
+      "초록 불이야! 초록은 영어로 그린! 그린은 지로 시작해. 그래서 지야! 지 눌러줄래?"
     ],
-    "초록 불이야! 지는 가. 지 눌러줄래?": [
+    "초록 불이야! 초록은 영어로 그린! 그린은 지로 시작해. 그래서 지야! 지 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 신호등은 G를 기다려.",
-      "초록 불! 부릉, 차가 달려.",
+      "초록 불! 부릉, 차가 달려. 그린은 지야!",
       "신호를 잘 봤어. 초코가 안전해서 고마워해! 다음도 해 볼까?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 신호등은 G를 기다려.": [
-      "초록 불! 부릉, 차가 달려.",
+      "초록 불! 부릉, 차가 달려. 그린은 지야!",
       "신호를 잘 봤어. 초코가 안전해서 고마워해! 다음도 해 볼까?"
     ],
-    "초록 불! 부릉, 차가 달려.": [
+    "초록 불! 부릉, 차가 달려. 그린은 지야!": [
       "신호를 잘 봤어. 초코가 안전해서 고마워해! 다음도 해 볼까?"
     ],
-    "초코에게 밥 주기! 초코가 사과 먹고 싶대! 에이 눌러줄래?": [
-      "초코가 사과 먹고 싶대! 에이 눌러줄래?",
+    "초코에게 밥 주기! 초코가 사과 먹고 싶대! 사과는 영어로 애플! 애플은 에이로 시작해. 그래서 에이야! 에이 눌러줄래?": [
+      "초코가 사과 먹고 싶대! 사과는 영어로 애플! 애플은 에이로 시작해. 그래서 에이야! 에이 눌러줄래?",
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 A를 기다려.",
       "좋아. 이제 엔터!",
-      "냠냠! 멍멍!",
-      "달걀도 줄래? 이는 에그야. 이 눌러줄래?"
+      "냠냠! 멍멍! 애플은 에이야!",
+      "달걀도 줄래? 달걀은 영어로 에그! 에그는 이로 시작해. 그래서 이야! 이 눌러줄래?"
     ],
-    "초코가 사과 먹고 싶대! 에이 눌러줄래?": [
+    "초코가 사과 먹고 싶대! 사과는 영어로 애플! 애플은 에이로 시작해. 그래서 에이야! 에이 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 A를 기다려.",
-      "냠냠! 멍멍!",
-      "달걀도 줄래? 이는 에그야. 이 눌러줄래?"
+      "냠냠! 멍멍! 애플은 에이야!",
+      "달걀도 줄래? 달걀은 영어로 에그! 에그는 이로 시작해. 그래서 이야! 이 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 A를 기다려.": [
-      "냠냠! 멍멍!",
-      "달걀도 줄래? 이는 에그야. 이 눌러줄래?"
+      "냠냠! 멍멍! 애플은 에이야!",
+      "달걀도 줄래? 달걀은 영어로 에그! 에그는 이로 시작해. 그래서 이야! 이 눌러줄래?"
     ],
-    "냠냠! 멍멍!": [
-      "달걀도 줄래? 이는 에그야. 이 눌러줄래?"
+    "냠냠! 멍멍! 애플은 에이야!": [
+      "달걀도 줄래? 달걀은 영어로 에그! 에그는 이로 시작해. 그래서 이야! 이 눌러줄래?"
     ],
-    "달걀도 줄래? 이는 에그야. 이 눌러줄래?": [
+    "달걀도 줄래? 달걀은 영어로 에그! 에그는 이로 시작해. 그래서 이야! 이 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 E를 기다려.",
-      "냠냠! 달걀도 먹었어.",
-      "오렌지는 오야. 오 눌러줄래?"
+      "냠냠! 달걀도 먹었어. 에그는 이야!",
+      "오렌지도 있어! 오렌지는 영어로 오렌지! 오렌지는 오로 시작해. 그래서 오야! 오 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 E를 기다려.": [
-      "냠냠! 달걀도 먹었어.",
-      "오렌지는 오야. 오 눌러줄래?"
+      "냠냠! 달걀도 먹었어. 에그는 이야!",
+      "오렌지도 있어! 오렌지는 영어로 오렌지! 오렌지는 오로 시작해. 그래서 오야! 오 눌러줄래?"
     ],
-    "냠냠! 달걀도 먹었어.": [
-      "오렌지는 오야. 오 눌러줄래?"
+    "냠냠! 달걀도 먹었어. 에그는 이야!": [
+      "오렌지도 있어! 오렌지는 영어로 오렌지! 오렌지는 오로 시작해. 그래서 오야! 오 눌러줄래?"
     ],
-    "오렌지는 오야. 오 눌러줄래?": [
+    "오렌지도 있어! 오렌지는 영어로 오렌지! 오렌지는 오로 시작해. 그래서 오야! 오 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 O를 기다려.",
-      "냠냠! 오렌지 맛있어.",
-      "물고기는 피쉬, 에프야. 에프 눌러줄래?"
+      "냠냠! 오렌지 맛있어. 오렌지는 오야!",
+      "물고기도 줄래? 물고기는 영어로 피쉬! 피쉬는 에프로 시작해. 그래서 에프야! 에프 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 O를 기다려.": [
-      "냠냠! 오렌지 맛있어.",
-      "물고기는 피쉬, 에프야. 에프 눌러줄래?"
+      "냠냠! 오렌지 맛있어. 오렌지는 오야!",
+      "물고기도 줄래? 물고기는 영어로 피쉬! 피쉬는 에프로 시작해. 그래서 에프야! 에프 눌러줄래?"
     ],
-    "냠냠! 오렌지 맛있어.": [
-      "물고기는 피쉬, 에프야. 에프 눌러줄래?"
+    "냠냠! 오렌지 맛있어. 오렌지는 오야!": [
+      "물고기도 줄래? 물고기는 영어로 피쉬! 피쉬는 에프로 시작해. 그래서 에프야! 에프 눌러줄래?"
     ],
-    "물고기는 피쉬, 에프야. 에프 눌러줄래?": [
+    "물고기도 줄래? 물고기는 영어로 피쉬! 피쉬는 에프로 시작해. 그래서 에프야! 에프 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 F를 기다려.",
-      "냠냠! 물고기 먹었어. 멍멍!",
+      "냠냠! 물고기 먹었어. 멍멍! 피쉬는 에프야!",
       "배부른 초코가 핥짝. 재윤아 고마워! 다음도 해 볼까?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 F를 기다려.": [
-      "냠냠! 물고기 먹었어. 멍멍!",
+      "냠냠! 물고기 먹었어. 멍멍! 피쉬는 에프야!",
       "배부른 초코가 핥짝. 재윤아 고마워! 다음도 해 볼까?"
     ],
-    "냠냠! 물고기 먹었어. 멍멍!": [
+    "냠냠! 물고기 먹었어. 멍멍! 피쉬는 에프야!": [
       "배부른 초코가 핥짝. 재윤아 고마워! 다음도 해 볼까?"
     ],
-    "이름 부르기! 재윤이 이름을 쓰자! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.": [
-      "재윤이 이름을 쓰자! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.",
+    "이름 부르기! 재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.": [
+      "재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.",
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 이름은 J를 기다려.",
       "제이! 다음은 에이.",
       "에이! 다음은 이.",
       "이! 됐어, 엔터!",
       "좋아. 이제 엔터!",
-      "재윤이 이름 완성!",
-      "모자는 햇이야. 에이치 누르면 초코가 모자를 써."
+      "재윤이 이름 완성! 재는 제이야!",
+      "초코에게 모자를 씌우자! 모자는 영어로 햇! 햇은 에이치로 시작해. 그래서 에이치야! 에이치 눌러줄래?"
     ],
-    "재윤이 이름을 쓰자! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.": [
+    "재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 이름은 J를 기다려.",
-      "재윤이 이름 완성!",
-      "모자는 햇이야. 에이치 누르면 초코가 모자를 써."
+      "재윤이 이름 완성! 재는 제이야!",
+      "초코에게 모자를 씌우자! 모자는 영어로 햇! 햇은 에이치로 시작해. 그래서 에이치야! 에이치 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 이름은 J를 기다려.": [
-      "재윤이 이름 완성!",
-      "모자는 햇이야. 에이치 누르면 초코가 모자를 써."
+      "재윤이 이름 완성! 재는 제이야!",
+      "초코에게 모자를 씌우자! 모자는 영어로 햇! 햇은 에이치로 시작해. 그래서 에이치야! 에이치 눌러줄래?"
     ],
-    "재윤이 이름 완성!": [
-      "모자는 햇이야. 에이치 누르면 초코가 모자를 써."
+    "재윤이 이름 완성! 재는 제이야!": [
+      "초코에게 모자를 씌우자! 모자는 영어로 햇! 햇은 에이치로 시작해. 그래서 에이치야! 에이치 눌러줄래?"
     ],
-    "모자는 햇이야. 에이치 누르면 초코가 모자를 써.": [
+    "초코에게 모자를 씌우자! 모자는 영어로 햇! 햇은 에이치로 시작해. 그래서 에이치야! 에이치 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 모자는 H를 기다려.",
-      "초코가 모자를 썼어! 멋져.",
-      "초코를 불러 보자! 먼저 씨. 다 쓰면 엔터."
+      "초코가 모자를 썼어! 멋져. 햇은 에이치야!",
+      "초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨, 에이치, 오, 씨, 오. 먼저 씨. 다 쓰면 엔터."
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 모자는 H를 기다려.": [
-      "초코가 모자를 썼어! 멋져.",
-      "초코를 불러 보자! 먼저 씨. 다 쓰면 엔터."
+      "초코가 모자를 썼어! 멋져. 햇은 에이치야!",
+      "초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨, 에이치, 오, 씨, 오. 먼저 씨. 다 쓰면 엔터."
     ],
-    "초코가 모자를 썼어! 멋져.": [
-      "초코를 불러 보자! 먼저 씨. 다 쓰면 엔터."
+    "초코가 모자를 썼어! 멋져. 햇은 에이치야!": [
+      "초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨, 에이치, 오, 씨, 오. 먼저 씨. 다 쓰면 엔터."
     ],
-    "초코를 불러 보자! 먼저 씨. 다 쓰면 엔터.": [
+    "초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨, 에이치, 오, 씨, 오. 먼저 씨. 다 쓰면 엔터.": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 C를 기다려.",
-      "초코가 재윤이 부르는 소리를 듣고 뛰어왔어!",
+      "초코가 재윤이 부르는 소리를 듣고 뛰어왔어! 초코는 씨야!",
       "이름을 불러 줘서 초코가 폴짝. 고마워! 다음도 해 볼까?"
     ],
-    "초코가 재윤이 부르는 소리를 듣고 뛰어왔어!": [
+    "초코가 재윤이 부르는 소리를 듣고 뛰어왔어! 초코는 씨야!": [
       "이름을 불러 줘서 초코가 폴짝. 고마워! 다음도 해 볼까?"
     ],
-    "초코랑 놀자! 디는 독, 강아지야. 디 눌러줄래?": [
-      "디는 독, 강아지야. 디 눌러줄래?",
+    "초코랑 놀자! 강아지 초코가 뛰고 싶대! 강아지는 영어로 독! 독은 디로 시작해. 그래서 디야! 디 눌러줄래?": [
+      "강아지 초코가 뛰고 싶대! 강아지는 영어로 독! 독은 디로 시작해. 그래서 디야! 디 눌러줄래?",
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 D를 기다려.",
       "좋아. 이제 엔터!",
-      "멍멍! 초코가 폴짝 뛰었어.",
-      "아이스크림은 아이야. 아이 눌러줄래?"
+      "멍멍! 초코가 폴짝 뛰었어. 독은 디야!",
+      "아이스크림 줄까? 아이스크림은 영어로 아이스크림! 아이스크림은 아이로 시작해. 그래서 아이야! 아이 눌러줄래?"
     ],
-    "디는 독, 강아지야. 디 눌러줄래?": [
+    "강아지 초코가 뛰고 싶대! 강아지는 영어로 독! 독은 디로 시작해. 그래서 디야! 디 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 D를 기다려.",
-      "멍멍! 초코가 폴짝 뛰었어.",
-      "아이스크림은 아이야. 아이 눌러줄래?"
+      "멍멍! 초코가 폴짝 뛰었어. 독은 디야!",
+      "아이스크림 줄까? 아이스크림은 영어로 아이스크림! 아이스크림은 아이로 시작해. 그래서 아이야! 아이 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 D를 기다려.": [
-      "멍멍! 초코가 폴짝 뛰었어.",
-      "아이스크림은 아이야. 아이 눌러줄래?"
+      "멍멍! 초코가 폴짝 뛰었어. 독은 디야!",
+      "아이스크림 줄까? 아이스크림은 영어로 아이스크림! 아이스크림은 아이로 시작해. 그래서 아이야! 아이 눌러줄래?"
     ],
-    "멍멍! 초코가 폴짝 뛰었어.": [
-      "아이스크림은 아이야. 아이 눌러줄래?"
+    "멍멍! 초코가 폴짝 뛰었어. 독은 디야!": [
+      "아이스크림 줄까? 아이스크림은 영어로 아이스크림! 아이스크림은 아이로 시작해. 그래서 아이야! 아이 눌러줄래?"
     ],
-    "아이스크림은 아이야. 아이 눌러줄래?": [
+    "아이스크림 줄까? 아이스크림은 영어로 아이스크림! 아이스크림은 아이로 시작해. 그래서 아이야! 아이 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 I를 기다려.",
-      "냠냠! 시원해. 멍멍!",
-      "연은 카이트, 케이야. 케이 눌러줄래?"
+      "냠냠! 시원해. 멍멍! 아이스크림은 아이야!",
+      "연을 날려 보자! 연은 영어로 카이트! 카이트는 케이로 시작해. 그래서 케이야! 케이 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 I를 기다려.": [
-      "냠냠! 시원해. 멍멍!",
-      "연은 카이트, 케이야. 케이 눌러줄래?"
+      "냠냠! 시원해. 멍멍! 아이스크림은 아이야!",
+      "연을 날려 보자! 연은 영어로 카이트! 카이트는 케이로 시작해. 그래서 케이야! 케이 눌러줄래?"
     ],
-    "냠냠! 시원해. 멍멍!": [
-      "연은 카이트, 케이야. 케이 눌러줄래?"
+    "냠냠! 시원해. 멍멍! 아이스크림은 아이야!": [
+      "연을 날려 보자! 연은 영어로 카이트! 카이트는 케이로 시작해. 그래서 케이야! 케이 눌러줄래?"
     ],
-    "연은 카이트, 케이야. 케이 눌러줄래?": [
+    "연을 날려 보자! 연은 영어로 카이트! 카이트는 케이로 시작해. 그래서 케이야! 케이 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 연은 K를 기다려.",
-      "연이 하늘로 올라갔어!",
-      "코는 노즈, 엔이야. 엔 눌러줄래?"
+      "연이 하늘로 올라갔어! 카이트는 케이야!",
+      "초코 코가 간지러워! 코는 영어로 노즈! 노즈는 엔으로 시작해. 그래서 엔이야! 엔 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 연은 K를 기다려.": [
-      "연이 하늘로 올라갔어!",
-      "코는 노즈, 엔이야. 엔 눌러줄래?"
+      "연이 하늘로 올라갔어! 카이트는 케이야!",
+      "초코 코가 간지러워! 코는 영어로 노즈! 노즈는 엔으로 시작해. 그래서 엔이야! 엔 눌러줄래?"
     ],
-    "연이 하늘로 올라갔어!": [
-      "코는 노즈, 엔이야. 엔 눌러줄래?"
+    "연이 하늘로 올라갔어! 카이트는 케이야!": [
+      "초코 코가 간지러워! 코는 영어로 노즈! 노즈는 엔으로 시작해. 그래서 엔이야! 엔 눌러줄래?"
     ],
-    "코는 노즈, 엔이야. 엔 눌러줄래?": [
+    "초코 코가 간지러워! 코는 영어로 노즈! 노즈는 엔으로 시작해. 그래서 엔이야! 엔 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 N을 기다려.",
-      "에취! 초코 코가 간지러워.",
+      "에취! 초코 코가 간지러워. 노즈는 엔이야!",
       "같이 놀아 줘서 초코가 고마워해. 멍멍! 다음도 해 볼까?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 초코는 N을 기다려.": [
-      "에취! 초코 코가 간지러워.",
+      "에취! 초코 코가 간지러워. 노즈는 엔이야!",
       "같이 놀아 줘서 초코가 고마워해. 멍멍! 다음도 해 볼까?"
     ],
-    "에취! 초코 코가 간지러워.": [
+    "에취! 초코 코가 간지러워. 노즈는 엔이야!": [
       "같이 놀아 줘서 초코가 고마워해. 멍멍! 다음도 해 볼까?"
     ],
-    "밤하늘 놀이! 별은 스타, 에스야. 에스 눌러줄래?": [
-      "별은 스타, 에스야. 에스 눌러줄래?",
+    "밤하늘 놀이! 별을 켜 볼까? 별은 영어로 스타! 스타는 에스로 시작해. 그래서 에스야! 에스 눌러줄래?": [
+      "별을 켜 볼까? 별은 영어로 스타! 스타는 에스로 시작해. 그래서 에스야! 에스 눌러줄래?",
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 별은 S를 기다려.",
       "좋아. 이제 엔터!",
-      "별이 반짝 켜졌어!",
-      "달은 문, 엠이야. 엠 눌러줄래?"
+      "별이 반짝 켜졌어! 스타는 에스야!",
+      "달을 띄워 볼까? 달은 영어로 문! 문은 엠으로 시작해. 그래서 엠이야! 엠 눌러줄래?"
     ],
-    "별은 스타, 에스야. 에스 눌러줄래?": [
+    "별을 켜 볼까? 별은 영어로 스타! 스타는 에스로 시작해. 그래서 에스야! 에스 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 별은 S를 기다려.",
-      "별이 반짝 켜졌어!",
-      "달은 문, 엠이야. 엠 눌러줄래?"
+      "별이 반짝 켜졌어! 스타는 에스야!",
+      "달을 띄워 볼까? 달은 영어로 문! 문은 엠으로 시작해. 그래서 엠이야! 엠 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 별은 S를 기다려.": [
-      "별이 반짝 켜졌어!",
-      "달은 문, 엠이야. 엠 눌러줄래?"
+      "별이 반짝 켜졌어! 스타는 에스야!",
+      "달을 띄워 볼까? 달은 영어로 문! 문은 엠으로 시작해. 그래서 엠이야! 엠 눌러줄래?"
     ],
-    "별이 반짝 켜졌어!": [
-      "달은 문, 엠이야. 엠 눌러줄래?"
+    "별이 반짝 켜졌어! 스타는 에스야!": [
+      "달을 띄워 볼까? 달은 영어로 문! 문은 엠으로 시작해. 그래서 엠이야! 엠 눌러줄래?"
     ],
-    "달은 문, 엠이야. 엠 눌러줄래?": [
+    "달을 띄워 볼까? 달은 영어로 문! 문은 엠으로 시작해. 그래서 엠이야! 엠 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 달은 M을 기다려.",
-      "달이 동그랗게 떴어.",
-      "비가 와. 우산은 유야. 유 눌러줄래?"
+      "달이 동그랗게 떴어. 문은 엠이야!",
+      "비가 와! 우산은 영어로 엄브렐라! 엄브렐라는 유로 시작해. 그래서 유야! 유 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 달은 M을 기다려.": [
-      "달이 동그랗게 떴어.",
-      "비가 와. 우산은 유야. 유 눌러줄래?"
+      "달이 동그랗게 떴어. 문은 엠이야!",
+      "비가 와! 우산은 영어로 엄브렐라! 엄브렐라는 유로 시작해. 그래서 유야! 유 눌러줄래?"
     ],
-    "달이 동그랗게 떴어.": [
-      "비가 와. 우산은 유야. 유 눌러줄래?"
+    "달이 동그랗게 떴어. 문은 엠이야!": [
+      "비가 와! 우산은 영어로 엄브렐라! 엄브렐라는 유로 시작해. 그래서 유야! 유 눌러줄래?"
     ],
-    "비가 와. 우산은 유야. 유 눌러줄래?": [
+    "비가 와! 우산은 영어로 엄브렐라! 엄브렐라는 유로 시작해. 그래서 유야! 유 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 우산은 U를 기다려.",
-      "우산 아래 초코가 폭신해.",
-      "왕관은 퀸, 큐야. 큐 눌러줄래?"
+      "우산 아래 초코가 폭신해. 엄브렐라는 유야!",
+      "여왕 초코가 왕관을 쓰고 싶대! 여왕은 영어로 퀸! 퀸은 큐로 시작해. 그래서 큐야! 큐 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 우산은 U를 기다려.": [
-      "우산 아래 초코가 폭신해.",
-      "왕관은 퀸, 큐야. 큐 눌러줄래?"
+      "우산 아래 초코가 폭신해. 엄브렐라는 유야!",
+      "여왕 초코가 왕관을 쓰고 싶대! 여왕은 영어로 퀸! 퀸은 큐로 시작해. 그래서 큐야! 큐 눌러줄래?"
     ],
-    "우산 아래 초코가 폭신해.": [
-      "왕관은 퀸, 큐야. 큐 눌러줄래?"
+    "우산 아래 초코가 폭신해. 엄브렐라는 유야!": [
+      "여왕 초코가 왕관을 쓰고 싶대! 여왕은 영어로 퀸! 퀸은 큐로 시작해. 그래서 큐야! 큐 눌러줄래?"
     ],
-    "왕관은 퀸, 큐야. 큐 눌러줄래?": [
+    "여왕 초코가 왕관을 쓰고 싶대! 여왕은 영어로 퀸! 퀸은 큐로 시작해. 그래서 큐야! 큐 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 왕관은 Q를 기다려.",
-      "초코가 왕이 됐어!",
+      "초코가 왕이 됐어! 퀸은 큐야!",
       "밤하늘을 보여 줘서 초코가 고마워해. 다음도 해 볼까?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 왕관은 Q를 기다려.": [
-      "초코가 왕이 됐어!",
+      "초코가 왕이 됐어! 퀸은 큐야!",
       "밤하늘을 보여 줘서 초코가 고마워해. 다음도 해 볼까?"
     ],
-    "초코가 왕이 됐어!": [
+    "초코가 왕이 됐어! 퀸은 큐야!": [
       "밤하늘을 보여 줘서 초코가 고마워해. 다음도 해 볼까?"
     ],
-    "자동차 놀이! 트럭은 티야. 티 눌러줄래?": [
-      "트럭은 티야. 티 눌러줄래?",
+    "자동차 놀이! 트럭이 출발해! 트럭은 영어로 트럭! 트럭은 티로 시작해. 그래서 티야! 티 눌러줄래?": [
+      "트럭이 출발해! 트럭은 영어로 트럭! 트럭은 티로 시작해. 그래서 티야! 티 눌러줄래?",
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 트럭은 T를 기다려.",
       "좋아. 이제 엔터!",
-      "부릉! 트럭이 가.",
-      "바퀴는 휠, 더블유야. 더블유 눌러줄래?"
+      "부릉! 트럭이 가. 트럭은 티야!",
+      "바퀴가 굴러가! 바퀴는 영어로 휠! 휠은 더블유로 시작해. 그래서 더블유야! 더블유 눌러줄래?"
     ],
-    "트럭은 티야. 티 눌러줄래?": [
+    "트럭이 출발해! 트럭은 영어로 트럭! 트럭은 티로 시작해. 그래서 티야! 티 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 트럭은 T를 기다려.",
-      "부릉! 트럭이 가.",
-      "바퀴는 휠, 더블유야. 더블유 눌러줄래?"
+      "부릉! 트럭이 가. 트럭은 티야!",
+      "바퀴가 굴러가! 바퀴는 영어로 휠! 휠은 더블유로 시작해. 그래서 더블유야! 더블유 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 트럭은 T를 기다려.": [
-      "부릉! 트럭이 가.",
-      "바퀴는 휠, 더블유야. 더블유 눌러줄래?"
+      "부릉! 트럭이 가. 트럭은 티야!",
+      "바퀴가 굴러가! 바퀴는 영어로 휠! 휠은 더블유로 시작해. 그래서 더블유야! 더블유 눌러줄래?"
     ],
-    "부릉! 트럭이 가.": [
-      "바퀴는 휠, 더블유야. 더블유 눌러줄래?"
+    "부릉! 트럭이 가. 트럭은 티야!": [
+      "바퀴가 굴러가! 바퀴는 영어로 휠! 휠은 더블유로 시작해. 그래서 더블유야! 더블유 눌러줄래?"
     ],
-    "바퀴는 휠, 더블유야. 더블유 눌러줄래?": [
+    "바퀴가 굴러가! 바퀴는 영어로 휠! 휠은 더블유로 시작해. 그래서 더블유야! 더블유 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 바퀴는 W를 기다려.",
-      "바퀴가 데굴데굴 굴러.",
-      "밴은 브이야. 브이 눌러줄래?"
+      "바퀴가 데굴데굴 굴러. 휠은 더블유야!",
+      "밴이 지나가! 밴은 영어로 밴! 밴은 브이로 시작해. 그래서 브이야! 브이 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 바퀴는 W를 기다려.": [
-      "바퀴가 데굴데굴 굴러.",
-      "밴은 브이야. 브이 눌러줄래?"
+      "바퀴가 데굴데굴 굴러. 휠은 더블유야!",
+      "밴이 지나가! 밴은 영어로 밴! 밴은 브이로 시작해. 그래서 브이야! 브이 눌러줄래?"
     ],
-    "바퀴가 데굴데굴 굴러.": [
-      "밴은 브이야. 브이 눌러줄래?"
+    "바퀴가 데굴데굴 굴러. 휠은 더블유야!": [
+      "밴이 지나가! 밴은 영어로 밴! 밴은 브이로 시작해. 그래서 브이야! 브이 눌러줄래?"
     ],
-    "밴은 브이야. 브이 눌러줄래?": [
+    "밴이 지나가! 밴은 영어로 밴! 밴은 브이로 시작해. 그래서 브이야! 브이 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 밴은 V를 기다려.",
-      "붕붕! 밴이 지나갔어.",
+      "붕붕! 밴이 지나갔어. 밴은 브이야!",
       "차를 보여 줘서 초코가 신났어. 고마워! 다음도 해 볼까?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 밴은 V를 기다려.": [
-      "붕붕! 밴이 지나갔어.",
+      "붕붕! 밴이 지나갔어. 밴은 브이야!",
       "차를 보여 줘서 초코가 신났어. 고마워! 다음도 해 볼까?"
     ],
-    "붕붕! 밴이 지나갔어.": [
+    "붕붕! 밴이 지나갔어. 밴은 브이야!": [
       "차를 보여 줘서 초코가 신났어. 고마워! 다음도 해 볼까?"
     ],
-    "동물 친구 놀이! 돼지는 피그, 피야. 피 눌러줄래?": [
-      "돼지는 피그, 피야. 피 눌러줄래?",
+    "동물 친구 놀이! 돼지 친구가 오고 싶대! 돼지는 영어로 피그! 피그는 피로 시작해. 그래서 피야! 피 눌러줄래?": [
+      "돼지 친구가 오고 싶대! 돼지는 영어로 피그! 피그는 피로 시작해. 그래서 피야! 피 눌러줄래?",
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 돼지는 P를 기다려.",
       "좋아. 이제 엔터!",
-      "꿀꿀! 돼지 친구가 왔어.",
-      "사자는 라이언, 엘이야. 엘 눌러줄래?"
+      "꿀꿀! 돼지 친구가 왔어. 피그는 피야!",
+      "사자가 나타났어! 사자는 영어로 라이언! 라이언은 엘로 시작해. 그래서 엘이야! 엘 눌러줄래?"
     ],
-    "돼지는 피그, 피야. 피 눌러줄래?": [
+    "돼지 친구가 오고 싶대! 돼지는 영어로 피그! 피그는 피로 시작해. 그래서 피야! 피 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 돼지는 P를 기다려.",
-      "꿀꿀! 돼지 친구가 왔어.",
-      "사자는 라이언, 엘이야. 엘 눌러줄래?"
+      "꿀꿀! 돼지 친구가 왔어. 피그는 피야!",
+      "사자가 나타났어! 사자는 영어로 라이언! 라이언은 엘로 시작해. 그래서 엘이야! 엘 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 돼지는 P를 기다려.": [
-      "꿀꿀! 돼지 친구가 왔어.",
-      "사자는 라이언, 엘이야. 엘 눌러줄래?"
+      "꿀꿀! 돼지 친구가 왔어. 피그는 피야!",
+      "사자가 나타났어! 사자는 영어로 라이언! 라이언은 엘로 시작해. 그래서 엘이야! 엘 눌러줄래?"
     ],
-    "꿀꿀! 돼지 친구가 왔어.": [
-      "사자는 라이언, 엘이야. 엘 눌러줄래?"
+    "꿀꿀! 돼지 친구가 왔어. 피그는 피야!": [
+      "사자가 나타났어! 사자는 영어로 라이언! 라이언은 엘로 시작해. 그래서 엘이야! 엘 눌러줄래?"
     ],
-    "사자는 라이언, 엘이야. 엘 눌러줄래?": [
+    "사자가 나타났어! 사자는 영어로 라이언! 라이언은 엘로 시작해. 그래서 엘이야! 엘 눌러줄래?": [
       "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 사자는 L을 기다려.",
-      "어흥! 사자가 나타났어.",
-      "얼룩말은 지브라, 제트야. 제트 눌러줄래?"
+      "어흥! 사자가 나타났어. 라이언은 엘이야!",
+      "얼룩말이 달려와! 얼룩말은 영어로 지브라! 지브라는 제트로 시작해. 그래서 제트야! 제트 눌러줄래?"
     ],
     "어, 그건 Z이네! Z는 Zebra~ 얼룩말. 사자는 L을 기다려.": [
-      "어흥! 사자가 나타났어.",
-      "얼룩말은 지브라, 제트야. 제트 눌러줄래?"
+      "어흥! 사자가 나타났어. 라이언은 엘이야!",
+      "얼룩말이 달려와! 얼룩말은 영어로 지브라! 지브라는 제트로 시작해. 그래서 제트야! 제트 눌러줄래?"
     ],
-    "어흥! 사자가 나타났어.": [
-      "얼룩말은 지브라, 제트야. 제트 눌러줄래?"
+    "어흥! 사자가 나타났어. 라이언은 엘이야!": [
+      "얼룩말이 달려와! 얼룩말은 영어로 지브라! 지브라는 제트로 시작해. 그래서 제트야! 제트 눌러줄래?"
     ],
-    "얼룩말은 지브라, 제트야. 제트 눌러줄래?": [
+    "얼룩말이 달려와! 얼룩말은 영어로 지브라! 지브라는 제트로 시작해. 그래서 제트야! 제트 눌러줄래?": [
       "Z만 누르고 엔터 해 줘.",
-      "얼룩말이 달려왔어!",
-      "실로폰은 엑스야. 엑스 눌러줄래?",
-      "띵동! 초코가 꼬리를 흔들어.",
+      "얼룩말이 달려왔어! 지브라는 제트야!",
+      "실로폰을 쳐 볼까? 실로폰은 영어로 자일로폰! 자일로폰은 엑스로 시작해. 그래서 엑스야! 엑스 눌러줄래?",
+      "띵동! 초코가 꼬리를 흔들어. 자일로폰은 엑스야!",
       "친구들을 불러 줘서 초코가 고마워해. 멍멍! 다음도 해 볼까?"
     ],
     "Z만 누르고 엔터 해 줘.": [
-      "띵동! 초코가 꼬리를 흔들어.",
+      "띵동! 초코가 꼬리를 흔들어. 자일로폰은 엑스야!",
       "친구들을 불러 줘서 초코가 고마워해. 멍멍! 다음도 해 볼까?"
     ],
-    "얼룩말이 달려왔어!": [
-      "띵동! 초코가 꼬리를 흔들어.",
+    "얼룩말이 달려왔어! 지브라는 제트야!": [
+      "띵동! 초코가 꼬리를 흔들어. 자일로폰은 엑스야!",
       "친구들을 불러 줘서 초코가 고마워해. 멍멍! 다음도 해 볼까?"
     ],
-    "실로폰은 엑스야. 엑스 눌러줄래?": [
-      "띵동! 초코가 꼬리를 흔들어.",
+    "실로폰을 쳐 볼까? 실로폰은 영어로 자일로폰! 자일로폰은 엑스로 시작해. 그래서 엑스야! 엑스 눌러줄래?": [
+      "띵동! 초코가 꼬리를 흔들어. 자일로폰은 엑스야!",
       "친구들을 불러 줘서 초코가 고마워해. 멍멍! 다음도 해 볼까?"
     ],
-    "띵동! 초코가 꼬리를 흔들어.": [
+    "띵동! 초코가 꼬리를 흔들어. 자일로폰은 엑스야!": [
       "친구들을 불러 줘서 초코가 고마워해. 멍멍! 다음도 해 볼까?"
     ],
     "글자 놀이는 여기까지! 이제 짧은 명령을 내려 보자. 글자를 차례로 누르고 엔터. 방이 너무 어두워요. 불을 켜 볼까요? 차례대로, 오, 엔.": [
