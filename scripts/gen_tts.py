@@ -135,6 +135,9 @@ ENUM_INJECT = r"""
         });
         add('좋아. 이제 엔터!');
       }
+      if (typeof chapterJumpLines !== 'undefined') {
+        Object.keys(chapterJumpLines).forEach(function (key) { add(chapterJumpLines[key]); });
+      }
       return lines;
     };
 """
@@ -451,6 +454,26 @@ def collect_lines() -> dict:
                 ],
             )
             context = browser.new_context(viewport={"width": 1280, "height": 900})
+            # Main collection is the ordinary game. October 31 would open the
+            # birthday candles instead of chapter 1. Ages are collected separately.
+            context.add_init_script(
+                """
+                (() => {
+                  const fixedMs = Date.parse('2026-06-15T12:00:00');
+                  const NativeDate = Date;
+                  class FakeDate extends NativeDate {
+                    constructor(...args) {
+                      if (args.length === 0) super(fixedMs);
+                      else super(...args);
+                    }
+                    static now() { return fixedMs; }
+                    static parse(value) { return NativeDate.parse(value); }
+                    static UTC(...args) { return NativeDate.UTC(...args); }
+                  }
+                  window.Date = FakeDate;
+                })();
+                """
+            )
             context.add_init_script(
                 """
                 window.__lhqLines = [];

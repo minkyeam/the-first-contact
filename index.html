@@ -518,7 +518,7 @@ COMMAND: PRESS START OR PICK A CHAPTER</pre>
             <input id="commandInput" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="명령어 입력" />
           </label>
           <button id="submitBtn" type="button">[ ENTER ] RUN</button>
-          <button id="repeatBtn" type="button">[ F1 ] REPEAT VOICE</button>
+          <button id="repeatBtn" type="button" title="F1: 안내 다시 듣기. 다음 챕터는 Ctrl+Shift+→, 이전은 Ctrl+Shift+←. Mac은 Cmd+Shift+화살표. 입력창에는 next 또는 다음, ch 5.">[ F1 ] REPEAT VOICE</button>
         </section>
 
         <p id="status" class="status" role="status" aria-live="polite"></p>
@@ -755,7 +755,7 @@ ________________
       D: { word: 'Dog', ko: '강아지' },
       E: { word: 'Egg', ko: '달걀' },
       F: { word: 'Fish', ko: '물고기' },
-      G: { word: 'Go', ko: '출발' },
+      G: { word: 'Green', ko: '초록' },
       H: { word: 'Hat', ko: '모자' },
       I: { word: 'Ice', ko: '아이스크림' },
       J: { word: 'Jae', ko: '재윤' },
@@ -944,7 +944,41 @@ ________________
       ];
     }
 
+    function hangulJong(word) {
+      if (!word) return 0;
+      const code = word.charCodeAt(word.length - 1);
+      if (code < 0xac00 || code > 0xd7a3) return 0;
+      return (code - 0xac00) % 28;
+    }
+
+    function topicParticle(word) {
+      return hangulJong(word) ? '은' : '는';
+    }
+
+    function roParticle(word) {
+      const jong = hangulJong(word);
+      if (jong === 0 || jong === 8) return '로';
+      return '으로';
+    }
+
+    function ieya(word) {
+      return `${word}${hangulJong(word) ? '이야' : '야'}`;
+    }
+
+    // 화면은 알파벳 글자, 음성은 늘 쓰던 글자 이름(에이, 비). SunHi가 A를 아로 읽지 않게.
+    function letterWhySpeech(ko, pron, letter) {
+      const name = letterKo[letter];
+      return `${ko}${topicParticle(ko)} 영어로 ${pron}! ${pron}${topicParticle(pron)} ${name}${roParticle(name)} 시작해. 그래서 ${ieya(name)}!`;
+    }
+
+    function letterWhyScreen(ko, en, pron, letter) {
+      return `${ko}${topicParticle(ko)} 영어로 ${en}(${pron})! ${pron}${topicParticle(pron)} ${letter}로 시작해. 그래서 ${letter}야.`;
+    }
+
     function letterMission(letter, spec) {
+      const name = letterKo[letter];
+      const why = letterWhySpeech(spec.ko, spec.pron, letter);
+      const lead = spec.lead ? `${spec.lead} ` : '';
       return {
         command: letter.toLowerCase(),
         name: spec.name,
@@ -952,10 +986,10 @@ ________________
         waits: spec.waits,
         artBefore: withLetter(letter, spec.before),
         frames: spec.frames,
-        descBefore: spec.descBefore,
+        descBefore: `${letterWhyScreen(spec.ko, spec.en, spec.pron, letter)} ${spec.descBefore}`,
         descAfter: spec.descAfter,
-        contextTTS: spec.ask,
-        rewardTTS: spec.reward,
+        contextTTS: `${lead}${why} ${name} 눌러줄래?`,
+        rewardTTS: `${spec.reward} ${spec.pron}${topicParticle(spec.pron)} ${ieya(name)}!`,
         themeColor: spec.themeColor
       };
     }
@@ -1007,6 +1041,10 @@ ________________
         levels: [
           letterMission('J', {
             name: 'J 정류장',
+            ko: '재윤',
+            en: 'Jae',
+            pron: '재',
+            lead: '2층버스가 재윤이 정류장에 왔어!',
             waits: '문은',
             before: busArt({ caption: '문이 닫혀 있어요' }),
             frames: [
@@ -1014,13 +1052,16 @@ ________________
               busArt({ open: true, caption: '문이 열렸어요' }),
               busArt({ open: true, caption: '재윤이가 탔어요' })
             ],
-            descBefore: '2층버스가 J 정류장에 왔어요. J를 치면 문이 열려요.',
+            descBefore: 'J를 치면 문이 열려요.',
             descAfter: '치익~ 문이 열렸어요! 재윤이가 탔어요.',
-            ask: '2층버스가 재윤이 정류장에 왔어! 제이 눌러줄래?',
             reward: '치익~ 문이 열렸어! 재윤이가 탔어.'
           }),
           letterMission('C', {
             name: 'C 초코 탑승',
+            ko: '초코',
+            en: 'Choco',
+            pron: '초코',
+            lead: '초코도 타고 싶대!',
             waits: '초코는',
             before: `${busArt({ open: true, caption: '재윤이가 타고 있어요' })}\n${shiftArt(dog('o', '', false), 8)}`,
             frames: [
@@ -1028,13 +1069,16 @@ ________________
               `${busArt({ open: true, caption: '멍멍!' })}\n${shiftArt(dog('^', '', true), 1)}`,
               `${busArt({ open: true, caption: '초코가 탔어요' })}\n${dog('^', '', true)}`
             ],
-            descBefore: '초코도 버스를 타고 싶어 해요. C를 치면 초코가 타요.',
+            descBefore: 'C를 치면 초코가 타요.',
             descAfter: '멍멍! 초코가 재윤이 옆에 탔어요.',
-            ask: '초코도 타고 싶대! 씨 눌러줄래?',
             reward: '멍멍! 초코가 재윤이 옆에 탔어.'
           }),
           letterMission('B', {
             name: 'B 버스 출발',
+            ko: '버스',
+            en: 'Bus',
+            pron: '버스',
+            lead: '이제 버스가 가!',
             waits: '버스는',
             before: busArt({ open: true, caption: '재윤이랑 초코가 탔어요' }),
             frames: [
@@ -1042,9 +1086,8 @@ ________________
               busArt({ open: true, shift: 3, caption: '부릉!' }),
               busArt({ open: true, shift: 6, caption: '2층버스가 달렸어요' })
             ],
-            descBefore: 'B는 Bus, 2층버스예요. B를 치면 버스가 출발해요.',
+            descBefore: 'B를 치면 버스가 출발해요.',
             descAfter: '부릉! 2층버스가 출발했어요.',
-            ask: '비는 버스야! 비 누르면 2층버스가 가.',
             reward: '부릉! 2층버스가 달렸어.'
           })
         ]
@@ -1061,6 +1104,10 @@ ________________
         levels: [
           letterMission('R', {
             name: 'R 빨간 불',
+            ko: '빨강',
+            en: 'Red',
+            pron: '레드',
+            lead: '빨간 불이야!',
             waits: '신호등은',
             themeColor: '#ff0000',
             before: roadScene('', car(8, '= ')),
@@ -1069,13 +1116,16 @@ ________________
               roadScene('R', car(2), '정지'),
               roadScene('R', car(2), '멈췄어')
             ],
-            descBefore: '빨간 불이면 멈춰요. R은 Red, 빨강이에요.',
+            descBefore: 'R을 치면 자동차가 멈춰요.',
             descAfter: '빨간 불! 자동차가 멈췄어요.',
-            ask: '빨간 불이야! 알은 멈춰. 알 눌러줄래?',
             reward: '빨간 불! 차가 멈췄어.'
           }),
           letterMission('Y', {
             name: 'Y 노란 불',
+            ko: '노랑',
+            en: 'Yellow',
+            pron: '옐로',
+            lead: '노란 불이야!',
             waits: '신호등은',
             themeColor: '#ffd43b',
             before: roadScene('', car(2)),
@@ -1084,13 +1134,16 @@ ________________
               roadScene('Y', car(3, '.'), '천천히'),
               roadScene('Y', car(4, '. '), '천천히')
             ],
-            descBefore: '노란 불은 천천히예요. Y는 Yellow, 노랑이에요.',
+            descBefore: 'Y를 치면 자동차가 천천히 가요.',
             descAfter: '노란 불! 자동차가 천천히 가요.',
-            ask: '노란 불이야. 와이는 천천히. 와이 눌러줄래?',
             reward: '노란 불! 차가 천천히 가.'
           }),
           letterMission('G', {
             name: 'G 초록 불',
+            ko: '초록',
+            en: 'Green',
+            pron: '그린',
+            lead: '초록 불이야!',
             waits: '신호등은',
             themeColor: '#00ff00',
             before: roadScene('', car(2)),
@@ -1099,9 +1152,8 @@ ________________
               roadScene('G', car(10, '== '), '출발'),
               roadScene('G', car(16, '=== '), '부릉!')
             ],
-            descBefore: '초록 불이면 가도 돼요. G는 Go, 출발이에요.',
+            descBefore: 'G를 치면 차가 출발해요.',
             descAfter: '초록 불! 자동차가 씽씽 달려요.',
-            ask: '초록 불이야! 지는 가. 지 눌러줄래?',
             reward: '초록 불! 부릉, 차가 달려.'
           })
         ]
@@ -1118,42 +1170,54 @@ ________________
         levels: [
           letterMission('A', {
             name: 'A 사과',
+            ko: '사과',
+            en: 'Apple',
+            pron: '애플',
+            lead: '초코가 사과 먹고 싶대!',
             waits: '초코는',
             before: `${DOG_HUNGRY}사과를 기다려요`,
             frames: eatFrames('(@)', '사과'),
-            descBefore: '초코가 배고파요. 사과는 Apple이에요. A를 치면 사과를 줄 수 있어요.',
+            descBefore: 'A를 치면 초코가 사과를 먹어요.',
             descAfter: '초코가 사과를 냠냠 먹었어요.',
-            ask: '초코가 사과 먹고 싶대! 에이 눌러줄래?',
             reward: '냠냠! 멍멍!'
           }),
           letterMission('E', {
             name: 'E 달걀',
+            ko: '달걀',
+            en: 'Egg',
+            pron: '에그',
+            lead: '달걀도 줄래?',
             waits: '초코는',
             before: `${DOG_HUNGRY}달걀을 기다려요`,
             frames: eatFrames('(o)', '달걀'),
-            descBefore: '달걀은 Egg예요. E를 치면 초코 그릇에 달걀이 들어가요.',
+            descBefore: 'E를 치면 초코 그릇에 달걀이 들어가요.',
             descAfter: '초코가 달걀을 먹었어요.',
-            ask: '달걀도 줄래? 이는 에그야. 이 눌러줄래?',
             reward: '냠냠! 달걀도 먹었어.'
           }),
           letterMission('O', {
             name: 'O 오렌지',
+            ko: '오렌지',
+            en: 'Orange',
+            pron: '오렌지',
+            lead: '오렌지도 있어!',
             waits: '초코는',
             before: `${DOG_HUNGRY}오렌지를 기다려요`,
             frames: eatFrames('(#)', '오렌지'),
-            descBefore: '오렌지는 Orange예요. O를 치면 초코가 먹어요.',
+            descBefore: 'O를 치면 초코가 먹어요.',
             descAfter: '초코가 오렌지를 먹었어요.',
-            ask: '오렌지는 오야. 오 눌러줄래?',
             reward: '냠냠! 오렌지 맛있어.'
           }),
           letterMission('F', {
             name: 'F 물고기',
+            ko: '물고기',
+            en: 'Fish',
+            pron: '피쉬',
+            lead: '물고기도 줄래?',
             waits: '초코는',
             before: `${DOG_HUNGRY}물고기를 기다려요`,
             frames: eatFrames('><>', '물고기'),
-            descBefore: '물고기는 Fish예요. F를 치면 초코가 먹어요.',
+            descBefore: 'F를 치면 초코가 먹어요.',
             descAfter: '초코가 물고기를 먹고 배가 불렀어요.',
-            ask: '물고기는 피쉬, 에프야. 에프 눌러줄래?',
             reward: '냠냠! 물고기 먹었어. 멍멍!'
           })
         ]
@@ -1172,29 +1236,32 @@ ________________
             name: '재윤 이름',
             waits: '이름은',
             doneLine: '재윤이 이름 완성!',
-            descBefore: 'J, A, E를 차례로 누르고, 다 쓰면 엔터!',
+            descBefore: '재윤은 영어로 Jae(재)! 재는 J로 시작해. J, A, E를 차례로 누르고, 다 쓰면 엔터!',
             descAfter: '재윤이 이름 완성!',
-            ask: '재윤이 이름을 쓰자! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.',
-            reward: '재윤이 이름 완성!'
+            ask: '재윤은 영어로 재! 재는 제이로 시작해. 그래서 제이야! 제이, 에이, 이. 먼저 제이. 다 쓰면 엔터.',
+            reward: '재윤이 이름 완성! 재는 제이야!'
           }),
           letterMission('H', {
             name: 'H 모자',
+            ko: '모자',
+            en: 'Hat',
+            pron: '햇',
+            lead: '초코에게 모자를 씌우자!',
             waits: '모자는',
             before: dog('o', '', false),
             frames: [dogHat('^'), dogHat('o'), dogHat('^')],
-            descBefore: '모자는 Hat이에요. H를 치면 초코가 모자를 써요.',
+            descBefore: 'H를 치면 초코가 모자를 써요.',
             descAfter: '초코가 모자를 쓰고 웃어요.',
-            ask: '모자는 햇이야. 에이치 누르면 초코가 모자를 써.',
             reward: '초코가 모자를 썼어! 멋져.'
           }),
           nameMission('choco', {
             name: '초코 이름',
             waits: '초코는',
             doneLine: '초코가 뛰어왔어요!',
-            descBefore: 'C, H, O, C, O를 차례로 누르고, 다 쓰면 엔터!',
+            descBefore: '초코는 영어로 Choco(초코)! 초코는 C로 시작해. C, H, O, C, O를 차례로 누르고, 다 쓰면 엔터!',
             descAfter: '초코가 재윤이 부르는 소리를 듣고 뛰어왔어요!',
-            ask: '초코를 불러 보자! 먼저 씨. 다 쓰면 엔터.',
-            reward: '초코가 재윤이 부르는 소리를 듣고 뛰어왔어!'
+            ask: '초코는 영어로 초코! 초코는 씨로 시작해. 그래서 씨야! 씨, 에이치, 오, 씨, 오. 먼저 씨. 다 쓰면 엔터.',
+            reward: '초코가 재윤이 부르는 소리를 듣고 뛰어왔어! 초코는 씨야!'
           })
         ]
       }),
@@ -1210,42 +1277,54 @@ ________________
         levels: [
           letterMission('D', {
             name: 'D 강아지',
+            ko: '강아지',
+            en: 'Dog',
+            pron: '독',
+            lead: '강아지 초코가 뛰고 싶대!',
             waits: '초코는',
             before: dog('o', '', false),
             frames: jumpFrames(),
-            descBefore: 'D는 Dog, 강아지예요. D를 치면 초코가 뛰어요.',
+            descBefore: 'D를 치면 초코가 뛰어요.',
             descAfter: '멍멍! 초코가 폴짝 뛰었어요.',
-            ask: '디는 독, 강아지야. 디 눌러줄래?',
             reward: '멍멍! 초코가 폴짝 뛰었어.'
           }),
           letterMission('I', {
             name: 'I 아이스크림',
+            ko: '아이스크림',
+            en: 'Ice cream',
+            pron: '아이스크림',
+            lead: '아이스크림 줄까?',
             waits: '초코는',
             before: DOG_HUNGRY,
             frames: eatFrames('ICE', '아이스크림'),
-            descBefore: '아이스크림은 Ice예요. I를 치면 초코가 먹어요.',
+            descBefore: 'I를 치면 초코가 먹어요.',
             descAfter: '초코가 아이스크림을 냠냠 먹었어요.',
-            ask: '아이스크림은 아이야. 아이 눌러줄래?',
             reward: '냠냠! 시원해. 멍멍!'
           }),
           letterMission('K', {
             name: 'K 연',
+            ko: '연',
+            en: 'Kite',
+            pron: '카이트',
+            lead: '연을 날려 보자!',
             waits: '연은',
             before: kiteFrame(0),
             frames: [kiteFrame(1), kiteFrame(3), kiteFrame(2)],
-            descBefore: '연은 Kite예요. K를 치면 연이 날아올라요.',
+            descBefore: 'K를 치면 연이 날아올라요.',
             descAfter: '연이 하늘로 올라갔어요!',
-            ask: '연은 카이트, 케이야. 케이 눌러줄래?',
             reward: '연이 하늘로 올라갔어!'
           }),
           letterMission('N', {
             name: 'N 코',
+            ko: '코',
+            en: 'Nose',
+            pron: '노즈',
+            lead: '초코 코가 간지러워!',
             waits: '초코는',
             before: dog('o', '', false),
             frames: sneezeFrames(),
-            descBefore: '코는 Nose예요. N을 치면 초코가 재채기해요.',
+            descBefore: 'N을 치면 초코가 재채기해요.',
             descAfter: '에취! 초코 코가 간지러워요.',
-            ask: '코는 노즈, 엔이야. 엔 눌러줄래?',
             reward: '에취! 초코 코가 간지러워.'
           })
         ]
@@ -1262,26 +1341,36 @@ ________________
         levels: [
           letterMission('S', {
             name: 'S 별',
+            ko: '별',
+            en: 'Star',
+            pron: '스타',
+            lead: '별을 켜 볼까?',
             waits: '별은',
             before: NIGHT,
             frames: [starFrame(false), starFrame(true), starFrame(true)],
-            descBefore: '별은 Star예요. S를 치면 별이 켜져요.',
+            descBefore: 'S를 치면 별이 켜져요.',
             descAfter: '별이 반짝 켜졌어요!',
-            ask: '별은 스타, 에스야. 에스 눌러줄래?',
             reward: '별이 반짝 켜졌어!'
           }),
           letterMission('M', {
             name: 'M 달',
+            ko: '달',
+            en: 'Moon',
+            pron: '문',
+            lead: '달을 띄워 볼까?',
             waits: '달은',
             before: NIGHT,
             frames: [moonFrame(false), moonFrame(true), moonFrame(true)],
-            descBefore: '달은 Moon이에요. M을 치면 달이 떠요.',
+            descBefore: 'M을 치면 달이 떠요.',
             descAfter: '달이 동그랗게 떴어요.',
-            ask: '달은 문, 엠이야. 엠 눌러줄래?',
             reward: '달이 동그랗게 떴어.'
           }),
           letterMission('U', {
             name: 'U 우산',
+            ko: '우산',
+            en: 'Umbrella',
+            pron: '엄브렐라',
+            lead: '비가 와!',
             waits: '우산은',
             before: `  .  .  .  .  .  .\n${dog('o', '', false)}`,
             frames: [
@@ -1289,19 +1378,21 @@ ________________
               `${dogUmbrella()}\n우산!`,
               dogUmbrella()
             ],
-            descBefore: '비가 와요. 우산은 Umbrella예요. U를 치면 우산이 펴져요.',
+            descBefore: 'U를 치면 우산이 펴져요.',
             descAfter: '우산 아래 초코가 폭신해요.',
-            ask: '비가 와. 우산은 유야. 유 눌러줄래?',
             reward: '우산 아래 초코가 폭신해.'
           }),
           letterMission('Q', {
             name: 'Q 왕관',
+            ko: '여왕',
+            en: 'Queen',
+            pron: '퀸',
+            lead: '여왕 초코가 왕관을 쓰고 싶대!',
             waits: '왕관은',
             before: dog('o', '', false),
             frames: [dogCrown(), dogCrown(), `${dogCrown()}\n왕!`],
-            descBefore: '여왕은 Queen이에요. Q를 치면 초코가 왕관을 써요.',
+            descBefore: 'Q를 치면 초코가 왕관을 써요.',
             descAfter: '초코가 왕이 되었어요!',
-            ask: '왕관은 퀸, 큐야. 큐 눌러줄래?',
             reward: '초코가 왕이 됐어!'
           })
         ]
@@ -1318,32 +1409,41 @@ ________________
         levels: [
           letterMission('T', {
             name: 'T 트럭',
+            ko: '트럭',
+            en: 'Truck',
+            pron: '트럭',
+            lead: '트럭이 출발해!',
             waits: '트럭은',
             before: truckFrame(2),
             frames: [truckFrame(4, '= '), truckFrame(8, '== '), truckFrame(12, '=== ')],
-            descBefore: '트럭은 Truck이에요. T를 치면 트럭이 출발해요.',
+            descBefore: 'T를 치면 트럭이 출발해요.',
             descAfter: '부릉! 트럭이 달려요.',
-            ask: '트럭은 티야. 티 눌러줄래?',
             reward: '부릉! 트럭이 가.'
           }),
           letterMission('W', {
             name: 'W 바퀴',
+            ko: '바퀴',
+            en: 'Wheel',
+            pron: '휠',
+            lead: '바퀴가 굴러가!',
             waits: '바퀴는',
             before: wheelFrame(2, 'O'),
             frames: [wheelFrame(4, 'O'), wheelFrame(7, '+'), wheelFrame(10, 'X')],
-            descBefore: '바퀴는 Wheel이에요. W를 치면 바퀴가 굴러요.',
+            descBefore: 'W를 치면 바퀴가 굴러요.',
             descAfter: '바퀴가 데굴데굴 굴러요.',
-            ask: '바퀴는 휠, 더블유야. 더블유 눌러줄래?',
             reward: '바퀴가 데굴데굴 굴러.'
           }),
           letterMission('V', {
             name: 'V 밴',
+            ko: '밴',
+            en: 'Van',
+            pron: '밴',
+            lead: '밴이 지나가!',
             waits: '밴은',
             before: vanFrame(1),
             frames: [vanFrame(3), vanFrame(7), vanFrame(11)],
-            descBefore: '밴은 Van이에요. V를 치면 밴이 지나가요.',
+            descBefore: 'V를 치면 밴이 지나가요.',
             descAfter: '붕붕! 밴이 지나갔어요.',
-            ask: '밴은 브이야. 브이 눌러줄래?',
             reward: '붕붕! 밴이 지나갔어.'
           })
         ]
@@ -1360,42 +1460,54 @@ ________________
         levels: [
           letterMission('P', {
             name: 'P 돼지',
+            ko: '돼지',
+            en: 'Pig',
+            pron: '피그',
+            lead: '돼지 친구가 오고 싶대!',
             waits: '돼지는',
             before: dog('o', '', false),
             frames: palFrames('🐷', '꿀꿀'),
-            descBefore: '돼지는 Pig예요. P를 치면 돼지 친구가 와요.',
+            descBefore: 'P를 치면 돼지 친구가 와요.',
             descAfter: '꿀꿀! 돼지 친구가 왔어요.',
-            ask: '돼지는 피그, 피야. 피 눌러줄래?',
             reward: '꿀꿀! 돼지 친구가 왔어.'
           }),
           letterMission('L', {
             name: 'L 사자',
+            ko: '사자',
+            en: 'Lion',
+            pron: '라이언',
+            lead: '사자가 나타났어!',
             waits: '사자는',
             before: dog('o', '', false),
             frames: palFrames('🦁', '어흥'),
-            descBefore: '사자는 Lion이에요. L을 치면 사자가 나타나요.',
+            descBefore: 'L을 치면 사자가 나타나요.',
             descAfter: '어흥! 사자가 나타났어요.',
-            ask: '사자는 라이언, 엘이야. 엘 눌러줄래?',
             reward: '어흥! 사자가 나타났어.'
           }),
           letterMission('Z', {
             name: 'Z 얼룩말',
+            ko: '얼룩말',
+            en: 'Zebra',
+            pron: '지브라',
+            lead: '얼룩말이 달려와!',
             waits: '얼룩말은',
             before: dog('o', '', false),
             frames: palFrames('🦓', '달려와'),
-            descBefore: '얼룩말은 Zebra예요. Z를 치면 얼룩말이 달려와요.',
+            descBefore: 'Z를 치면 얼룩말이 달려와요.',
             descAfter: '얼룩말이 달려왔어요!',
-            ask: '얼룩말은 지브라, 제트야. 제트 눌러줄래?',
             reward: '얼룩말이 달려왔어!'
           }),
           letterMission('X', {
             name: 'X 실로폰',
+            ko: '실로폰',
+            en: 'Xylophone',
+            pron: '자일로폰',
+            lead: '실로폰을 쳐 볼까?',
             waits: '실로폰은',
             before: robot('-_-', '  ..  '),
             frames: xyloFrames(),
-            descBefore: '실로폰은 Xylophone이에요. X를 치면 띵동 소리가 나요.',
+            descBefore: 'X를 치면 띵동 소리가 나요.',
             descAfter: '띵동! 초코가 음악에 꼬리를 흔들어요.',
-            ask: '실로폰은 엑스야. 엑스 눌러줄래?',
             reward: '띵동! 초코가 꼬리를 흔들어.'
           })
         ]
@@ -1702,6 +1814,14 @@ ________________
 
     const CLEARED_KEY = 'lhq_cleared_chapters';
     const PROGRESS_VERSION_KEY = 'lhq_progress_version';
+    const chapterJumpLines = {
+      next: '다음 챕터로 갈게!',
+      prev: '이전 챕터로 갈게!',
+      goto: '그 챕터로 갈게!',
+      last: '여기가 마지막 챕터야.',
+      first: '여기가 첫 챕터야.',
+      missing: '그 챕터는 없어.'
+    };
     // 알파벳 챕터는 이야기를 통째로 바꿨다. 예전 클리어는 명령 챕터만 남긴다.
     const REWRITTEN_CHAPTER_IDS = new Set(['abc1', 'abc2', 'abc3']);
     let currentChapter = 0;
@@ -1716,6 +1836,8 @@ ________________
     let sceneAnimationTimer = null;
     let isStageTransitioning = false;
     let playToken = 0;
+    let chapterJumpGen = 0;
+    let menuTypeBuffer = '';
     let hintTimer = 0;
     let hintGen = 0;
     let hintCount = 0;
@@ -2636,6 +2758,7 @@ ________________
     }
 
     function startChapter(index) {
+      menuTypeBuffer = '';
       trackEvent('chapter_select', { chapter_id: chapters[index].id });
       if (isKakaoInApp && !allowKakaoInAppPlay) {
         pendingChapterIndex = index;
@@ -2659,6 +2782,7 @@ ________________
     }
 
     function showMenu() {
+      menuTypeBuffer = '';
       playToken += 1;
       isStageTransitioning = false;
       clearKeyHint();
@@ -2743,6 +2867,9 @@ ________________
       const allCleared = chapters.every(item => loadCleared().includes(item.id));
       const hasNext = currentChapter + 1 < chapters.length;
       setInputEnabled(false);
+      ui.commandInput.disabled = false;
+      ui.commandInput.value = '';
+      letterSoundBaseline = '';
       if (chapter.thanksFrames) {
         ui.sceneDesc.textContent = chapter.thanksDesc || ui.sceneDesc.textContent;
         startResultAnimation({ frames: chapter.thanksFrames });
@@ -2801,7 +2928,152 @@ ________________
       speakDiscovery(nonLetterDiscovery(level, target, level.guide && matched > 0));
     }
 
+    function parentChapterChord(event) {
+      // Ctrl+Shift+N 은 시크릿 창, Alt+← 는 뒤로가기라 쓰지 않는다.
+      // Ctrl+Shift+→ / ←. Mac은 Cmd+Shift+화살표도 받는다.
+      if (!event || event.repeat || event.altKey) return '';
+      if (!(event.ctrlKey || event.metaKey) || !event.shiftKey) return '';
+      const key = event.key || '';
+      const code = event.code || '';
+      if (key === 'ArrowRight' || code === 'ArrowRight') return 'next';
+      if (key === 'ArrowLeft' || code === 'ArrowLeft') return 'prev';
+      return '';
+    }
+
+    function parseChapterCommand(raw) {
+      const text = String(raw || '').trim().toLowerCase().replace(/\s+/g, ' ');
+      if (!text) return null;
+      if (text === 'next' || text === '다음') return { type: 'next' };
+      if (text === 'prev' || text === 'previous' || text === '이전') return { type: 'prev' };
+      const numbered = text.match(/^(?:ch|chapter|챕터)\s*(\d{1,2})$/);
+      if (!numbered) return null;
+      return { type: 'goto', number: Number(numbered[1]) };
+    }
+
+    function activeChapterIndex() {
+      const state = window.__lhqBirthdayState;
+      if ((state === 'candles' || state === 'party') && Number.isInteger(window.__lhqBirthdayPending)) {
+        return window.__lhqBirthdayPending;
+      }
+      if (gameStarted && !ui.gameScreen.classList.contains('hidden')) return currentChapter;
+      return -1;
+    }
+
+    function ensureSpeakingAllowed() {
+      if (gameStarted) return;
+      gameStarted = true;
+      if (hasTTS()) pickKoreanVoice();
+      trackEvent('game_start');
+    }
+
+    function canResumeIntro() {
+      if (ui.gameScreen.classList.contains('hidden')) return false;
+      if (!ui.doneBox.classList.contains('hidden')) return false;
+      if (window.__lhqBirthdayState === 'candles' || window.__lhqBirthdayState === 'party') return false;
+      const chapter = chapters[currentChapter];
+      return !!(chapter && chapter.levels[currentLevel]);
+    }
+
+    function cancelChapterRuntime() {
+      playToken += 1;
+      isStageTransitioning = true;
+      clearKeyHint();
+      discoveryGen += 1;
+      stopSceneAnimation();
+      if (typeof window.__lhqLeaveBirthday === 'function') window.__lhqLeaveBirthday();
+      stopSpeaking();
+      ui.commandInput.value = '';
+      letterSoundBaseline = '';
+      menuTypeBuffer = '';
+    }
+
+    async function speakJumpLine(line) {
+      ensureSpeakingAllowed();
+      await speak(line, { rate: 0.95, timeoutMs: 8000 });
+    }
+
+    async function sayStay(line) {
+      const gen = ++chapterJumpGen;
+      const resumeBirthday = window.__lhqBirthdayState === 'candles' ? window.__lhqBirthdayRepeatLine : '';
+      await speakJumpLine(line);
+      if (gen !== chapterJumpGen) return;
+      if (resumeBirthday && window.__lhqBirthdayState === 'candles') {
+        speak(resumeBirthday, { rate: 0.86, pitch: 1.05, timeoutMs: 14000 });
+        return;
+      }
+      if (canResumeIntro()) repeatVoice();
+    }
+
+    async function goToChapterIndex(index, line) {
+      if (index < 0 || index >= chapters.length) {
+        await sayStay(chapterJumpLines.missing);
+        return;
+      }
+      const gen = ++chapterJumpGen;
+      cancelChapterRuntime();
+      if (line) {
+        await speakJumpLine(line);
+        if (gen !== chapterJumpGen) return;
+      }
+      trackEvent('chapter_jump', { to_chapter: index + 1 });
+      startChapter(index);
+    }
+
+    async function jumpNextChapter() {
+      const current = activeChapterIndex();
+      const inBirthday = window.__lhqBirthdayState === 'candles' || window.__lhqBirthdayState === 'party';
+      if (current < 0) {
+        await goToChapterIndex(firstUnclearedChapter(), chapterJumpLines.next);
+        return;
+      }
+      if (current + 1 >= chapters.length) {
+        if (inBirthday) {
+          await goToChapterIndex(current, chapterJumpLines.last);
+          return;
+        }
+        await sayStay(chapterJumpLines.last);
+        return;
+      }
+      await goToChapterIndex(current + 1, chapterJumpLines.next);
+    }
+
+    async function jumpPrevChapter() {
+      const current = activeChapterIndex();
+      if (current <= 0) {
+        await sayStay(chapterJumpLines.first);
+        return;
+      }
+      await goToChapterIndex(current - 1, chapterJumpLines.prev);
+    }
+
+    function applyChapterCommand(nav) {
+      if (!nav) return;
+      if (nav.type === 'next') {
+        void jumpNextChapter();
+        return;
+      }
+      if (nav.type === 'prev') {
+        void jumpPrevChapter();
+        return;
+      }
+      if (nav.type !== 'goto') return;
+      const index = nav.number - 1;
+      if (index < 0 || index >= chapters.length) {
+        void sayStay(chapterJumpLines.missing);
+        return;
+      }
+      void goToChapterIndex(index, chapterJumpLines.goto);
+    }
+
     function handleSubmit() {
+      const nav = parseChapterCommand(ui.commandInput.value);
+      if (nav) {
+        ui.commandInput.value = '';
+        letterSoundBaseline = '';
+        applyChapterCommand(nav);
+        return;
+      }
+      if (!ui.doneBox.classList.contains('hidden')) return;
       const chapter = chapters[currentChapter];
       if (!chapter || currentLevel >= chapter.levels.length) return;
       if (isStageTransitioning) return;
@@ -2857,6 +3129,7 @@ ________________
       const next = ui.commandInput.value;
       const prev = letterSoundBaseline;
       letterSoundBaseline = next;
+      if (!ui.doneBox.classList.contains('hidden')) return;
       if (!gameStarted || isStageTransitioning) return;
       const chapter = chapters[currentChapter];
       const level = chapter && chapter.levels[currentLevel];
@@ -2911,10 +3184,51 @@ ________________
     ui.repeatBtn.addEventListener('click', repeatVoice);
 
     window.addEventListener('keydown', (event) => {
+      const dir = parentChapterChord(event);
+      if (dir) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (dir === 'next') void jumpNextChapter();
+        else void jumpPrevChapter();
+        return;
+      }
       if (event.key !== 'F1' && event.code !== 'F1') return;
       event.preventDefault();
       if (event.repeat) return;
       repeatVoice();
+    }, true);
+
+    window.addEventListener('keydown', (event) => {
+      if (!ui.startScreen.classList.contains('hidden')) {
+        if (event.metaKey || event.ctrlKey || event.altKey) return;
+        if (event.isComposing || event.key === 'Process' || event.key === 'Unidentified') return;
+        if (event.key === 'Enter') {
+          const nav = parseChapterCommand(menuTypeBuffer);
+          menuTypeBuffer = '';
+          if (!nav) return;
+          event.preventDefault();
+          event.stopPropagation();
+          applyChapterCommand(nav);
+          return;
+        }
+        if (event.key === 'Backspace') {
+          menuTypeBuffer = menuTypeBuffer.slice(0, -1);
+          return;
+        }
+        if (event.key === 'Escape') {
+          menuTypeBuffer = '';
+          return;
+        }
+        if (event.key.length === 1) {
+          menuTypeBuffer += event.key;
+          if (menuTypeBuffer.length > 24) menuTypeBuffer = menuTypeBuffer.slice(-24);
+        }
+      }
+    }, true);
+
+    window.addEventListener('compositionend', (event) => {
+      if (ui.startScreen.classList.contains('hidden')) return;
+      menuTypeBuffer += event.data || '';
     });
     window.addEventListener('keyup', (event) => {
       if (event.key !== 'F1' && event.code !== 'F1') return;
@@ -3295,6 +3609,7 @@ ________________
         const next = pendingBirthdayChapter;
         publishBirthday(null);
         pendingBirthdayChapter = null;
+        window.__lhqBirthdayPending = null;
         isStageTransitioning = false;
         originalStartChapter(next);
       }
@@ -3335,6 +3650,7 @@ ________________
         isStageTransitioning = true;
         publishBirthday('candles');
         pendingBirthdayChapter = index;
+        window.__lhqBirthdayPending = index;
         candlesLit = candleTotal;
         ui.startScreen.classList.add('hidden');
         ui.gameScreen.classList.remove('hidden');
@@ -3377,9 +3693,18 @@ ________________
         if (birthdayState !== 'candles' && birthdayState !== 'party') return;
         publishBirthday(null);
         pendingBirthdayChapter = null;
+        window.__lhqBirthdayPending = null;
         stopSong();
         stopSpeaking();
       }
+
+      window.__lhqLeaveBirthday = function () {
+        if (birthdayState !== 'candles' && birthdayState !== 'party') return false;
+        birthdayPlayedThisLoad = true;
+        leaveBirthday();
+        return true;
+      };
+      window.__lhqBirthdaySongCount = () => songNodes.length;
 
       ui.menuBtn.addEventListener('click', leaveBirthday, true);
       ui.backToMenuBtn.addEventListener('click', leaveBirthday, true);
