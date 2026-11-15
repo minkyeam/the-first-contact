@@ -135,6 +135,9 @@ ENUM_INJECT = r"""
         });
         add('좋아. 이제 엔터!');
       }
+      if (typeof hangulLines === 'function') {
+        try { hangulLines().forEach(add); } catch (_error) {}
+      }
       if (typeof chapterJumpLines !== 'undefined') {
         Object.keys(chapterJumpLines).forEach(function (key) { add(chapterJumpLines[key]); });
       }
@@ -307,6 +310,9 @@ def play_level(page, collector: Collector, pending: list[str], record_links: boo
         raise RuntimeError("level has an empty command")
     page.fill("#commandInput", "")
     page.locator("#commandInput").press_sequentially(command, delay=10)
+    typed_value = page.evaluate("() => document.querySelector('#commandInput').value || ''")
+    if typed_value.replace(" ", "").lower() != command.replace(" ", "").lower():
+        page.fill("#commandInput", command)
     page.click("#repeatBtn")
     midway = drain(page, collector)
     page.locator("#commandInput").press("Enter")
