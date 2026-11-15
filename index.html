@@ -4,16 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Little Hacker's Quest - Voice Edition</title>
-  <meta name="description" content="만 4세 아이를 위한 음성 안내 CLI 놀이. 한국어로 들으며 알파벳과 첫 명령어를 연습해요." />
+  <meta name="description" content="만 4세 아이를 위한 음성 안내 CLI 놀이. 한국어로 들으며 알파벳, 한글, 첫 명령어를 연습해요." />
   <meta property="og:title" content="Little Hacker's Quest - Voice Edition" />
-  <meta property="og:description" content="만 4세 아이를 위한 음성 안내 CLI 놀이. 한국어로 들으며 알파벳과 첫 명령어를 연습해요." />
+  <meta property="og:description" content="만 4세 아이를 위한 음성 안내 CLI 놀이. 한국어로 들으며 알파벳, 한글, 첫 명령어를 연습해요." />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="ko_KR" />
   <meta property="og:url" content="https://the-first-contact.vercel.app/" />
   <meta property="og:image" content="https://the-first-contact.vercel.app/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Little Hacker's Quest - Voice Edition" />
-  <meta name="twitter:description" content="만 4세 아이를 위한 음성 안내 CLI 놀이. 한국어로 들으며 알파벳과 첫 명령어를 연습해요." />
+  <meta name="twitter:description" content="만 4세 아이를 위한 음성 안내 CLI 놀이. 한국어로 들으며 알파벳, 한글, 첫 명령어를 연습해요." />
   <meta name="twitter:image" content="https://the-first-contact.vercel.app/og.png" />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -1756,8 +1756,952 @@ ________________
       };
     }
 
+// ---------- 한글 이야기 (자음, 모음, 소리 모아 쓰기) ----------
+    // 두벌식 물리 키. 영문 자판이어도 code로 자모를 넣는다.
+    const HANGUL_CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+    const HANGUL_JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
+    const HANGUL_JONG = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+    const JUNG_COMBO = {
+      'ㅗㅏ': 'ㅘ', 'ㅗㅐ': 'ㅙ', 'ㅗㅣ': 'ㅚ',
+      'ㅜㅓ': 'ㅝ', 'ㅜㅔ': 'ㅞ', 'ㅜㅣ': 'ㅟ',
+      'ㅡㅣ': 'ㅢ', 'ㅏㅣ': 'ㅐ', 'ㅓㅣ': 'ㅔ', 'ㅑㅣ': 'ㅒ', 'ㅕㅣ': 'ㅖ'
+    };
+    const JONG_COMBO = {
+      'ㄱㅅ': 'ㄳ', 'ㄴㅈ': 'ㄵ', 'ㄴㅎ': 'ㄶ',
+      'ㄹㄱ': 'ㄺ', 'ㄹㅁ': 'ㄻ', 'ㄹㅂ': 'ㄼ', 'ㄹㅅ': 'ㄽ', 'ㄹㅌ': 'ㄾ', 'ㄹㅍ': 'ㄿ', 'ㄹㅎ': 'ㅀ',
+      'ㅂㅅ': 'ㅄ'
+    };
+    const JONG_SPLIT = {};
+    Object.keys(JONG_COMBO).forEach((pair) => {
+      JONG_SPLIT[JONG_COMBO[pair]] = [pair[0], pair[1]];
+    });
+    const HANGUL_CODE = {
+      KeyQ: 'ㅂ', KeyW: 'ㅈ', KeyE: 'ㄷ', KeyR: 'ㄱ', KeyT: 'ㅅ',
+      KeyY: 'ㅛ', KeyU: 'ㅕ', KeyI: 'ㅑ', KeyO: 'ㅐ', KeyP: 'ㅔ',
+      KeyA: 'ㅁ', KeyS: 'ㄴ', KeyD: 'ㅇ', KeyF: 'ㄹ', KeyG: 'ㅎ',
+      KeyH: 'ㅗ', KeyJ: 'ㅓ', KeyK: 'ㅏ', KeyL: 'ㅣ',
+      KeyZ: 'ㅋ', KeyX: 'ㅌ', KeyC: 'ㅊ', KeyV: 'ㅍ', KeyB: 'ㅠ', KeyN: 'ㅜ', KeyM: 'ㅡ'
+    };
+    const HANGUL_SHIFT_CODE = {
+      KeyQ: 'ㅃ', KeyW: 'ㅉ', KeyE: 'ㄸ', KeyR: 'ㄲ', KeyT: 'ㅆ'
+    };
+
+    const jamoInfo = {
+      'ㄱ': { name: '기역', word: '기차', keyLabel: 'R', taught: true },
+      'ㄴ': { name: '니은', word: '나비', keyLabel: 'S', taught: true },
+      'ㄷ': { name: '디귿', word: '다리', keyLabel: 'E', taught: true },
+      'ㄹ': { name: '리을', word: '로봇', keyLabel: 'F', taught: true },
+      'ㅁ': { name: '미음', word: '물', keyLabel: 'A', taught: true },
+      'ㅂ': { name: '비읍', word: '밥', keyLabel: 'Q', taught: true },
+      'ㅅ': { name: '시옷', word: '수박', keyLabel: 'T', taught: true },
+      'ㅇ': { name: '이응', word: '우유', keyLabel: 'D', taught: true },
+      'ㅈ': { name: '지읒', word: '자동차', keyLabel: 'W', taught: true },
+      'ㅊ': { name: '치읓', word: '초코', keyLabel: 'C', taught: true },
+      'ㅋ': { name: '키읔', word: '코끼리', keyLabel: 'Z', taught: true },
+      'ㅌ': { name: '티읕', word: '토끼', keyLabel: 'X', taught: true },
+      'ㅍ': { name: '피읖', word: '포도', keyLabel: 'V', taught: true },
+      'ㅎ': { name: '히읗', word: '호랑이', keyLabel: 'G', taught: true },
+      'ㅏ': { name: '아', word: '아빠', keyLabel: 'K', taught: true },
+      'ㅑ': { name: '야', word: '야옹', keyLabel: 'I', taught: true },
+      'ㅓ': { name: '어', word: '엄마', keyLabel: 'J', taught: true },
+      'ㅕ': { name: '여', word: '여우', keyLabel: 'U', taught: true },
+      'ㅗ': { name: '오', word: '오리', keyLabel: 'H', taught: true },
+      'ㅛ': { name: '요', word: '요요', keyLabel: 'Y', taught: true },
+      'ㅜ': { name: '우', word: '우산', keyLabel: 'N', taught: true },
+      'ㅠ': { name: '유', word: '유리', keyLabel: 'B', taught: true },
+      'ㅡ': { name: '으', word: '으악', keyLabel: 'M', taught: true },
+      'ㅣ': { name: '이', word: '이불', keyLabel: 'L', taught: true },
+      'ㅐ': { name: '애', word: '애', keyLabel: 'O', taught: false },
+      'ㅔ': { name: '에', word: '에', keyLabel: 'P', taught: false },
+      'ㄲ': { name: '쌍기역', word: '꿀', keyLabel: '쉬프트 R', taught: false },
+      'ㄸ': { name: '쌍디귿', word: '떡', keyLabel: '쉬프트 E', taught: false },
+      'ㅃ': { name: '쌍비읍', word: '빠', keyLabel: '쉬프트 Q', taught: false },
+      'ㅆ': { name: '쌍시옷', word: '쌀', keyLabel: '쉬프트 T', taught: false },
+      'ㅉ': { name: '쌍지읒', word: '짜', keyLabel: '쉬프트 W', taught: false }
+    };
+
+    function composeHangul(keys) {
+      let out = '';
+      let cho = '';
+      let jung = '';
+      let jong = '';
+
+      function syllable() {
+        if (!cho && !jung && !jong) return '';
+        if (cho && jung) {
+          const ci = HANGUL_CHO.indexOf(cho);
+          const ji = HANGUL_JUNG.indexOf(jung);
+          const ki = HANGUL_JONG.indexOf(jong);
+          if (ci >= 0 && ji >= 0 && ki >= 0) {
+            return String.fromCharCode(0xAC00 + (ci * 588) + (ji * 28) + ki);
+          }
+        }
+        return cho + jung + jong;
+      }
+
+      function flush() {
+        out += syllable();
+        cho = '';
+        jung = '';
+        jong = '';
+      }
+
+      (keys || []).forEach((key) => {
+        const isCho = HANGUL_CHO.indexOf(key) >= 0;
+        const isJung = HANGUL_JUNG.indexOf(key) >= 0;
+        if (!isCho && !isJung) {
+          flush();
+          out += key;
+          return;
+        }
+        if (isCho) {
+          if (!cho && !jung) {
+            cho = key;
+            return;
+          }
+          if (cho && !jung) {
+            flush();
+            cho = key;
+            return;
+          }
+          if (jung && !jong) {
+            if (HANGUL_JONG.indexOf(key) > 0) {
+              jong = key;
+              return;
+            }
+            flush();
+            cho = key;
+            return;
+          }
+          const combo = JONG_COMBO[jong + key];
+          if (combo) {
+            jong = combo;
+            return;
+          }
+          flush();
+          cho = key;
+          return;
+        }
+        if (cho && !jung) {
+          jung = key;
+          return;
+        }
+        if (jung && !jong) {
+          const combo = JUNG_COMBO[jung + key];
+          if (combo) {
+            jung = combo;
+            return;
+          }
+          flush();
+          jung = key;
+          flush();
+          return;
+        }
+        if (jong) {
+          const split = JONG_SPLIT[jong];
+          const moving = split ? split[1] : jong;
+          jong = split ? split[0] : '';
+          flush();
+          cho = moving;
+          jung = key;
+          return;
+        }
+        flush();
+        jung = key;
+        flush();
+      });
+      flush();
+      return out.normalize('NFC');
+    }
+
+    function decomposeHangulText(text) {
+      const out = [];
+      [...String(text || '').normalize('NFC')].forEach((ch) => {
+        const code = ch.codePointAt(0);
+        if (code >= 0xAC00 && code <= 0xD7A3) {
+          const syl = code - 0xAC00;
+          out.push(HANGUL_CHO[Math.floor(syl / 588)]);
+          out.push(HANGUL_JUNG[Math.floor((syl % 588) / 28)]);
+          const jong = HANGUL_JONG[syl % 28];
+          if (jong) {
+            const split = JONG_SPLIT[jong];
+            if (split) out.push(split[0], split[1]);
+            else out.push(jong);
+          }
+          return;
+        }
+        out.push(ch);
+      });
+      return out;
+    }
+
+    function jamoIeya(jamo) {
+      const name = jamoInfo[jamo].name;
+      return `${jamo}${hangulJong(name) ? '이야' : '야'}`;
+    }
+
+    function jamoWhySpeech(jamo) {
+      const info = jamoInfo[jamo];
+      return `${info.word}${topicParticle(info.word)} ${info.name}${roParticle(info.name)} 시작해. 그래서 ${jamoIeya(jamo)}!`;
+    }
+
+    function jamoWhyScreen(jamo) {
+      const info = jamoInfo[jamo];
+      return `${info.word}${topicParticle(info.word)} ${info.name}(${jamo})${roParticle(info.name)} 시작해. 그래서 ${jamoIeya(jamo)}`;
+    }
+
+    function hangulKeyHint(jamo) {
+      const info = jamoInfo[jamo];
+      const particle = hangulJong(info.name) ? '이' : '가';
+      return `${info.keyLabel} 키에 ${jamo}${particle} 있어`;
+    }
+
+    function jamoThat(jamo) {
+      const name = jamoInfo[jamo].name;
+      if (hangulJong(name)) return `어, 그건 ${name}이네!`;
+      return `어, 그건 ${name}!`;
+    }
+
+    function hangulWrongSpeech(wrong, target) {
+      const info = jamoInfo[wrong];
+      const because = `${info.word}${topicParticle(info.word)} ${info.name}${roParticle(info.name)} 시작해.`;
+      return `${jamoThat(wrong)} ${because} ${hangulKeyHint(target)}`;
+    }
+
+    function hangulNonLetter(target) {
+      return `어, 글자가 아니야. ${hangulKeyHint(target)}`;
+    }
+
+    function hangulEmpty(target) {
+      return `아직은 비어 있어. 먼저 ${jamoInfo[target].name}. ${hangulKeyHint(target)}`;
+    }
+
+    function hangulPartial(prev, next) {
+      return `좋아, ${jamoInfo[prev].name}. 다음은 ${jamoInfo[next].name}. ${hangulKeyHint(next)}`;
+    }
+
+    function hangulStepSpeech(keys, count) {
+      const just = jamoInfo[keys[count - 1]].name;
+      if (count >= keys.length) return `${just}! 됐어, 엔터!`;
+      return `${just}! 다음은 ${jamoInfo[keys[count]].name}.`;
+    }
+
+    function hangulMidRepeat(keys, count) {
+      const next = keys[count];
+      return `다음은 ${jamoInfo[next].name}. ${hangulKeyHint(next)} 다 쓰면 엔터.`;
+    }
+
+    function hangulOnlyCommand(command) {
+      return `${command}만 누르고 엔터 해 줘.`;
+    }
+
+    function withJamo(jamo, scene) {
+      return `[BIG]${jamo}[/BIG]\n${scene}`;
+    }
+
+    function trainArt(shift, caption) {
+      const pad = ' '.repeat(shift || 0);
+      const lines = [
+        '  ______________',
+        ' | 기차   ____  |',
+        ' | [] [] |____| |',
+        " '-O----------O-'",
+        '=================='
+      ];
+      return lines.map((line) => pad + line).join('\n') + (caption ? `\n${caption}` : '');
+    }
+
+    function butterflyScene(up) {
+      const wing = up ? '\\     /' : ' \\   /';
+      const wing2 = up ? '/     \\' : ' /   \\';
+      return `\n   ${wing}\n  =  나비  =\n   ${wing2}\n${dog('^', '', true)}`;
+    }
+
+    function bridgeScene(pos, caption) {
+      return `${' '.repeat(pos)}초코\n  ____|_________|____\n  ====================\n  ${caption || ''}`;
+    }
+
+    function drinkFrames(item, note) {
+      return [
+        `${dog('o', item, false)}${note}`,
+        `${dog('^', item, true)}꿀꺽`,
+        `${dog('^', '', true)}${note}!`
+      ];
+    }
+
+    function yoyoArt(low) {
+      const string = low ? '    |\n    |\n    |\n   (o)' : '    |\n   (o)';
+      return `\n${string}\n${dog('^', '', low)}`;
+    }
+
+    function marbleArt(on) {
+      const ball = on ? '[AQUA]( 유리 )[/AQUA]' : '(    )';
+      return `\n    ${ball}\n   ${on ? '*  *  *' : ''}\n${dog('^', '', on)}`;
+    }
+
+    function sleepScene(deep) {
+      return `\n   [이불]\n  [=======]\n${dog(deep ? '-' : 'o', '', false)}  ${deep ? 'zzz' : 'z'}`;
+    }
+
+    function bagScene(full) {
+      const mark = full ? '[YELLOW]가[/YELLOW]' : '??';
+      return `\n   .------.\n   | 가방 |\n   | ${mark}  |\n   '------'\n${dog(full ? '^' : 'o', '', full)}`;
+    }
+
+    function treeScene(done) {
+      return `\n     /\\\n    /  \\\n   / 나무 \\\n     ||\n${done ? dog('^', '', true) : dog('o', '', false)}`;
+    }
+
+    function personScene(label, happy) {
+      const arm = happy ? '\\o/' : ' | ';
+      return `\n    O\n   ${arm}  ${label}\n   / \\\n${dog(happy ? '^' : 'o', '', happy)}`;
+    }
+
+    function hangulWordPaint(keys) {
+      return function paint(count) {
+        const shown = composeHangul(keys.slice(0, count)) || '·';
+        const slots = keys.map((ch, index) => (index < count ? `[YELLOW]${ch}[/YELLOW]` : '_')).join(' ');
+        const pup = shiftArt(dog(count ? '^' : 'o', '', count > 0), Math.max(0, 8 - count));
+        return `[BIG]${shown}[/BIG]\n${pup}\n  ${slots}`;
+      };
+    }
+
+    function hangulDoneFrames(word, line) {
+      const big = `[BIG][YELLOW]${word}[/YELLOW][/BIG]`;
+      return [
+        `${big}\n${dog('^', '', true)}${line}`,
+        `${big}\n${dog('^', '<3 ', true)}${line}`,
+        `${big}\n${shiftArt(dog('^', '', true), 2)}${line}`
+      ];
+    }
+
+    function jamoMission(jamo, spec) {
+      const why = jamoWhySpeech(jamo);
+      const hint = hangulKeyHint(jamo);
+      const lead = spec.lead ? `${spec.lead} ` : '';
+      return {
+        command: jamo,
+        name: spec.name,
+        story: true,
+        hangul: true,
+        jamo: [jamo],
+        artBefore: withJamo(jamo, spec.before),
+        frames: spec.frames,
+        descBefore: `${jamoWhyScreen(jamo)} ${spec.descBefore} ${hint}.`,
+        descAfter: spec.descAfter,
+        contextTTS: `${lead}${why} ${hint}. 눌러줄래?`,
+        rewardTTS: `${spec.reward} ${why}`,
+        themeColor: spec.themeColor
+      };
+    }
+
+    function syllableMission(keys, spec) {
+      const paint = hangulWordPaint(keys);
+      const names = keys.map((key) => jamoInfo[key].name).join(', ');
+      const first = keys[0];
+      const lead = spec.lead ? `${spec.lead} ` : '';
+      return {
+        command: composeHangul(keys),
+        name: spec.name,
+        story: true,
+        hangul: true,
+        jamo: keys.slice(),
+        paint,
+        artBefore: paint(0),
+        frames: spec.frames,
+        descBefore: `${spec.descBefore} ${names}. 먼저 ${jamoInfo[first].name}. ${hangulKeyHint(first)}.`,
+        descAfter: spec.descAfter,
+        contextTTS: `${lead}${names}. 먼저 ${jamoInfo[first].name}. ${hangulKeyHint(first)}.`,
+        rewardTTS: spec.reward,
+        themeColor: spec.themeColor
+      };
+    }
+
+    const hangulChapters = [
+      storyChapter({
+        id: 'han1',
+        title: '기차 여행',
+        intro: '초코랑 기차 여행! 자음 누르고 엔터.',
+        collect: ['기차', '나비', '다리', '로봇', '물'],
+        label: '여행',
+        thanksLine: '여행 고마워! 멍멍!',
+        thanksDesc: '초코가 기차 여행이 재미있어서 꼬리를 흔들어요.',
+        thanks: '기차 여행 끝! 초코가 꼬리를 흔들며 고마워해. 멍멍!',
+        levels: [
+          jamoMission('ㄱ', {
+            name: 'ㄱ 기차',
+            lead: '기차가 멈춰 있어!',
+            before: trainArt(0, '출발을 기다려요'),
+            frames: [trainArt(2, '부릉'), trainArt(6, '부릉'), trainArt(10, '기차가 달렸어요')],
+            descBefore: 'R 키를 누르면 기차가 출발해요.',
+            descAfter: '부릉! 기차가 달렸어요.',
+            reward: '부릉! 기차가 떠났어.'
+          }),
+          jamoMission('ㄴ', {
+            name: 'ㄴ 나비',
+            lead: '나비가 날아와!',
+            before: `\n  ( 나비 )\n${dog('o', '', false)}`,
+            frames: [butterflyScene(false), butterflyScene(true), butterflyScene(true)],
+            descBefore: 'S 키를 누르면 나비가 팔랑팔랑 날아요.',
+            descAfter: '나비가 초코 앞에서 팔랑팔랑 날아요.',
+            reward: '나비가 팔랑팔랑!'
+          }),
+          jamoMission('ㄷ', {
+            name: 'ㄷ 다리',
+            lead: '개울이야. 다리가 필요해!',
+            before: bridgeScene(0, '개울'),
+            frames: [bridgeScene(4, '뚜벅'), bridgeScene(10, '뚜벅'), bridgeScene(16, '건넜어')],
+            descBefore: 'E 키를 누르면 초코가 다리를 건너요.',
+            descAfter: '초코가 다리를 건넜어요.',
+            reward: '뚜벅뚜벅, 다리를 건넜어.'
+          }),
+          jamoMission('ㄹ', {
+            name: 'ㄹ 로봇',
+            lead: '로봇이 자고 있어!',
+            before: robot('-_-', '  zz  '),
+            frames: [robot('^_^', ' 안녕 ', true), robot('^o^', ' 삐빅 ', false), robot('^_^', ' 안녕 ', true)],
+            descBefore: 'F 키를 누르면 로봇이 일어나요.',
+            descAfter: '삐빅! 로봇이 깨어나서 인사해요.',
+            reward: '삐빅! 로봇이 일어났어.'
+          }),
+          jamoMission('ㅁ', {
+            name: 'ㅁ 물',
+            lead: '초코가 목이 말라!',
+            themeColor: '#3b82ff',
+            before: `${DOG_HUNGRY}물이 마시고 싶어요`,
+            frames: drinkFrames('~~', '물'),
+            descBefore: 'A 키를 누르면 초코가 물을 마셔요.',
+            descAfter: '꿀꺽꿀꺽. 초코가 시원해요.',
+            reward: '꿀꺽꿀꺽. 시원하다!'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'han2',
+        title: '초코의 하루',
+        intro: '초코의 하루! 밥도 주고 이름도 불러 보자.',
+        collect: ['밥', '수박', '우유', '자동차', '초코'],
+        label: '하루',
+        thanksLine: '배불러! 고마워!',
+        thanksDesc: '배부른 초코가 고마워해요.',
+        thanks: '초코가 배를 두드리며 고마워해. 냠냠, 멍멍!',
+        levels: [
+          jamoMission('ㅂ', {
+            name: 'ㅂ 밥',
+            lead: '초코가 밥 먹고 싶대!',
+            before: `${DOG_HUNGRY}밥을 기다려요`,
+            frames: eatFrames('밥', '밥'),
+            descBefore: 'Q 키를 누르면 초코 그릇에 밥이 담겨요.',
+            descAfter: '냠냠! 초코가 밥을 맛있게 먹어요.',
+            reward: '냠냠! 밥 먹었어. 멍멍!'
+          }),
+          jamoMission('ㅅ', {
+            name: 'ㅅ 수박',
+            lead: '수박도 줄래?',
+            themeColor: '#ff4d6d',
+            before: `${DOG_HUNGRY}수박을 기다려요`,
+            frames: eatFrames('수박', '수박'),
+            descBefore: 'T 키를 누르면 초코가 수박을 먹어요.',
+            descAfter: '수박이 달아요. 초코 입에 씨가 묻었어요.',
+            reward: '냠냠! 수박이 달아.'
+          }),
+          jamoMission('ㅇ', {
+            name: 'ㅇ 우유',
+            lead: '우유 한 잔 줄까?',
+            before: `${dog('o', '', false)}우유가 있어요`,
+            frames: drinkFrames('우유', '우유'),
+            descBefore: 'D 키를 누르면 초코가 우유를 마셔요.',
+            descAfter: '초코가 우유를 꿀꺽 마셨어요.',
+            reward: '꿀꺽! 우유가 맛있어.'
+          }),
+          jamoMission('ㅈ', {
+            name: 'ㅈ 자동차',
+            lead: '자동차가 나가고 싶어!',
+            before: car(2),
+            frames: [car(4, '= '), car(8, '== '), car(12, '=== ')],
+            descBefore: 'W 키를 누르면 자동차가 출발해요.',
+            descAfter: '부릉부릉! 자동차가 달려요.',
+            reward: '부릉부릉! 자동차가 달렸어.'
+          }),
+          jamoMission('ㅊ', {
+            name: 'ㅊ 초코',
+            lead: '초코를 부르자!',
+            themeColor: '#c47a3a',
+            before: `${dog('o', '', false)}초코를 기다려요`,
+            frames: [
+              `${shiftArt(dog('^', '', true), 8)}달려와`,
+              `${shiftArt(dog('^', '', true), 3)}멍멍`,
+              `${dog('^', '<3 ', true)}초코!`
+            ],
+            descBefore: 'C 키를 누르면 초코가 달려와요.',
+            descAfter: '멍멍! 초코가 재윤이한테 달려왔어요.',
+            reward: '멍멍! 초코가 달려왔어.'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'han3',
+        title: '동물원',
+        intro: '동물원이다! 자음으로 친구를 부르자.',
+        collect: ['코끼리', '토끼', '포도', '호랑이'],
+        label: '동물',
+        thanksLine: '동물 고마워!',
+        thanksDesc: '초코가 동물 친구들에게 고마워해요.',
+        thanks: '동물 친구가 많아졌어. 초코가 신나서 고마워해!',
+        levels: [
+          jamoMission('ㅋ', {
+            name: 'ㅋ 코끼리',
+            lead: '코끼리가 코를 흔들어!',
+            before: `\n  코끼리 ..\n${dog('o', '', false)}`,
+            frames: palFrames('🐘', '뿌우'),
+            descBefore: 'Z 키를 누르면 코끼리가 인사해요.',
+            descAfter: '뿌우! 코끼리가 코를 흔들어요.',
+            reward: '뿌우! 코끼리가 인사해.'
+          }),
+          jamoMission('ㅌ', {
+            name: 'ㅌ 토끼',
+            lead: '토끼가 깡충!',
+            before: `\n  토끼 ..\n${dog('o', '', false)}`,
+            frames: palFrames('🐰', '깡충'),
+            descBefore: 'X 키를 누르면 토끼가 뛰어요.',
+            descAfter: '깡충! 토끼가 폴짝 뛰어요.',
+            reward: '깡충! 토끼가 폴짝.'
+          }),
+          jamoMission('ㅍ', {
+            name: 'ㅍ 포도',
+            lead: '포도 알을 나눠 먹자!',
+            themeColor: '#a855f7',
+            before: `${DOG_HUNGRY}포도를 기다려요`,
+            frames: eatFrames('포도', '포도'),
+            descBefore: 'V 키를 누르면 초코가 포도를 먹어요.',
+            descAfter: '알맹이 톡톡. 초코가 포도를 먹어요.',
+            reward: '냠냠! 포도 알이 톡톡.'
+          }),
+          jamoMission('ㅎ', {
+            name: 'ㅎ 호랑이',
+            lead: '호랑이가 나타났어!',
+            themeColor: '#ff8c00',
+            before: `\n  호랑이 ..\n${dog('o', '', false)}`,
+            frames: palFrames('🐯', '어흥'),
+            descBefore: 'G 키를 누르면 호랑이가 나타나요.',
+            descAfter: '어흥! 호랑이가 나타나고 초코는 용감해요.',
+            reward: '어흥! 호랑이다. 초코는 용감해.'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'han4',
+        title: '모음 나라',
+        intro: '이제 모음이야. 입 모양을 들어 보자.',
+        collect: ['아빠', '야옹', '엄마', '여우', '오리'],
+        label: '모음',
+        thanksLine: '모음 고마워!',
+        thanksDesc: '초코가 모음 소리를 듣고 좋아해요.',
+        thanks: '모음 소리를 잘 찾았어. 초코가 귀를 쫑긋, 고마워!',
+        levels: [
+          jamoMission('ㅏ', {
+            name: 'ㅏ 아빠',
+            lead: '아빠가 보고 싶대!',
+            before: personScene('아빠', false),
+            frames: [personScene('아빠', true), personScene('아빠', true), `${personScene('아빠', true)}안아!`],
+            descBefore: 'K 키를 누르면 아빠가 안아 줘요.',
+            descAfter: '아빠가 번쩍 안아 줘요.',
+            reward: '아빠가 번쩍 안아 줬어.'
+          }),
+          jamoMission('ㅑ', {
+            name: 'ㅑ 야옹',
+            lead: '고양이가 야옹!',
+            before: `\n  고양이 ..\n${dog('o', '', false)}`,
+            frames: palFrames('🐱', '야옹'),
+            descBefore: 'I 키를 누르면 고양이가 야옹 해요.',
+            descAfter: '야옹! 고양이가 초코 옆에 앉아요.',
+            reward: '야옹! 고양이가 왔어.'
+          }),
+          jamoMission('ㅓ', {
+            name: 'ㅓ 엄마',
+            lead: '엄마 목소리가 들려!',
+            before: personScene('엄마', false),
+            frames: [personScene('엄마', true), personScene('엄마', true), `${personScene('엄마', true)}꼬옥`],
+            descBefore: 'J 키를 누르면 엄마가 안아 줘요.',
+            descAfter: '엄마가 꼬옥 안아 줘요.',
+            reward: '엄마가 꼬옥 안아 줬어.'
+          }),
+          jamoMission('ㅕ', {
+            name: 'ㅕ 여우',
+            lead: '여우가 살금살금!',
+            before: `\n  여우 ..\n${dog('o', '', false)}`,
+            frames: palFrames('🦊', '살금'),
+            descBefore: 'U 키를 누르면 여우가 나타나요.',
+            descAfter: '여우가 살금살금 다가와요.',
+            reward: '여우가 살금살금 왔어.'
+          }),
+          jamoMission('ㅗ', {
+            name: 'ㅗ 오리',
+            lead: '오리가 헤엄쳐!',
+            before: `\n  오리 ..\n${dog('o', '', false)}`,
+            frames: palFrames('🦆', '꽥꽥'),
+            descBefore: 'H 키를 누르면 오리가 꽥꽥 해요.',
+            descAfter: '꽥꽥! 오리가 물 위를 헤엄쳐요.',
+            reward: '꽥꽥! 오리가 헤엄쳐.'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'han5',
+        title: '모음 여행',
+        intro: '모음 여행 계속! 소리 하나씩.',
+        collect: ['요요', '우산', '유리', '으악', '이불'],
+        label: '모음',
+        thanksLine: '모음 끝! 잘자!',
+        thanksDesc: '초코가 이불 속에서 고마워해요.',
+        thanks: '모음 여행 끝! 초코가 이불 속에서 고마워해.',
+        levels: [
+          jamoMission('ㅛ', {
+            name: 'ㅛ 요요',
+            lead: '요요를 굴려 볼까?',
+            before: yoyoArt(true),
+            frames: [yoyoArt(false), yoyoArt(true), yoyoArt(false)],
+            descBefore: 'Y 키를 누르면 요요가 올라갔다 내려와요.',
+            descAfter: '요요가 올라갔다 내려와요.',
+            reward: '요요가 스르르 내려왔어.'
+          }),
+          jamoMission('ㅜ', {
+            name: 'ㅜ 우산',
+            lead: '비가 와! 우산이 필요해.',
+            before: `  .  .  .  .  .  .\n${dog('o', '', false)}`,
+            frames: [
+              `${dogUmbrella()}\n비야`,
+              `${dogUmbrella()}\n우산`,
+              dogUmbrella()
+            ],
+            descBefore: 'N 키를 누르면 우산이 펴져요.',
+            descAfter: '우산 아래 초코가 폭신해요.',
+            reward: '우산 아래 초코가 폭신해.'
+          }),
+          jamoMission('ㅠ', {
+            name: 'ㅠ 유리',
+            lead: '유리구슬이 반짝!',
+            before: marbleArt(false),
+            frames: [marbleArt(true), marbleArt(true), `${marbleArt(true)}반짝`],
+            descBefore: 'B 키를 누르면 유리구슬이 반짝여요.',
+            descAfter: '유리구슬이 반짝 빛나요.',
+            reward: '유리구슬이 반짝!'
+          }),
+          jamoMission('ㅡ', {
+            name: 'ㅡ 으악',
+            lead: '풍선이 갑자기 펑!',
+            before: BALLOON,
+            frames: [
+              `${dog('o', '', false)}으악`,
+              `${dog('^', '', true)}으악!`,
+              `${dog('^', '<3 ', true)}깜짝!`
+            ],
+            descBefore: 'M 키를 누르면 초코가 으악 해요.',
+            descAfter: '으악! 초코가 깜짝 놀라고 웃어요.',
+            reward: '으악! 깜짝이야. 그리고 깔깔.'
+          }),
+          jamoMission('ㅣ', {
+            name: 'ㅣ 이불',
+            lead: '이제 잘 시간. 이불을 덮자.',
+            before: `${dog('o', '', false)}졸려요`,
+            frames: [sleepScene(false), sleepScene(true), sleepScene(true)],
+            descBefore: 'L 키를 누르면 초코가 이불을 덮어요.',
+            descAfter: '초코가 이불 속에서 새근새근 자요.',
+            reward: '새근새근. 이불 속이야. 잘 자.'
+          })
+        ]
+      }),
+      storyChapter({
+        id: 'han6',
+        title: '한글 이름',
+        intro: '이제 소리를 모아 글자를 만들자. 다 쓰면 엔터.',
+        collect: ['가방', '나무', '엄마', '아빠', '초코', '재윤'],
+        label: '이름',
+        thanksLine: '이름 고마워! 폴짝!',
+        thanksDesc: '초코가 이름을 듣고 폴짝 뛰어요.',
+        thanks: '이름을 모아 썼어. 초코가 폴짝폴짝. 재윤아, 사랑해!',
+        levels: [
+          syllableMission(['ㄱ', 'ㅏ'], {
+            name: '가 가방',
+            lead: '가방을 챙기자!',
+            frames: [bagScene(true), bagScene(true), `${bagScene(true)}도시락`],
+            descBefore: '가방의 가.',
+            descAfter: '가방에 도시락이 들어갔어요.',
+            reward: '가방 완성! 초코 도시락을 넣었어.'
+          }),
+          syllableMission(['ㄴ', 'ㅏ', 'ㅁ', 'ㅜ'], {
+            name: '나 나무',
+            lead: '나무 그늘로 가자!',
+            frames: [treeScene(true), treeScene(true), `${treeScene(true)}그늘`],
+            descBefore: '나무의 나. 니은이 잠깐 붙었다가 우를 누르면 무가 돼.',
+            descAfter: '나무 그늘이 시원해요.',
+            reward: '나무 그늘! 시원하다. 멍멍!'
+          }),
+          syllableMission(['ㅇ', 'ㅓ', 'ㅁ', 'ㅁ', 'ㅏ'], {
+            name: '엄마',
+            lead: '엄마를 불러 보자!',
+            frames: hangulDoneFrames('엄마', '꼬옥'),
+            descBefore: '엄마를 쓰자.',
+            descAfter: '엄마가 꼬옥 안아 줘요.',
+            reward: '엄마! 엄마가 꼬옥 안아 줬어.'
+          }),
+          syllableMission(['ㅇ', 'ㅏ', 'ㅃ', 'ㅏ'], {
+            name: '아빠',
+            lead: '아빠를 불러 보자! 빠는 쌍비읍이야. 쉬프트라는 아래 큰 키를 누르고 Q.',
+            frames: hangulDoneFrames('아빠', '번쩍'),
+            descBefore: '아빠를 쓰자. 빠는 쉬프트랑 Q.',
+            descAfter: '아빠가 번쩍 안아 올려 줘요.',
+            reward: '아빠! 아빠가 번쩍 안아 줬어.'
+          }),
+          syllableMission(['ㅊ', 'ㅗ', 'ㅋ', 'ㅗ'], {
+            name: '초코',
+            lead: '초코 이름을 쓰면 달려와! 키읔이 잠깐 붙었다가, 오를 누르면 코가 돼.',
+            themeColor: '#c47a3a',
+            frames: [
+              `${shiftArt(dog('^', '', true), 8)}초코?`,
+              `${shiftArt(dog('^', '', true), 2)}멍멍`,
+              `${dog('^', '<3 ', true)}초코다!`
+            ],
+            descBefore: '초코를 쓰자.',
+            descAfter: '초코가 이름을 듣고 달려와요.',
+            reward: '멍멍! 초코가 이름을 듣고 달려왔어.'
+          }),
+          syllableMission(['ㅈ', 'ㅏ', 'ㅣ', 'ㅇ', 'ㅠ', 'ㄴ'], {
+            name: '재윤',
+            lead: '재윤이 이름이야. 아 다음에 이를 누르면 재가 돼.',
+            frames: hangulDoneFrames('재윤', '나야!'),
+            descBefore: '재윤을 쓰자. 아 다음 이.',
+            descAfter: '재윤이 이름이 완성됐어요.',
+            reward: '재윤아! 네가 쓴 이름이야. 초코가 폴짝.'
+          })
+        ]
+      })
+    ];
+
+    function hangulMatch(level, text) {
+      const keys = level.jamo || [];
+      const normalized = String(text || '').normalize('NFC');
+      let found = -1;
+      for (let i = 0; i <= keys.length; i += 1) {
+        if (composeHangul(keys.slice(0, i)) === normalized) found = i;
+      }
+      if (found < 0) return { ok: false, text: normalized };
+      return {
+        ok: true,
+        text: normalized,
+        count: found,
+        done: found === keys.length,
+        keys: keys.slice(0, found)
+      };
+    }
+
+    function hangulStartsCommand(text, command) {
+      const typed = decomposeHangulText(text);
+      const need = decomposeHangulText(command);
+      if (!need.length || typed.length <= need.length) return false;
+      return need.every((jamo, index) => typed[index] === jamo);
+    }
+
+    function hangulTarget(level) {
+      const keys = level.jamo || [];
+      if (hangulKeys.length >= keys.length) return keys[keys.length - 1];
+      return keys[hangulKeys.length];
+    }
+
+    function guessHangulWrong(prevText, nextText) {
+      if (prevText && nextText.startsWith(prevText) && nextText.length > prevText.length) {
+        const extra = decomposeHangulText(nextText.slice(prevText.length));
+        const found = extra.find((part) => jamoInfo[part] && jamoInfo[part].taught);
+        if (found) return found;
+      }
+      const oldParts = decomposeHangulText(prevText);
+      const newParts = decomposeHangulText(nextText);
+      for (let i = 0; i < newParts.length; i += 1) {
+        if (newParts[i] !== oldParts[i] && jamoInfo[newParts[i]] && jamoInfo[newParts[i]].taught) return newParts[i];
+      }
+      return '';
+    }
+
+    function renderHangulArt() {
+      const chapter = chapters[currentChapter];
+      const level = chapter && chapter.levels[currentLevel];
+      if (!level || !level.hangul || !level.paint || isStageTransitioning) return;
+      ui.sceneArt.innerHTML = renderColoredArt(withCollect(level.paint(hangulKeys.length), chapter, currentLevel));
+    }
+
+    function setHangulInput(text) {
+      hangulLock = true;
+      ui.commandInput.value = text;
+      letterSoundBaseline = text;
+      hangulText = text;
+      hangulLock = false;
+      try { ui.commandInput.setSelectionRange(text.length, text.length); } catch (_error) { /* ignore */ }
+    }
+
+    function speakJamoTap(jamo) {
+      if (!ui.letterSoundToggle.checked || !gameStarted || isStageTransitioning) return;
+      const info = jamoInfo[jamo];
+      if (!info) return;
+      const now = Date.now();
+      if (now - lastLetterSpokenAt < 80) return;
+      lastLetterSpokenAt = now;
+      speak(info.name, { rate: 0.82, pitch: 1.04, timeoutMs: 2500 });
+    }
+
+    function applyHangulText(next, attempted) {
+      const chapter = chapters[currentChapter];
+      const level = chapter && chapter.levels[currentLevel];
+      if (!level || !level.hangul || isStageTransitioning) return;
+      if (!ui.doneBox.classList.contains('hidden')) return;
+      const normalized = String(next || '').replace(/\u200b/g, '').normalize('NFC');
+      if (normalized === hangulText) return;
+      if (parseChapterCommand(normalized)) {
+        hangulKeys = [];
+        hangulText = normalized;
+        letterSoundBaseline = normalized;
+        return;
+      }
+      const progress = hangulMatch(level, normalized);
+      if (!progress.ok) {
+        const target = hangulTarget(level);
+        const previous = hangulText;
+        setHangulInput(previous);
+        if (hangulStartsCommand(normalized, level.command)) {
+          speak(hangulOnlyCommand(level.command), { rate: 0.95, timeoutMs: 5000 });
+          return;
+        }
+        const wrong = attempted || guessHangulWrong(previous, normalized);
+        if (wrong && jamoInfo[wrong] && jamoInfo[wrong].taught && wrong !== target) speakDiscovery(hangulWrongSpeech(wrong, target));
+        else speakDiscovery(hangulNonLetter(target));
+        return;
+      }
+      const prevCount = hangulKeys.length;
+      hangulKeys = progress.keys;
+      if (ui.commandInput.value.normalize('NFC') !== progress.text) setHangulInput(progress.text);
+      else {
+        hangulText = progress.text;
+        letterSoundBaseline = progress.text;
+      }
+      renderHangulArt();
+      if (progress.count > prevCount) {
+        if (level.jamo.length === 1) speakJamoTap(level.jamo[0]);
+        else speak(hangulStepSpeech(level.jamo, progress.count), { rate: 0.95, timeoutMs: 5000 });
+      }
+      noteActivityForHint();
+    }
+
+    function hangulBackspace() {
+      if (!hangulKeys.length) {
+        setHangulInput('');
+        renderHangulArt();
+        return;
+      }
+      hangulKeys = hangulKeys.slice(0, -1);
+      setHangulInput(composeHangul(hangulKeys));
+      renderHangulArt();
+      noteActivityForHint();
+    }
+
+    function isHangulGlyph(value) {
+      if (!value) return false;
+      const code = value.codePointAt(0);
+      return (code >= 0x3131 && code <= 0x318E)
+        || (code >= 0x1100 && code <= 0x11FF)
+        || (code >= 0xAC00 && code <= 0xD7A3);
+    }
+
+    function handleHangulKeydown(event) {
+      if (event.isComposing || imeComposing || event.key === 'Process' || event.key === 'Unidentified') return;
+      if (isHangulGlyph(event.key)) return;
+      if (event.key === 'Backspace') {
+        event.preventDefault();
+        hangulBackspace();
+        return;
+      }
+      const jamo = (event.shiftKey && HANGUL_SHIFT_CODE[event.code]) || HANGUL_CODE[event.code] || '';
+      const latin = !!(event.key && event.key.length === 1 && /[a-z]/i.test(event.key));
+      if (!jamo && !latin) return;
+      event.preventDefault();
+      if (event.repeat) return;
+      if (!jamo) {
+        const level = chapters[currentChapter].levels[currentLevel];
+        speakDiscovery(hangulNonLetter(hangulTarget(level)));
+        return;
+      }
+      applyHangulText(composeHangul(hangulKeys.concat([jamo])), jamo);
+    }
+
+    function hangulHintLine(level) {
+      if (hangulKeys.length >= level.jamo.length) return '좋아. 이제 엔터!';
+      return hangulKeyHint(level.jamo[hangulKeys.length]);
+    }
+
+    function hangulIntroTTS(level) {
+      if (hangulKeys.length >= level.jamo.length) return '좋아. 이제 엔터!';
+      if (hangulKeys.length > 0) return hangulMidRepeat(level.jamo, hangulKeys.length);
+      return level.contextTTS;
+    }
+
+    function handleHangulMiss(level) {
+      if (!hangulKeys.length) {
+        speakDiscovery(hangulEmpty(level.jamo[0]));
+        return;
+      }
+      if (hangulKeys.length >= level.jamo.length) {
+        speak('됐어, 엔터!', { rate: 0.95, timeoutMs: 4000 });
+        return;
+      }
+      const prev = level.jamo[hangulKeys.length - 1];
+      const next = level.jamo[hangulKeys.length];
+      speakDiscovery(hangulPartial(prev, next));
+    }
+
+    function hangulSpelling(keys) {
+      return (keys || []).map((jamo) => {
+        const info = jamoInfo[jamo];
+        return info ? `${info.name}, ${info.keyLabel} 키` : jamo;
+      }).join(' / ');
+    }
+
+    function hangulLines() {
+      const lines = [];
+      const add = (value) => {
+        if (value) lines.push(value);
+      };
+      const taught = Object.keys(jamoInfo).filter((jamo) => jamoInfo[jamo].taught);
+      const targets = new Set();
+      hangulChapters.forEach((chapter) => {
+        (chapter.levels || []).forEach((level) => {
+          (level.jamo || []).forEach((jamo) => targets.add(jamo));
+          add(hangulOnlyCommand(level.command));
+          if (level.jamo && level.jamo.length > 1) {
+            for (let count = 1; count <= level.jamo.length; count += 1) add(hangulStepSpeech(level.jamo, count));
+            for (let count = 1; count < level.jamo.length; count += 1) {
+              add(hangulPartial(level.jamo[count - 1], level.jamo[count]));
+              add(hangulMidRepeat(level.jamo, count));
+            }
+          }
+        });
+      });
+      taught.forEach((jamo) => add(jamoInfo[jamo].name));
+      add('됐어, 엔터!');
+      targets.forEach((target) => {
+        add(hangulKeyHint(target));
+        add(hangulNonLetter(target));
+        add(hangulEmpty(target));
+        taught.forEach((wrong) => {
+          if (wrong !== target) add(hangulWrongSpeech(wrong, target));
+        });
+      });
+      return lines;
+    }
+
+    window.__lhqComposeHangul = composeHangul;
+    window.__lhqHangulState = () => ({ keys: hangulKeys.slice(), text: hangulText });
+
     const chapters = [
       ...storyChapters,
+      ...hangulChapters,
       {
         id: 'cmd',
         title: '첫 명령어',
@@ -1841,6 +2785,10 @@ ________________
     let hintTimer = 0;
     let hintGen = 0;
     let hintCount = 0;
+    let hangulKeys = [];
+    let hangulText = '';
+    let imeComposing = false;
+    let hangulLock = false;
     let discoveryGen = 0;
     let lastDiscoveryAt = 0;
     const KEY_HINT_DELAY_MS = 6500;
@@ -2021,6 +2969,7 @@ ________________
     }
 
     function hintLine(level) {
+      if (level.hangul) return hangulHintLine(level);
       const expected = storyAnswer(level, level.command);
       const typed = storyAnswer(level);
       if (typed === expected) return '좋아. 이제 엔터!';
@@ -2170,6 +3119,7 @@ ________________
     }
 
     function buildIntroTTS(level) {
+      if (level.hangul) return hangulIntroTTS(level);
       if (level.story) {
         const expected = storyAnswer(level, level.command);
         const typed = storyAnswer(level);
@@ -2806,7 +3756,11 @@ ________________
       ui.sceneArt.innerHTML = renderColoredArt(withCollect(scene, chapter, currentLevel));
       ui.sceneDesc.textContent = level.descBefore;
       ui.commandText.textContent = level.command.toUpperCase();
-      ui.spellingText.textContent = `철자 힌트: ${level.command.toUpperCase()} (${commandToSpellingKo(level.command)})`;
+      const spelling = level.hangul ? hangulSpelling(level.jamo) : commandToSpellingKo(level.command);
+      ui.spellingText.textContent = `철자 힌트: ${level.command.toUpperCase()} (${spelling})`;
+      hangulKeys = [];
+      hangulText = '';
+      imeComposing = false;
       ui.commandInput.value = '';
       letterSoundBaseline = '';
       hintCount = 0;
@@ -2896,6 +3850,10 @@ ________________
     }
 
     function handleStoryMiss(level, answer) {
+      if (level.hangul) {
+        handleHangulMiss(level);
+        return;
+      }
       const expected = storyAnswer(level, level.command);
       if (!answer) {
         if (Date.now() - lastDiscoveryAt < 1600) return;
@@ -3125,7 +4083,16 @@ ________________
       speak(spoken, { rate: 0.82, pitch: 1.04, timeoutMs: 2500 });
     }
 
-    function handleCommandInput() {
+    function handleCommandInput(event) {
+      if (hangulLock) return;
+      const hangulLevel = chapters[currentChapter] && chapters[currentChapter].levels[currentLevel];
+      const birthdayNow = window.__lhqBirthdayState === 'candles' || window.__lhqBirthdayState === 'party';
+      if (!birthdayNow && hangulLevel && hangulLevel.hangul && gameStarted && !ui.gameScreen.classList.contains('hidden') && ui.doneBox.classList.contains('hidden')) {
+        if (isStageTransitioning) return;
+        if ((event && event.isComposing) || imeComposing) return;
+        applyHangulText(ui.commandInput.value);
+        return;
+      }
       const next = ui.commandInput.value;
       const prev = letterSoundBaseline;
       letterSoundBaseline = next;
@@ -3240,7 +4207,34 @@ ________________
     });
 
     ui.commandInput.addEventListener('keydown', (event) => {
+      const birthdayNow = window.__lhqBirthdayState === 'candles' || window.__lhqBirthdayState === 'party';
+      if (!birthdayNow && !ui.gameScreen.classList.contains('hidden') && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        const level = chapters[currentChapter] && chapters[currentChapter].levels[currentLevel];
+        if (level && level.hangul && event.key !== 'Enter' && ui.doneBox.classList.contains('hidden') && !isStageTransitioning) {
+          handleHangulKeydown(event);
+        }
+      }
       if (event.key === 'Enter') handleSubmit();
+    });
+
+    ui.commandInput.addEventListener('compositionstart', () => {
+      imeComposing = true;
+    });
+    ui.commandInput.addEventListener('compositionend', () => {
+      imeComposing = false;
+      const token = playToken;
+      const chapterIndex = currentChapter;
+      const levelIndex = currentLevel;
+      const applyNow = () => {
+        if (token !== playToken || chapterIndex !== currentChapter || levelIndex !== currentLevel) return;
+        if (imeComposing || isStageTransitioning) return;
+        if (ui.gameScreen.classList.contains('hidden') || !ui.doneBox.classList.contains('hidden')) return;
+        const level = chapters[currentChapter] && chapters[currentChapter].levels[currentLevel];
+        if (!level || !level.hangul) return;
+        applyHangulText(ui.commandInput.value);
+      };
+      applyNow();
+      setTimeout(applyNow, 0);
     });
 
     // Gboard often reports keydown key as "Unidentified". The input event has the character.
