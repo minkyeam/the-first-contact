@@ -2096,28 +2096,406 @@ ________________
     }
 
     function syllableMission(keys, spec) {
-      const paint = hangulWordPaint(keys);
+      const paint = spec.paint || hangulWordPaint(keys);
       const names = keys.map((key) => jamoInfo[key].name).join(', ');
       const first = keys[0];
       const lead = spec.lead ? `${spec.lead} ` : '';
+      const hint = `먼저 ${jamoInfo[first].name}. ${hangulKeyHint(first)}.`;
       return {
         command: composeHangul(keys),
         name: spec.name,
         story: true,
         hangul: true,
+        snack: !!spec.snack,
+        aeLoose: !!spec.aeLoose,
+        freeSyllable: !!spec.freeSyllable,
         jamo: keys.slice(),
         paint,
         artBefore: paint(0),
         frames: spec.frames,
-        descBefore: `${spec.descBefore} ${names}. 먼저 ${jamoInfo[first].name}. ${hangulKeyHint(first)}.`,
+        framesFor: spec.framesFor,
+        descBefore: spec.descExact ? spec.descBefore : `${spec.descBefore} ${names}. ${hint}`,
         descAfter: spec.descAfter,
-        contextTTS: `${lead}${names}. 먼저 ${jamoInfo[first].name}. ${hangulKeyHint(first)}.`,
+        contextTTS: spec.contextTTS || `${lead}${names}. ${hint}`,
         rewardTTS: spec.reward,
+        rewardByText: spec.rewardByText,
         themeColor: spec.themeColor
       };
     }
 
+    // 간식 챕터에서 받는 자모. 다른 자모는 정답으로 요구하지 않는다.
+    const SNACK_VOWELS = ['ㅏ', 'ㅣ', 'ㅓ', 'ㅗ', 'ㅜ', 'ㅡ', 'ㅐ', 'ㅔ'];
+    const SNACK_CONSONANTS = ['ㅇ', 'ㅎ'];
+    const SNACK_JAMO = new Set(SNACK_VOWELS.concat(SNACK_CONSONANTS));
+
+    function snackCheer(word, caption) {
+      const big = `[BIG][YELLOW]${word}[/YELLOW][/BIG]`;
+      return [
+        `${big}\n${dog('^', '', true)}${caption}`,
+        `${big}\n${dog('^', '<3 ', true)}${caption}`,
+        `${big}\n${shiftArt(dog('^', '', true), 2)}${caption}`
+      ];
+    }
+
+    function snackPaint(keys, scene) {
+      return function paint(count) {
+        const shown = composeHangul(keys.slice(0, count));
+        const slots = keys.map((ch, index) => (index < count ? `[YELLOW]${ch}[/YELLOW]` : '_')).join(' ');
+        return `${scene(shown, count, count === keys.length)}\n  ${slots}`;
+      };
+    }
+
+    function snackSignScene(goal) {
+      return function scene(shown, count) {
+        const glyph = count ? shown : goal;
+        return `[BIG]${glyph}[/BIG]\n  .----------.\n  |   간판   |\n  '----|-----'\n       |\n${dog(count ? '^' : 'o', '', !!count)}${count ? '찾았다' : '간판을 봐요'}`;
+      };
+    }
+
+    function snackCircleScene() {
+      return function scene(shown, count) {
+        const glyph = shown || 'ㅇ';
+        return `[BIG]${glyph}[/BIG]\n    .---.\n   (     )\n    '---'\n${dog(count > 1 ? '^' : 'o', '', count > 1)}${count > 1 ? '됐다' : '동그라미'}`;
+      };
+    }
+
+    function snackLaughScene(word) {
+      return function scene(shown, count) {
+        return `[BIG]${shown || word}[/BIG]\n   \\ ^ ^ /\n${dog(count ? '^' : 'o', '', !!count)}웃음`;
+      };
+    }
+
+    function snackMagicScene(from) {
+      return function scene(shown, count) {
+        const next = count ? shown : '?';
+        return `[BIG]${from}[/BIG]  →  [BIG]${next}[/BIG]\n${dog(count > 1 ? '^' : 'o', '', count > 1)}마법`;
+      };
+    }
+
+    function snackPlateScene(word) {
+      return function scene(shown, count, done) {
+        return `\n   .------.\n   | ${word} |\n   '------'\n${dog(done ? '^' : '@', '', done)}${done ? '냠냠' : '간식'}`;
+      };
+    }
+
+    function snackFreePaint() {
+      return function paint(count) {
+        const shown = count ? (hangulText || '·') : '·';
+        const slots = count
+          ? hangulKeys.map((ch) => `[YELLOW]${ch}[/YELLOW]`).join(' ')
+          : '_ _';
+        return `[BIG]${shown}[/BIG]\n${dog(count ? '^' : 'o', '', count > 0)}아는 글자\n  ${slots}`;
+      };
+    }
+
+    function iGaParticle(word) {
+      return hangulJong(word) ? '이' : '가';
+    }
+
+    function eulReulParticle(word) {
+      return hangulJong(word) ? '을' : '를';
+    }
+
+    function snackFirstHint(jamo) {
+      return `먼저 ${jamoInfo[jamo].name}. ${hangulKeyHint(jamo)}.`;
+    }
+
+    function circleReward(word) {
+      return `동그라미에 막대기를 붙이니 ${word}${iGaParticle(word)} 됐어!`;
+    }
+
+    function laughReward(word) {
+      const syllable = [...word][0];
+      return `${syllable.repeat(3)}! 초코가 ${word} 웃어요!`;
+    }
+
+    function aeKeyForms(keys) {
+      const indexes = [];
+      keys.forEach((jamo, index) => {
+        if (jamo === 'ㅐ' || jamo === 'ㅔ') indexes.push(index);
+      });
+      const forms = [];
+      const total = 1 << indexes.length;
+      for (let mask = 0; mask < total; mask += 1) {
+        const next = keys.slice();
+        indexes.forEach((pos, bit) => {
+          if (mask & (1 << bit)) next[pos] = keys[pos] === 'ㅐ' ? 'ㅔ' : 'ㅐ';
+        });
+        forms.push(next);
+      }
+      return forms;
+    }
+
+    function snackMission(keys, spec) {
+      keys.forEach((jamo) => {
+        if (!SNACK_JAMO.has(jamo)) throw new Error(`snack mission used ${jamo}`);
+      });
+      const rewardByText = {};
+      aeKeyForms(keys).forEach((form) => {
+        const word = composeHangul(form);
+        rewardByText[word] = spec.rewardOf ? spec.rewardOf(word) : spec.reward;
+      });
+      const word = composeHangul(keys);
+      return syllableMission(keys, {
+        name: spec.name,
+        snack: true,
+        aeLoose: true,
+        reward: rewardByText[word],
+        rewardByText,
+        paint: snackPaint(keys, spec.scene),
+        frames: spec.frames,
+        framesFor: spec.framesFor,
+        descExact: true,
+        descBefore: spec.screen,
+        descAfter: spec.descAfter,
+        contextTTS: spec.ask,
+        themeColor: spec.themeColor || '#c47a3a'
+      });
+    }
+
+    function snackFreeMission(spec) {
+      return syllableMission(['ㅇ', 'ㅏ'], {
+        name: spec.name,
+        snack: true,
+        aeLoose: true,
+        freeSyllable: true,
+        reward: '아! 고마워 재윤아!',
+        paint: snackFreePaint(),
+        frames: snackCheer('아', '고마워'),
+        framesFor: (typed) => snackCheer(typed || '아', '고마워'),
+        descExact: true,
+        descBefore: spec.screen,
+        descAfter: spec.descAfter,
+        contextTTS: spec.ask,
+        themeColor: '#c47a3a'
+      });
+    }
+
+    function snackSignMission(keys, spec) {
+      const goal = composeHangul(keys);
+      return snackMission(keys, {
+        name: spec.name,
+        scene: snackSignScene(goal),
+        frames: snackCheer(goal, '간판'),
+        framesFor: (typed) => snackCheer(typed || goal, '간판'),
+        ask: spec.ask,
+        screen: spec.screen,
+        descAfter: spec.descAfter,
+        reward: spec.reward,
+        themeColor: '#3aa0ff'
+      });
+    }
+
+    function snackCircleMission(keys, spec) {
+      return snackMission(keys, {
+        name: spec.name,
+        scene: snackCircleScene(),
+        frames: snackCheer(composeHangul(keys), '동그라미'),
+        framesFor: (typed) => snackCheer(typed || composeHangul(keys), '동그라미'),
+        ask: spec.ask,
+        screen: spec.screen,
+        descAfter: spec.descAfter,
+        rewardOf: circleReward,
+        themeColor: '#3aa0ff'
+      });
+    }
+
+    function snackLaughMission(keys, spec) {
+      const word = composeHangul(keys);
+      return snackMission(keys, {
+        name: spec.name,
+        scene: snackLaughScene(word),
+        frames: snackCheer(word, '웃음'),
+        framesFor: (typed) => snackCheer(typed || word, '웃음'),
+        ask: spec.ask,
+        screen: spec.screen,
+        descAfter: spec.descAfter,
+        rewardOf: laughReward,
+        themeColor: '#ff8fb8'
+      });
+    }
+
+    function snackMagicMission(keys, spec) {
+      const word = composeHangul(keys);
+      return snackMission(keys, {
+        name: spec.name,
+        scene: snackMagicScene(spec.from),
+        frames: snackCheer(word, '마법'),
+        framesFor: (typed) => snackCheer(typed || word, '마법'),
+        ask: spec.ask,
+        screen: spec.screen,
+        descAfter: spec.descAfter,
+        reward: spec.reward,
+        themeColor: '#7c5cbf'
+      });
+    }
+
+    function snackFoodMission(keys, spec) {
+      const word = composeHangul(keys);
+      return snackMission(keys, {
+        name: spec.name,
+        scene: snackPlateScene(word),
+        frames: snackCheer(word, '냠냠'),
+        framesFor: (typed) => snackCheer(typed || word, '냠냠'),
+        ask: spec.ask,
+        screen: spec.screen,
+        descAfter: spec.descAfter,
+        reward: spec.reward,
+        themeColor: '#6fbf73'
+      });
+    }
+
+    function snackChapter() {
+      const ieung = snackFirstHint('ㅇ');
+      const hieut = snackFirstHint('ㅎ');
+      return storyChapter({
+        id: 'hansnack',
+        title: '초코의 한글 간식',
+        intro: '초코의 한글 간식! 아는 글자로 초코를 도와주자.',
+        collect: ['아', '이', '오', '하', '오이'],
+        label: '간식',
+        thanksLine: '간식 고마워!',
+        thanksDesc: '초코가 간식을 먹고 꼬리를 흔들며 고마워해요.',
+        thanks: '한글 간식 끝! 초코가 배를 두드리며 고마워해. 멍멍!',
+        levels: [
+          snackSignMission(['ㅇ', 'ㅏ'], {
+            name: '아 간판',
+            ask: `초코가 아 간판을 찾았어! 아를 쳐볼까? ${ieung}`,
+            screen: `초코가 '아' 간판을 찾았어! 아를 쳐 보자. ${ieung}`,
+            descAfter: '아! 아이디헤어 간판의 그 글자예요.',
+            reward: '아! 맞아요, 재윤이가 아이디헤어 간판에서 찾은 그 글자!'
+          }),
+          snackSignMission(['ㅇ', 'ㅣ'], {
+            name: '이 간판',
+            ask: `초코가 이 간판도 찾았어! 이를 쳐볼까? ${ieung}`,
+            screen: `초코가 '이' 간판도 찾았어! 이를 쳐 보자. ${ieung}`,
+            descAfter: '이! 아이디헤어 간판의 그 글자예요.',
+            reward: '이! 맞아요, 재윤이가 아이디헤어 간판에서 찾은 그 글자!'
+          }),
+          snackCircleMission(['ㅇ', 'ㅗ'], {
+            name: '오 동그라미',
+            ask: `동그라미에 막대기를 붙여 보자! 오. ${ieung}`,
+            screen: `동그라미 ㅇ에 막대기를 붙이자. 오. ${ieung}`,
+            descAfter: '동그라미에 막대기를 붙이니 오가 됐어요.'
+          }),
+          snackCircleMission(['ㅇ', 'ㅜ'], {
+            name: '우 동그라미',
+            ask: `이번엔 우! 동그라미에 막대기. ${ieung}`,
+            screen: `이번엔 우. 동그라미에 막대기를 붙이자. ${ieung}`,
+            descAfter: '동그라미에 막대기를 붙이니 우가 됐어요.'
+          }),
+          snackCircleMission(['ㅇ', 'ㅓ'], {
+            name: '어 동그라미',
+            ask: `이번엔 어! ${ieung}`,
+            screen: `이번엔 어. 동그라미에 막대기를 붙이자. ${ieung}`,
+            descAfter: '동그라미에 막대기를 붙이니 어가 됐어요.'
+          }),
+          snackCircleMission(['ㅇ', 'ㅡ'], {
+            name: '으 동그라미',
+            ask: `이번엔 으! ${ieung}`,
+            screen: `이번엔 으. 동그라미에 막대기를 붙이자. ${ieung}`,
+            descAfter: '동그라미에 막대기를 붙이니 으가 됐어요.'
+          }),
+          snackCircleMission(['ㅇ', 'ㅐ'], {
+            name: '애 동그라미',
+            ask: `이번엔 애! 애는 O 키, 에는 P 키. 둘 다 좋아. ${ieung}`,
+            screen: `이번엔 애. 애는 O 키, 에는 P 키. 둘 다 좋아. ${ieung}`,
+            descAfter: '동그라미에 막대기를 붙이니 애가 됐어요.'
+          }),
+          snackCircleMission(['ㅇ', 'ㅔ'], {
+            name: '에 동그라미',
+            ask: `이번엔 에! 애랑 같은 소리야. ${ieung}`,
+            screen: `이번엔 에. 애랑 같아. ${ieung}`,
+            descAfter: '동그라미에 막대기를 붙이니 에가 됐어요.'
+          }),
+          snackLaughMission(['ㅎ', 'ㅏ', 'ㅎ', 'ㅏ'], {
+            name: '하하',
+            ask: `초코가 웃고 싶대! 하하. ${hieut}`,
+            screen: `초코가 웃고 싶대! 하하. ${hieut}`,
+            descAfter: '초코가 하하 웃어요.'
+          }),
+          snackLaughMission(['ㅎ', 'ㅗ', 'ㅎ', 'ㅗ'], {
+            name: '호호',
+            ask: `이번 웃음은 호호! ${hieut}`,
+            screen: `이번 웃음은 호호. ${hieut}`,
+            descAfter: '초코가 호호 웃어요.'
+          }),
+          snackLaughMission(['ㅎ', 'ㅣ', 'ㅎ', 'ㅣ'], {
+            name: '히히',
+            ask: `이번 웃음은 히히! ${hieut}`,
+            screen: `이번 웃음은 히히. ${hieut}`,
+            descAfter: '초코가 히히 웃어요.'
+          }),
+          snackLaughMission(['ㅎ', 'ㅔ', 'ㅎ', 'ㅔ'], {
+            name: '헤헤',
+            ask: `이번 웃음은 헤헤! 해해도 같아. ${hieut}`,
+            screen: `이번 웃음은 헤헤. 해해도 같아. ${hieut}`,
+            descAfter: '초코가 헤헤 웃어요.'
+          }),
+          snackMagicMission(['ㅎ', 'ㅏ'], {
+            name: '아를 하로',
+            from: '아',
+            ask: `아의 이응을 히읗으로 바꾸면? 하. ${hieut}`,
+            screen: `아의 ㅇ을 ㅎ으로 바꾸면? 하. ${hieut}`,
+            descAfter: '아의 동그라미가 히읗으로 바뀌었어요.',
+            reward: '하! 아의 동그라미가 히읗으로 바뀌었어!'
+          }),
+          snackMagicMission(['ㅎ', 'ㅗ'], {
+            name: '오를 호로',
+            from: '오',
+            ask: `오의 이응을 히읗으로 바꾸면? 호. ${hieut}`,
+            screen: `오의 ㅇ을 ㅎ으로 바꾸면? 호. ${hieut}`,
+            descAfter: '오의 동그라미가 히읗으로 바뀌었어요.',
+            reward: '호! 오의 동그라미가 히읗으로 바뀌었어!'
+          }),
+          snackMagicMission(['ㅎ', 'ㅣ'], {
+            name: '이를 히로',
+            from: '이',
+            ask: `이의 이응을 히읗으로 바꾸면? 히. ${hieut}`,
+            screen: `이의 ㅇ을 ㅎ으로 바꾸면? 히. ${hieut}`,
+            descAfter: '이의 동그라미가 히읗으로 바뀌었어요.',
+            reward: '히! 이의 동그라미가 히읗으로 바뀌었어!'
+          }),
+          snackFoodMission(['ㅇ', 'ㅗ', 'ㅇ', 'ㅣ'], {
+            name: '오이',
+            ask: `초코한테 오이를 주자! 오, 이. ${ieung}`,
+            screen: `초코한테 오이를 주자! 오, 이. ${ieung}`,
+            descAfter: '아삭아삭! 초코가 오이를 먹었어요.',
+            reward: '아삭아삭! 초코가 오이를 먹었어요.'
+          }),
+          snackFoodMission(['ㅇ', 'ㅏ', 'ㅇ', 'ㅣ'], {
+            name: '아이',
+            ask: `초코한테 아이를 보여 주자! 아, 이. ${ieung}`,
+            screen: `초코한테 아이를 보여 주자! 아, 이. ${ieung}`,
+            descAfter: '아이! 초코가 반가워해요.',
+            reward: '아이야! 초코가 꼬리를 살랑 흔들어요.'
+          }),
+          snackFoodMission(['ㅎ', 'ㅏ', 'ㅇ', 'ㅣ'], {
+            name: '하이',
+            ask: `초코한테 하이를 해 주자! 하, 이. ${hieut}`,
+            screen: `초코한테 하이를 해 주자! 하, 이. ${hieut}`,
+            descAfter: '하이! 초코가 손을 흔들어요.',
+            reward: '하이! 초코가 손을 흔들며 웃어요.'
+          }),
+          snackFoodMission(['ㅇ', 'ㅗ', 'ㅎ', 'ㅜ'], {
+            name: '오후',
+            ask: `초코한테 오후를 알려 주자! 오, 후. ${ieung}`,
+            screen: `초코한테 오후를 알려 주자! 오, 후. ${ieung}`,
+            descAfter: '오후예요. 초코가 낮잠을 자요.',
+            reward: '오후예요. 초코가 낮잠을 자요.'
+          }),
+          snackFreeMission({
+            name: '고마운 글자',
+            ask: '초코가 간식을 다 먹었어. 아는 글자 하나만 써 줘. 아도 좋고, 이도 좋고, 하도 좋아.',
+            screen: '아는 글자 하나만. 아, 이, 어, 오, 우, 으, 애, 에, 하도 좋아.',
+            descAfter: '초코가 재윤이한테 고마워해요.'
+          })
+        ]
+      });
+    }
+
     const hangulChapters = [
+      snackChapter(),
       storyChapter({
         id: 'han1',
         title: '기차 여행',
@@ -2478,6 +2856,12 @@ ________________
       })
     ];
 
+    function jamoEq(got, need, loose) {
+      if (got === need) return true;
+      if (!loose) return false;
+      return (got === 'ㅐ' || got === 'ㅔ') && (need === 'ㅐ' || need === 'ㅔ');
+    }
+
     function hangulMatch(level, text) {
       const keys = level.jamo || [];
       const normalized = String(text || '').normalize('NFC');
@@ -2485,21 +2869,179 @@ ________________
       for (let i = 0; i <= keys.length; i += 1) {
         if (composeHangul(keys.slice(0, i)) === normalized) found = i;
       }
-      if (found < 0) return { ok: false, text: normalized };
+      if (found >= 0) {
+        return {
+          ok: true,
+          text: normalized,
+          count: found,
+          done: found === keys.length,
+          keys: keys.slice(0, found)
+        };
+      }
+      if (!level.aeLoose) return { ok: false, text: normalized };
+      const typed = decomposeHangulText(normalized);
+      if (typed.length > keys.length) return { ok: false, text: normalized };
+      if (composeHangul(typed) !== normalized) return { ok: false, text: normalized };
+      for (let i = 0; i < typed.length; i += 1) {
+        if (!jamoEq(typed[i], keys[i], true)) return { ok: false, text: normalized };
+      }
       return {
         ok: true,
         text: normalized,
-        count: found,
-        done: found === keys.length,
-        keys: keys.slice(0, found)
+        count: typed.length,
+        done: typed.length === keys.length,
+        keys: typed.slice()
       };
     }
 
-    function hangulStartsCommand(text, command) {
+    function hangulStartsCommand(text, command, loose) {
       const typed = decomposeHangulText(text);
       const need = decomposeHangulText(command);
       if (!need.length || typed.length <= need.length) return false;
-      return need.every((jamo, index) => typed[index] === jamo);
+      return need.every((jamo, index) => jamoEq(typed[index], jamo, loose));
+    }
+
+    function hangulFieldText() {
+      return String(ui.commandInput.value || '').replace(/\u200b/g, '').normalize('NFC').replace(/\s+/g, '');
+    }
+
+    function hangulAccepted(level) {
+      const text = hangulFieldText();
+      if (level.freeSyllable) {
+        const parsed = snackParse(text);
+        return !!(parsed && parsed.done);
+      }
+      const progress = hangulMatch(level, text);
+      return !!(progress.ok && progress.done);
+    }
+
+    function spokenReward(level) {
+      const text = hangulFieldText();
+      if (level.freeSyllable) {
+        const parsed = snackParse(text);
+        if (parsed && parsed.done && parsed.spoken) return `${parsed.spoken}! 고마워 재윤아!`;
+      }
+      if (level.rewardByText && level.rewardByText[text]) return level.rewardByText[text];
+      return level.rewardTTS;
+    }
+
+    function snackSpokenForm(ch) {
+      if (jamoInfo[ch]) return jamoInfo[ch].name;
+      return ch;
+    }
+
+    function snackParse(text) {
+      const normalized = String(text || '').replace(/\u200b/g, '').replace(/\s+/g, '').normalize('NFC');
+      if (!normalized) return { ok: true, count: 0, done: false, keys: [], text: '', partial: false };
+      const chars = [...normalized];
+      if (chars.length !== 1) return { ok: false, text: normalized };
+      const ch = chars[0];
+      const parts = decomposeHangulText(ch);
+      if (parts.length === 1 && SNACK_VOWELS.indexOf(parts[0]) >= 0 && ch === parts[0]) {
+        return {
+          ok: true,
+          count: 1,
+          done: true,
+          keys: parts.slice(),
+          text: normalized,
+          partial: false,
+          named: ch,
+          spoken: snackSpokenForm(ch)
+        };
+      }
+      if (parts.length === 1 && SNACK_CONSONANTS.indexOf(parts[0]) >= 0 && ch === parts[0]) {
+        return { ok: true, count: 1, done: false, keys: parts.slice(), text: normalized, partial: true };
+      }
+      if (
+        parts.length === 2
+        && SNACK_CONSONANTS.indexOf(parts[0]) >= 0
+        && SNACK_VOWELS.indexOf(parts[1]) >= 0
+        && composeHangul(parts) === normalized
+      ) {
+        return {
+          ok: true,
+          count: 2,
+          done: true,
+          keys: parts.slice(),
+          text: normalized,
+          partial: false,
+          named: ch,
+          spoken: ch
+        };
+      }
+      return { ok: false, text: normalized };
+    }
+
+    function snackThat(jamo) {
+      const name = jamoInfo[jamo].name;
+      if (hangulJong(name)) return `어, 그건 ${name}이네!`;
+      return `어, 그건 ${name}네!`;
+    }
+
+    function snackWait(target) {
+      const name = jamoInfo[target].name;
+      return `초코는 ${name}${eulReulParticle(name)} 기다려`;
+    }
+
+    function snackWrongSpeech(wrong, target) {
+      return `${snackThat(wrong)} ${snackWait(target)}. ${hangulKeyHint(target)}`;
+    }
+
+    function snackNonLetter(target) {
+      return `어, 글자가 아니야. ${snackWait(target)}. ${hangulKeyHint(target)}`;
+    }
+
+    function snackMismatch(level, text) {
+      const typed = decomposeHangulText(String(text || '').normalize('NFC'));
+      const keys = level.jamo || [];
+      let index = 0;
+      while (index < typed.length && index < keys.length && jamoEq(typed[index], keys[index], true)) index += 1;
+      const target = keys[index] || keys[keys.length - 1] || keys[0];
+      const wrong = typed[index] || '';
+      return { wrong, target };
+    }
+
+    function speakSnackWrong(wrong, target) {
+      const known = wrong && jamoInfo[wrong] && wrong !== target && (jamoInfo[wrong].taught || wrong === 'ㅐ' || wrong === 'ㅔ');
+      if (known) speakDiscovery(snackWrongSpeech(wrong, target));
+      else speakDiscovery(snackNonLetter(target));
+    }
+
+    function applySnackFree(level, normalized, attempted) {
+      const progress = snackParse(normalized);
+      if (!progress.ok) {
+        const previous = hangulText;
+        setHangulInput(previous);
+        const prev = snackParse(previous);
+        if (prev && prev.done) {
+          speakDiscovery('글자는 하나만! 됐어, 엔터!');
+          return;
+        }
+        const parts = decomposeHangulText(normalized);
+        const allKnown = parts.length > 0 && parts.every((part) => SNACK_JAMO.has(part));
+        if (allKnown) {
+          speakDiscovery('글자는 하나만 써 줘.');
+          return;
+        }
+        const named = parts.find((part) => jamoInfo[part] && !SNACK_JAMO.has(part) && (jamoInfo[part].taught || part === 'ㅐ' || part === 'ㅔ'));
+        const target = prev && prev.partial ? 'ㅏ' : 'ㅇ';
+        const wrong = attempted && !SNACK_JAMO.has(attempted) ? attempted : (named || attempted || '');
+        speakSnackWrong(wrong, target);
+        return;
+      }
+      const prevCount = hangulKeys.length;
+      hangulKeys = progress.keys;
+      if (ui.commandInput.value.normalize('NFC') !== progress.text) setHangulInput(progress.text);
+      else {
+        hangulText = progress.text;
+        letterSoundBaseline = progress.text;
+      }
+      renderHangulArt();
+      if (progress.count > prevCount) {
+        if (progress.done) speak(`${progress.spoken}! 됐어, 엔터!`, { rate: 0.95, timeoutMs: 5000 });
+        else speak(`${jamoInfo[progress.keys[0]].name}! 모음을 붙여 보자.`, { rate: 0.95, timeoutMs: 5000 });
+      }
+      noteActivityForHint();
     }
 
     function hangulTarget(level) {
@@ -2561,13 +3103,22 @@ ________________
         letterSoundBaseline = normalized;
         return;
       }
+      if (level.freeSyllable) {
+        applySnackFree(level, normalized, attempted);
+        return;
+      }
       const progress = hangulMatch(level, normalized);
       if (!progress.ok) {
         const target = hangulTarget(level);
         const previous = hangulText;
         setHangulInput(previous);
-        if (hangulStartsCommand(normalized, level.command)) {
+        if (hangulStartsCommand(normalized, level.command, level.aeLoose)) {
           speak(hangulOnlyCommand(level.command), { rate: 0.95, timeoutMs: 5000 });
+          return;
+        }
+        if (level.snack) {
+          const found = snackMismatch(level, normalized);
+          speakSnackWrong(attempted || found.wrong, found.target || target);
           return;
         }
         const wrong = attempted || guessHangulWrong(previous, normalized);
@@ -2625,24 +3176,50 @@ ________________
       if (event.repeat) return;
       if (!jamo) {
         const level = chapters[currentChapter].levels[currentLevel];
-        speakDiscovery(hangulNonLetter(hangulTarget(level)));
+        if (level && level.snack) speakSnackWrong('', hangulTarget(level));
+        else speakDiscovery(hangulNonLetter(hangulTarget(level)));
         return;
       }
       applyHangulText(composeHangul(hangulKeys.concat([jamo])), jamo);
     }
 
     function hangulHintLine(level) {
+      if (level.freeSyllable) {
+        const parsed = snackParse(hangulText);
+        if (parsed && parsed.done) return '좋아. 이제 엔터!';
+        if (parsed && parsed.partial) return '좋아. 모음을 붙여 보자.';
+        return '아는 글자 하나. 아도 좋아. D 키에 ㅇ이 있어.';
+      }
       if (hangulKeys.length >= level.jamo.length) return '좋아. 이제 엔터!';
       return hangulKeyHint(level.jamo[hangulKeys.length]);
     }
 
     function hangulIntroTTS(level) {
+      if (level.freeSyllable) {
+        const parsed = snackParse(hangulText);
+        if (parsed && parsed.done) return '좋아. 이제 엔터!';
+        if (parsed && parsed.partial) return '좋아. 모음을 붙여 보자. 다 쓰면 엔터.';
+        return level.contextTTS;
+      }
       if (hangulKeys.length >= level.jamo.length) return '좋아. 이제 엔터!';
       if (hangulKeys.length > 0) return hangulMidRepeat(level.jamo, hangulKeys.length);
       return level.contextTTS;
     }
 
     function handleHangulMiss(level) {
+      if (level.freeSyllable) {
+        const parsed = snackParse(hangulText);
+        if (parsed && parsed.done) {
+          speak('됐어, 엔터!', { rate: 0.95, timeoutMs: 4000 });
+          return;
+        }
+        if (parsed && parsed.partial) {
+          speakDiscovery('좋아. 모음을 붙여 보자.');
+          return;
+        }
+        speakDiscovery('아는 글자 하나만 써 줘. 아도 좋고 하도 좋아.');
+        return;
+      }
       if (!hangulKeys.length) {
         speakDiscovery(hangulEmpty(level.jamo[0]));
         return;
@@ -2663,6 +3240,34 @@ ________________
       }).join(' / ');
     }
 
+    function snackFreeLines() {
+      const lines = [];
+      const seen = new Set();
+      const push = (line) => {
+        if (line && !seen.has(line)) {
+          seen.add(line);
+          lines.push(line);
+        }
+      };
+      SNACK_VOWELS.forEach((vowel) => {
+        [vowel, composeHangul(['ㅇ', vowel]), composeHangul(['ㅎ', vowel])].forEach((ch) => {
+          const parsed = snackParse(ch);
+          if (!parsed.done) return;
+          push(`${parsed.spoken}! 고마워 재윤아!`);
+          push(`${parsed.spoken}! 됐어, 엔터!`);
+        });
+      });
+      push('이응! 모음을 붙여 보자.');
+      push('히읗! 모음을 붙여 보자.');
+      push('글자는 하나만! 됐어, 엔터!');
+      push('글자는 하나만 써 줘.');
+      push('아는 글자 하나만 써 줘. 아도 좋고 하도 좋아.');
+      push('좋아. 모음을 붙여 보자.');
+      push('아는 글자 하나. 아도 좋아. D 키에 ㅇ이 있어.');
+      push('좋아. 모음을 붙여 보자. 다 쓰면 엔터.');
+      return lines;
+    }
+
     function hangulLines() {
       const lines = [];
       const add = (value) => {
@@ -2670,17 +3275,22 @@ ________________
       };
       const taught = Object.keys(jamoInfo).filter((jamo) => jamoInfo[jamo].taught);
       const targets = new Set();
+      const snackTargets = new Set();
       hangulChapters.forEach((chapter) => {
         (chapter.levels || []).forEach((level) => {
-          (level.jamo || []).forEach((jamo) => targets.add(jamo));
+          (level.jamo || []).forEach((jamo) => {
+            if (level.snack) snackTargets.add(jamo);
+            else targets.add(jamo);
+          });
           add(hangulOnlyCommand(level.command));
-          if (level.jamo && level.jamo.length > 1) {
+          if (!level.freeSyllable && level.jamo && level.jamo.length > 1) {
             for (let count = 1; count <= level.jamo.length; count += 1) add(hangulStepSpeech(level.jamo, count));
             for (let count = 1; count < level.jamo.length; count += 1) {
               add(hangulPartial(level.jamo[count - 1], level.jamo[count]));
               add(hangulMidRepeat(level.jamo, count));
             }
           }
+          if (level.rewardByText) Object.keys(level.rewardByText).forEach((key) => add(level.rewardByText[key]));
         });
       });
       taught.forEach((jamo) => add(jamoInfo[jamo].name));
@@ -2693,6 +3303,15 @@ ________________
           if (wrong !== target) add(hangulWrongSpeech(wrong, target));
         });
       });
+      const snackWrong = taught.concat(['ㅐ', 'ㅔ'].filter((jamo) => taught.indexOf(jamo) < 0));
+      snackTargets.forEach((target) => {
+        add(hangulKeyHint(target));
+        add(snackNonLetter(target));
+        snackWrong.forEach((wrong) => {
+          if (wrong !== target) add(snackWrongSpeech(wrong, target));
+        });
+      });
+      snackFreeLines().forEach(add);
       return lines;
     }
 
@@ -3797,8 +4416,9 @@ ________________
       ui.sceneDesc.textContent = level.descAfter;
       applyTheme(level.themeColor || null);
       setStatus('OK> MISSION CLEARED. LOADING NEXT LEVEL...', 'ok');
-      startResultAnimation(level);
-      await speak(level.rewardTTS, { rate: 0.9, timeoutMs: 18000 });
+      const playedFrames = typeof level.framesFor === 'function' ? level.framesFor(hangulFieldText()) : null;
+      startResultAnimation(playedFrames && playedFrames.length ? { frames: playedFrames } : level);
+      await speak(spokenReward(level), { rate: 0.9, timeoutMs: 18000 });
       if (token !== playToken) return;
       trackEvent('level_clear', {
         chapter_id: chapter.id,
@@ -4038,7 +4658,7 @@ ________________
       const level = chapter.levels[currentLevel];
       const answer = level.story ? storyAnswer(level) : normalizeCommand(ui.commandInput.value);
       const expected = level.story ? storyAnswer(level, level.command) : normalizeCommand(level.command);
-      const correct = answer === expected;
+      const correct = level.hangul ? hangulAccepted(level) : answer === expected;
       trackEvent('command_submit', {
         chapter_id: chapter.id,
         level_index: currentLevel + 1,
@@ -4179,6 +4799,7 @@ ________________
           return;
         }
         if (event.key === 'Backspace') {
+          event.preventDefault();
           menuTypeBuffer = menuTypeBuffer.slice(0, -1);
           return;
         }
@@ -4187,6 +4808,16 @@ ________________
           return;
         }
         if (event.key.length === 1) {
+          // 메뉴 버튼에 포커스가 있으면 'ch 9'의 스페이스가 버튼을 다시 누른다.
+          if (
+            event.key === ' '
+            && menuTypeBuffer.trim()
+            && event.target
+            && typeof event.target.closest === 'function'
+            && event.target.closest('button')
+          ) {
+            event.preventDefault();
+          }
           menuTypeBuffer += event.key;
           if (menuTypeBuffer.length > 24) menuTypeBuffer = menuTypeBuffer.slice(-24);
         }
